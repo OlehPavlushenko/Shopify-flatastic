@@ -1,0 +1,286 @@
+{% case section.settings.width_limit %}
+      {% when 4 %}
+        {%- assign grid_item_width = 'large--one-quarter' -%}
+      {% when 3 %}
+        {%- assign grid_item_width = 'large--one-third' -%}
+      {% when 2 %}
+        {%- assign grid_item_width = 'large--one-half' -%}
+      {% else %}
+      {%- assign grid_item_width = 'large--one-third medium--one-half' -%}
+{% endcase %}
+{% paginate blog.articles by section.settings.products_limit %}
+	{% unless settings.sidebar_toggle %}
+		<div class="container">
+	{% endunless %}
+
+		{% comment %}<h1 class="page_heading">
+			{{ page_title }}
+			<a class="rss_link" href="{{ shop.url }}{{ blog.url }}.atom"><i class="fa fa-rss" aria-hidden="true"></i></a>
+		</h1>{% endcomment %}
+		<header class="section-header">
+		      <h2 class="section-header__title">
+		        {% if current_tags %}
+		          {{ blog.title | link_to: blog.url }} &mdash; {{ current_tags.first }}
+		        {% else %}
+		          {{ blog.title }}
+		        {% endif %}
+		       {% comment %} <a href="{{ shop.url }}{{ blog.url }}.atom" class="icon-fallback-text rss-link">
+		          <span class="icon icon-rss" aria-hidden="true"></span>
+		          <span class="fallback-text">RSS</span>
+		        </a>{% endcomment %}
+		      </h2>
+	    </header>
+
+		<div class="article grid blog-listing-{{ section.settings.layout }}">
+			<div class="row">
+				{% for article in blog.articles %}
+					<div class="grid__item grid-product {{ grid_item_width }}">
+						<article class="article_item flexible_block">
+							{% if article.image %}
+								{% case section.settings.layout %}
+									{% when 'grid' %}
+										{% case section.settings.img_size %}
+											{% when 'small' %}
+												{%- assign article_img = article.image | img_url: '570x350', crop: section.settings.img_alignment -%}
+											{% when 'medium' %}
+												{%- assign article_img = article.image | img_url: '570x570', crop: section.settings.img_alignment -%}
+											{% when 'large' %}
+												{%- assign article_img = article.image | img_url: '570x670', crop: section.settings.img_alignment -%}
+											
+										{% endcase %}
+
+									{% when 'list' %}
+											{% case section.settings.img_size %}
+												{% when 'small' %}
+													{%- assign article_img = article.image | img_url: '390x310', crop: section.settings.img_alignment -%}
+												{% when 'medium' %}
+													{%- assign article_img = article.image | img_url: '390x390', crop: section.settings.img_alignment -%}
+												{% when 'large' %}
+													{%- assign article_img = article.image | img_url: '390x460', crop: section.settings.img_alignment -%}
+											{% endcase %}
+									
+								{% endcase %}
+
+							<div class="blok-images">
+								<a href="{{ article.url }}">
+									
+									{% if section.settings.layout == 'list' %}
+									<span>
+									{% endif %}
+										<img src="{{ article_img }}" alt="{{ article_img.alt }}">
+									{% if section.settings.layout == 'list' %}
+									</span>
+									{% endif %}
+								</a>
+							</div>
+							{% endif %}
+
+							<div class="block-info">
+								<div>
+									<h3 class="article_title">
+										<a href="{{ article.url }}">{{ article.title | truncatewords: section.settings.worts_limit_prod }}</a>
+									</h3>
+										<p class="article_info">
+										<span>
+											<time class="article_time" datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M' }}"><i class="fa fa-calendar" aria-hidden="true"></i> {{ article.published_at | date: '%B %d, %Y' }}</time>
+										</span>
+
+										{% if blog.comments_enabled? %}
+											<span class="article_comments"><i class="fa fa-comments" aria-hidden="true"></i>{{ article.comments_count }} {{ 'blogs.article.comments' | t }}</span>
+										{% endif %}
+										
+									</p>
+									<div class="rte article_content">
+										{% if article.excerpt.size > 0 %}
+											{{ article.excerpt }}
+										{% else %}
+											{{ article.content | strip_html | truncate: section.settings.worts_limit_desc }}
+										{% endif %}
+									</div>
+
+									{% if article.tags.size > 0 %}
+							            <ul class="tags tags--article inline-list">
+							              {% include 'tags-article' %}
+							            </ul>
+						          	{% endif %}
+									<a class="btn article_btn" href="{{ article.url }}">{{ 'blogs.article.read_more' | t }}</a>
+								</div>
+							</div>
+					      <div class="clearfix"></div>
+
+						</article>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+
+		<div id="pagination" class="pagination blog_pagination">
+			{{ paginate | default_pagination }}
+		</div>
+		
+	{% unless settings.sidebar_toggle %}
+		</div>
+	{% endunless %}
+{% endpaginate %}
+
+{% schema %}
+{
+	"name": "Blog page",
+	"class": "section_template section_template__blog",
+	"settings": [
+		{
+			"type": "select",
+			"id": "layout",
+			"label": "Layout",
+			"default": "list",
+			"options": [
+				{
+					"value": "grid",
+					"label": "Grid"
+				},
+				{
+					"value": "list",
+					"label": "List"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "img_size",
+			"label": "Images size",
+			"options": [
+				{
+					"value": "small",
+					"label": "Small"
+				},
+				{
+					"value": "medium",
+					"label": "Medium"
+				},
+				{
+					"value": "large",
+					"label": "Large"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "img_alignment",
+			"label": "Images alignment",
+			"options": [
+				{
+					"value": "top",
+					"label": "Top"
+				},
+				{
+					"value": "center",
+					"label": "Middle"
+				},
+				{
+					"value": "bottom",
+					"label": "Bottom"
+				}
+			]
+		},
+		    {
+      "id": "products_limit",
+      "type": "select",
+      "label": "Show products in Row",
+      "options": [
+        {
+          "value": "2",
+          "label": "2"
+        },
+        {
+          "value": "3",
+          "label": "3"
+        },
+        {
+          "value": "4",
+          "label": "4"
+        },
+        {
+          "value": "6",
+          "label": "6"
+        },
+        {
+          "value": "8",
+          "label": "8"
+        },
+        {
+          "value": "9",
+          "label": "9"
+        },
+        {
+          "value": "12",
+          "label": "12"
+        },
+         {
+          "value": "15",
+          "label": "15"
+        },
+        {
+          "value": "16",
+          "label": "16"
+        },
+        {
+          "value": "24",
+          "label": "24"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "width_limit",
+      "label": {
+        "de": "Anzahl der Produkte in einer Reihe",
+        "en": "Number of products in a row",
+        "es": "Número de productos en una fila",
+        "fr": "Nombre de produits dans une rangée",
+        "it": "Numero di prodotti in fila",
+        "ja": "1行の商品数",
+        "pt-BR": "Número de produtos em uma fileira"
+      },
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "worts_limit_prod",
+      "label": {
+        "de": "Count of words in Title",
+        "en": "Count of words in Title",
+        "es": "Count of words in Title",
+        "fr": "Count of words in Title",
+        "it": "Count of words in Title",
+        "ja": "Count of words in Title",
+        "pt-BR": "Count of words in Title"
+      },
+      "min": 3,
+      "max": 100,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "worts_limit_desc",
+      "label": {
+        "de": "Count of words in Description",
+        "en": "Count of words in Description",
+        "es": "Count of words in Description",
+        "fr": "Count of words in Description",
+        "it": "Count of words in Description",
+        "ja": "Count of words in Description",
+        "pt-BR": "Count of words in Description"
+      },
+      "min": 30,
+      "max": 140,
+      "step": 5,
+      "default": 30
+    }
+	]
+}
+{% endschema %}
+

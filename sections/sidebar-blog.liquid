@@ -1,0 +1,422 @@
+<div class="sidebar">
+	{% for block in section.blocks %} 
+		{% case block.type %}
+			{% when 'blog_search' %}
+				<div class="sidebar_widget sidebar_blog sidebar_widget__search">
+					<form action="/search" method="get">
+						<input type="hidden" name="type" value="article" />
+						<input id="blog-search-field" name="q" type="text" placeholder="{{ block.settings.placeholder }}" class="hint" />
+						<button id="blog-search-submit" type="submit"><i class="fa fa-search"></i></button>
+					</form>
+				</div>
+
+			{% when 'link-list' %}
+				<div class="sidebar_widget sidebar_blog sidebar_widget__link-list">
+					<h3 class="widget_header">{{ block.settings.block_title | escape }}<i class="side_trigger" data-subside="side_{{ block.id }}"></i></h3>
+					{%- assign links = block.settings.links -%}
+
+					<div class="widget_content" id="side_{{ block.id }}">
+						{% if links.size > 0 %}
+							<ul class="sidebar_menu list_links">
+								{% for link in linklists[links].links %}
+									<li class="sidebar_menu_item">
+										<a class="sidebar_menu_links" href="{{ link.url }}">{{ link.title }}</a>
+									</li>
+								{% endfor %}
+							</ul>
+						{% endif %}
+					</div>
+				</div>
+
+			{% when 'resent_articles' %}
+				<div class="sidebar_widget sidebar_blog sidebar_widget__articles">
+					<h3 class="widget_header">{{ block.settings.title | escape }}<i class="side_trigger" data-subside="side_{{ block.id }}"></i></h3>
+
+					<div class="widget_content" id="side_{{ block.id }}">
+						<ul class="list_articles">
+							{% for article in blog.articles limit:3 %}
+								<li class="product">
+								<div class="product_img">  
+									<a href="{{ article.url }}">
+										<img src="{{ article.image | img_url: '150x150', crop:'center' }}" alt="{{ article.alt }}" />
+									</a>
+								</div>
+
+								<div class="product_info">
+									<p class="article_author">{{ article.author }}</p>
+									<div class="product_name">
+										<a href="{{ article.url }}">{{ article.title | truncate: 35 }}</a>
+									</div>
+									<div class="product_links">
+										<a class="btn--line" href="{{ article.url }}">{{ 'blogs.article.read_more' | t }}</a>
+									</div>
+								</div>
+							</li>
+								
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+
+			{% when 'blog_tags' %}
+				<div class="sidebar_widget sidebar_blog sidebar_widget__tags">
+					<h3 class="widget_header">{{ block.settings.title | escape }}<i class="side_trigger" data-subside="side_{{ block.id }}"></i></h3>
+
+					<div class="widget_content" id="side_{{ block.id }}">
+						{% if blog.all_tags.size == 0 %}
+							<p class="alert alert-warning">{{ 'blog.articles.no_tags' | t }}</p>
+						{% else %}
+							<div class="blog_tags">
+								{% for tag in blog.all_tags %}
+									<a{% if current_tags contains tag %} class="tag_active"{% endif %} href="{{ blog.url }}/tagged/{{ tag | handle }}">{{ tag }}</a>
+								{% endfor %}
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			{% when 'widget_banner' %}
+			{% case block.settings.banner_height %}
+				{% when 'small'  %}{%- assign img_size = '370x251' -%}
+				{% when 'medium' %}{%- assign img_size = '370x370' -%}
+				{% when 'large'  %}{%- assign img_size = '370x460' -%}
+			{% endcase %}
+			
+			<div class="sidebar_widget sidebar_widget__banner">
+					{% if block.settings.image.size > 0 %}
+					<div class="sidebar-list-wrap">
+			      	<img class="sidebar-list-image" src="{{ block.settings.image | img_url: img_size , crop: 'center' }}" alt="{{ block.settings.title | escape }}">
+			     	</div>
+					{% else %}
+						<div class="sidebar-list-wrap">
+							{{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+						</div>
+					{% endif %}
+
+					<div class="sidebar_banner_caption">
+						{% if block.settings.link.size > 0 %}
+							<a href="{{ block.settings.link }}">
+						{% endif %}
+
+							{% if block.settings.title.size > 0 %}
+								{{ block.settings.title | escape }}
+							{% endif %}
+
+						{% if block.settings.link.size > 0 %}
+							</a>
+						{% endif %}
+					</div>
+				</div>	
+
+			{% when 'blog_comments' %}
+				{% if blog.comments_enabled? %}
+					<div class="sidebar_widget sidebar_blog sidebar_widget__comments">
+						<h3 class="widget_header">{{ block.settings.title | escape }}<i class="side_trigger" data-subside="side_{{ block.id }}"></i></h3>
+
+						<div class="widget_content" id="side_{{ block.id }}">
+							<ul class="list_comments">
+								{% if blog.comments_count == 0 %}
+									<li>
+										<p class="alert alert-warning">{{ 'blog.articles.no_comments' | t }}</p>
+									</li>
+								{% else %}
+									{% for comment in blog.comments limit:3 %}
+										<li>
+											<a href="{{ comment.url }}">
+												<i class="fa fa-comments" aria-hidden="true"></i>
+												<span class="item_content">{{ comment.content | strip_html | truncate:50 }}</span>
+												<span class="clearfix"></span>
+												
+											</a>
+											<span class="item_info">
+												<span class="item_author"><i class="fa fa-user-o" aria-hidden="true"></i>{{ comment.author }}</span>
+												<time datetime="{{ comment.created_at | date: '%Y-%m-%d' }}">
+													<span class="item_date"><i class="fa fa-calendar" aria-hidden="true"></i>{{ comment.created_at | date: '%d %B %Y' }}</span>
+													<span class="item_time"><i class="fa fa-clock-o" aria-hidden="true"></i>{{ comment.created_at | date: '%I:%M %p' }}</span>
+												</time>
+											</span>
+										</li>
+									{% endfor %}
+								{% endif %}
+							</ul>
+						</div>
+					</div>
+
+				{% else %}
+					<p class="alert alert-warning">Turn on comments in the store settings!</p>
+				{% endif %}
+
+			{% when 'newsletter' %}
+				<div class="sidebar_widget sidebar_blog sidebar_widget__newsletter">
+					<h3 class="widget_header">{{ block.settings.block_title | escape }}<i class="side_trigger" data-subside="side_{{ block.id }}"></i></h3>
+					<div class="widget_content" id="side_{{ block.id }}">	
+					{% case settings.newsletter_form_type %}
+						{% when 'newsletter_shopify' %}
+							{% capture newsletterForm %}
+								{% form 'customer', class: 'sidebar_newsletter_form' %}
+									{{ form.errors | default_errors }}
+
+									<p class="alert alert-success">{{ 'layout.footer.newsletter_success' | t }}</p>
+								
+									<input type="hidden" name="contact[tags]" value="Newsletter subscriber">
+									<div class="form_wrapper">
+										<input type="email" name="contact[email]" class="input-group__field newsletter__input" placeholder="Enter your email">
+										<button class="btn" type="submit">{{ 'layout.footer.subscribe_button' | t }}</button>
+									</div>
+									
+								{% endform %}
+							{% endcapture %}
+
+							{% assign newsletterForm = newsletterForm | replace: "'", "&lsquo;" | replace: 'id="contact_form"', 'id="newsletter_form"' | strip_newlines %}
+
+						{% when 'newsletter_mailchimp' %}
+							{% capture newsletterForm %}
+								
+								<div class="newsletter_form__mailchimp">
+									<form action="{{ settings.newsletter_mailchimp_url }}" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="sidebar_newsletter_form">
+										<input required type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Enter your email">
+										<button class="btn" type="submit" name="subscribe" id="mc-embedded-subscribe">{{ 'layout.footer.subscribe_button' | t }}</button>
+									</form>
+								</div>
+							{% endcapture %}
+					{% endcase %}
+					
+					{{ newsletterForm }}
+					</div>					
+				</div>
+
+		{% endcase %}
+	{% endfor %}
+</div>
+
+
+
+{% schema %}
+{
+	"name": "Sidebar",
+	"class": "page_sidebar",
+	"max_blocks": 7,
+	"settings": [
+		{
+			"type": "header",
+			"content": "Sidebar widgets"
+		}
+	],
+	"blocks": [
+		// BLOG SEARCH //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "blog_search",
+			"name": "Blog search",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "text",
+					"id": "placeholder",
+					"label": "Widget placeholder",
+					"default": "Search blog"
+				}
+			]
+		},
+		
+		// LINK LISTS ///////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "link-list",
+			"name": "Link lists",
+			"settings": [
+				{
+					"type": "text",
+					"id": "block_title",
+					"label": "Widget title",
+					"default": "Link lists"
+				},
+				{
+					"type": "link_list",
+					"id": "links",
+					"label": "Choose linklist"
+				}
+			]
+		},
+
+		// NEWSLETTER //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "newsletter",
+			"name": "Newsletter",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "text",
+					"id": "block_title",
+					"label": "Widget title",
+					"default": "Newsletter"
+				}
+			]
+		},
+
+		// RECENT ARTICLES ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "resent_articles",
+			"name": "Resent articles",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Widget title",
+					"default": "Resent articles"
+				}
+			]
+		},
+
+		// TAGS //////////////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "blog_tags",
+			"name": "Blog tags",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Widget title",
+					"default": "Blog tags"
+				}
+			]
+		},
+
+		// BANNER ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "widget_banner",
+			"name": "Banner",
+			"settings": [
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "Image"
+				},
+				{
+					"type": "select",
+					"id": "banner_height",
+					"label": "Banner height",
+					"default": "medium",
+					"options": [
+						{
+							"label": "Small (270x151)",
+							"value": "small"
+						},
+						{
+							"label": "Medium (270x270)",
+							"value": "medium"
+						},
+						{
+							"label": "Large (270x360)",
+							"value": "large"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Heading",
+					"default": "Title"
+				},
+				{
+					"type": "url",
+					"id": "link",
+					"label": "Link"
+				}
+
+			]
+		},	
+
+		// COMMENTS ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "blog_comments",
+			"name": "Blog comments",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Widget title",
+					"default": "Blog comments"
+				}
+			]
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(document).ready(function($) { 
+
+	// NEWSLETTER FORM
+	$('.sidebar_newsletter_form').each(function (){      
+		$(this).on('submit', function(e){
+			var formCookie = $(this).attr('class');
+			$.cookie('footerformSended', formCookie);
+		});
+	});
+	
+	if( document.location.href.indexOf('?customer_posted=true') > 0 && $.cookie('footerformSended') == 'sidebar_newsletter_form') {
+		$('.sidebar_newsletter_form .form_wrapper').hide();
+		$('.sidebar_newsletter_form .form_text').hide();
+		$('.sidebar_newsletter_form .alert-success').show();
+	}
+
+	$('.sidebar_newsletter_form').formValidation();
+
+
+});
+(function($) {
+	// LINKLIST ITEM SHOW/HIDE ELEMENT
+	$(window).on('load', function() {
+		$('.sidebar_widget__linklist .menu_trigger').each(function(i) {
+			var targetMenu = '#' + $(this).data('submenu');
+
+			$(this).on('click', function(e){
+				if ($(this).hasClass('active')){
+					$(targetMenu).hide(300);
+					$(this).removeClass('active');
+				} else {
+					$(targetMenu).show(300);
+					$(this).addClass('active');
+				};
+			});
+		});
+	
+	});
+// trigger sidebar
+   var sideFlag = 0;
+   sideToggle = function() {
+    if ( $(window).width() > 767 ) {
+      $('.sidebar_small .side_trigger').removeClass('active');
+      sideFlag = 0;
+    }
+    else {
+      if ( sideFlag == 0 ) {
+       sideMobile();
+        sideFlag = 1;
+      };
+    };
+  };
+  sideMobile = function() {
+    $('.sidebar_small .side_trigger').on('click', function() {
+
+      var targetSide = '#' + $(this).data('subside');
+
+      $(targetSide).slideToggle(300);
+
+      $(this).toggleClass('active');
+
+      return false;
+    });
+
+  };
+  $(window).on('load resize', function() {
+    sideToggle();
+  });
+
+  $(document).ready(function() {
+    sideToggle();
+  });
+
+})(jQuery); 
+{% endjavascript %}

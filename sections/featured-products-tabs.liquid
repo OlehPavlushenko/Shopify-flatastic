@@ -1,0 +1,272 @@
+
+{% capture img_alignment %}{{ section.settings.img_alignment }}{% endcapture %} 
+<div class="column-box" id="{{ section.id }}" style="{% if section.settings.background_toggle %}background-color: {{ section.settings.bg_color }};{% endif %} padding-top: {{ section.settings.padding_box }}px;padding-bottom: {{ section.settings.padding_box_bot }}px;">
+<div class="wrapper">
+	{% if section.settings.section_title.size > 0 %}
+		<div class="section-header">
+			<h2 class="section-header__title">{{ section.settings.section_title | escape }}</h2>
+		</div>
+	{% endif %}
+
+		<div class="mod_vm2products  new-tabs tabs">
+			<div class="responsive-tabs">
+				{% for block in section.blocks %}
+					{%- assign collection = collections[block.settings.collection_item] -%}
+					{% if block.settings.title.size > 0 %}
+						<h3 class="module-title">{{ block.settings.title }} </h3>
+					{% else %}
+						<h3 class="module-title">{{ collections[block.settings.collection_item].title | truncate: 30 }} </h3>
+					{% endif %}
+					<div class="prod-box">
+
+					<div id="CollectionSection{{ block.id }}" class="CollectionSection grids" data-section-id="{{block.id }}" data-section-type="collection-template" data-grid-type="{{ block.settings.collection_products_grid }}">
+					    <div class="grid-uniform">
+
+					      {% if block.settings.collection_item == blank or collections[block.settings.collection_item] == empty or collections[block.settings.collection_item].products_count == 0 %}
+
+					      {% comment %}
+					        For onboarding new users to your theme, we add some default products and onboarding tutorials to help populate their store
+					      {% endcomment %}
+					      {% unless emptyState %}
+					        {% assign emptyState = true %}
+					      {% endunless %}
+					        {% include 'onboarding-featured-products' %}
+					      {% else %}
+					          {% assign grid_item_width = 'medium--one-half large--one-third' %}
+					          {% for product in collections[block.settings.collection_item].products limit: block.settings.products_limit %}
+					            {% include 'product-grid-itemtabs' %}
+					          {% endfor %}
+
+					      {% endif %}
+					    </div>
+					</div>
+	
+						
+						<div class="clearfix"></div>
+					</div>
+				{% endfor %}
+			</div> 
+		</div> 
+	
+</div>
+</div>
+
+{% schema %}
+{
+	"name": "Products tabs",
+	"class": "section section_homepage featured-tabs",
+	"max_blocks": 6,
+	"settings": [
+		{
+			"id": "section_title",
+			"type": "text",
+			"label": "Heading",
+			"default": "Products tabs"
+		},
+		{
+	      "type": "checkbox",
+	      "id": "background_toggle",
+	      "label": "Show background color",
+	      "default": true
+	    },
+	    {
+	      "type": "color",
+	      "id": "bg_color",
+	      "label": "Background color",
+	      "default": "#fafbfb"
+	    },
+	    {
+	      "type": "range",
+	      "id": "padding_box",
+	      "min": 0,
+	      "max": 100,
+	      "step": 1,
+	      "label": "Padding Top",
+	      "default": 30
+	    },
+	    {
+	      "type": "range",
+	      "id": "padding_box_bot",
+	      "min": 0,
+	      "max": 100,
+	      "step": 1,
+	      "label": "Padding Bottom",
+	      "default": 0
+	    }
+	],
+	"blocks": [
+
+		// COLLECTION //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "collection",
+			"name": "Collection",
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Column heading"
+				},
+				{
+					"label": "Collection",
+					"id": "collection_item",
+					"type": "collection"
+				},
+				{
+			      "type": "select",
+			      "id": "img_prod_size",
+			      "label": "Image size",
+			      "options": [
+			        {
+			          "value": "small",
+			          "label": "Small"
+			        },
+			        {
+			          "value": "medium",
+			          "label": "Medium"
+			        },
+			        {
+			          "value": "large",
+			          "label": "Large"
+			        }
+			      ]
+			    },
+			    {
+			      "type": "select",
+			      "id": "img_alignment",
+			      "label": "Image alignment",
+			      "options": [
+			        {
+			          "value": "top",
+			          "label": "Top"
+			        },
+			        {
+			          "value": "center",
+			          "label": "Middle"
+			        },
+			        {
+			          "value": "bottom",
+			          "label": "Bottom"
+			        }
+			      ]
+			    },
+			    {
+			      "id": "products_limit",
+			      "type": "select",
+			      "label": "Show products if collage that (4,8,12,16)",
+			      "options": [
+			        {
+			          "value": "2",
+			          "label": "2"
+			        },
+			        {
+			          "value": "3",
+			          "label": "3"
+			        },
+			        {
+			          "value": "4",
+			          "label": "4"
+			        },
+			        {
+			          "value": "6",
+			          "label": "6"
+			        },
+			        {
+			          "value": "8",
+			          "label": "8"
+			        },
+			        {
+			          "value": "9",
+			          "label": "9"
+			        },
+			        {
+			          "value": "12",
+			          "label": "12"
+			        },
+			        {
+			          "value": "16",
+			          "label": "16"
+			        }
+			      ]
+			    },
+			    {
+			      "type": "range",
+			      "id": "width_limit",
+			      "label": {
+			        "de": "Anzahl der Produkte in einer Reihe",
+			        "en": "Number of products in a row",
+			        "es": "Número de productos en una fila",
+			        "fr": "Nombre de produits dans une rangée",
+			        "it": "Numero di prodotti in fila",
+			        "ja": "1行の商品数",
+			        "pt-BR": "Número de produtos em uma fileira"
+			      },
+			      "min": 2,
+			      "max": 4,
+			      "step": 1,
+			      "default": 3
+			    },
+			    {
+			      "type": "range",
+			      "id": "worts_limit_prod",
+			      "label": {
+			        "de": "Count of words in Title",
+			        "en": "Count of words in Title",
+			        "es": "Count of words in Title",
+			        "fr": "Count of words in Title",
+			        "it": "Count of words in Title",
+			        "ja": "Count of words in Title",
+			        "pt-BR": "Count of words in Title"
+			      },
+			      "min": 3,
+			      "max": 100,
+			      "step": 1,
+			      "default": 30
+			    },
+			    {
+			      "type": "checkbox",
+			      "id": "show_animation_img",
+			      "label": {
+			        "de": "Animation Images",
+			        "en": "Animation Images",
+			        "es": "Animation Images",
+			        "fr": "Animation Images",
+			        "it": "Animation Images",
+			        "ja": "Animation Images",
+			        "pt-BR": "Animation Images"
+			      },
+			      "default": true
+			    },
+			    {
+			      "type": "checkbox",
+			      "id": "show_vendor",
+			      "label": {
+			        "de": "Anbieter anzeigen",
+			        "en": "Show vendor",
+			        "es": "Mostrar proveedor",
+			        "fr": "Afficher le distributeur",
+			        "it": "Mostra fornitore",
+			        "ja": "販売元を表示する",
+			        "pt-BR": "Exibir fornecedor"
+			      },
+			      "default": false
+			    }
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Products tabs",
+			"category": "Products"
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(window).load(function() {
+	RESPONSIVEUI.responsiveTabs();
+});
+jQuery(document).on('shopify:section:load', '.featured-tabs', function() {
+    RESPONSIVEUI.responsiveTabs();
+}); 
+{% endjavascript %}

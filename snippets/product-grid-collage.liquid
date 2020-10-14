@@ -1,0 +1,179 @@
+{% comment %}
+  This snippet controls the collage product grid.  Depending on the number of products in
+  a collection we want to display them in rows of 1, 2, 3, or a reversed row of 3.
+
+  A '3 row' has the large product left align with two smaller product on the right.
+
+  The 'reversed 3 row' has the large product right aligned with two smaller products on
+  the left.
+
+  If we're near the end of the loop and there are not enough products to make
+  complete rows of 3, we switch to a 2 item row.
+
+  Depending on where we are in the group of four products and if it's reversed,
+  we want to set the grid_item_width for each item in the collection.
+
+  The collage grid is only used for the desktop breakpoint.
+
+  For example:
+  1  = 1
+  2  = 2
+  3  = 3
+  4  = 4
+  5  = 4 + 1
+  6  = 4 + 2
+  7  = 4 + 3
+  8  = 4 + reverse 4 
+  9  = 4 + reverse 4 + 1
+  10 = 4 + reverse 4 + 2
+  11 = 4 + reverse 4 + 3
+  etc.
+
+  Change the grid item width by using classes from the grid in
+  the grid_item_width variable.
+
+  Example:
+    - {% assign grid_item_width = 'large--one-third medium--one-half' %}
+{% endcomment %}
+
+{% assign collection_index__product = forloop.index %}
+{% assign remaining_length__product = section.settings.products_limit | minus: collection_index__product %}
+
+{% comment %}
+  If there are more than four items left we want to put them in a 3
+  or reverse 4 row
+
+  4 row = 1 large product on the left, 3 small on the right
+  reverse 4 row = 3 small products on the left, 1 large on the right
+{% endcomment %}
+{% if remaining_length__product > 4 %}
+  {% assign is_four_row__product = true %}
+{% endif %}
+
+{% comment %}
+  Put remaining items in a 2 row if necessary.
+{% endcomment %}
+
+{% if remaining_length__product < 5 and four_row_index__product > 3 %}
+  {% assign is_four_row__product = false %}
+{% endif %}
+
+{% comment %}
+  If the total number of products is divisible by 4, we will just use
+  4 and reversed 4 item rows
+{% endcomment %}
+{% if divisible_by_four__product == 0 %}
+  {% assign is_four_row__product = true %}
+{% endif %}
+
+{% comment %}
+  If we set is_four_row__product to true based on the conditionals above.
+{% endcomment %}
+
+{% if is_four_row__product == true %}
+
+  {% if four_row_index__product > 3 %}
+    {% if is_reverse_row__product %}
+      {% assign is_reverse_row__product = false %}
+    {% else %}
+      {% assign is_reverse_row__product = true %}
+    {% endif %}
+    {% assign four_row_index__product = 0 %}
+  {% endif %}
+
+  {% comment %}
+    Assign grid classes for 4 rows and reverse 4 rows
+  {% endcomment %}
+  {% case four_row_index__product %}
+    {% when 0 %}
+      {% if is_reverse_row__product %}
+        {% assign grid_item_width = 'grid__item--small one-whole reverse' %}
+      {% else %}
+        {% assign grid_item_width = 'grid__item--large one-whole big-box-left' %}
+      {% endif %}
+    {% when 1 %}
+      {% if is_reverse_row__product %}
+        {% assign grid_item_width = 'grid__item--small one-whole reverse' %}
+      {% else %}
+        {% assign grid_item_width = 'grid__item--small one-whole small-box' %}
+      {% endif %}
+    {% when 2 %}
+      {% if is_reverse_row__product %}
+        {% assign grid_item_width = 'grid__item--small  one-whole reverse clearfix' %}
+      {% else %}
+        {% assign grid_item_width = 'grid__item--small one-whole small-box' %}
+      {% endif %}
+    {% when 3 %}
+      {% if is_reverse_row__product %}
+        {% assign grid_item_width = 'grid__item--large  one-whole big-box-right reverse clearfix' %}
+      {% else %}
+        {% assign grid_item_width = 'grid__item--small one-whole small-box' %}
+      {% endif %}
+  {% endcase %}
+
+  {% if four_row_index__product == 0 %}
+    <div class="grid__item collage-grid__row">
+      <div class="grid">
+  {% endif %}
+
+  {% comment %}
+    Wrap one-third items in reversed groups, so they can be floated properly without changing the order of products in the grid.
+  {% endcomment %}
+
+
+  {% if is_reverse_row__product and four_row_index__product == 0 %}
+    <div class="grid__item collage-grid__reverse--wrapper one-whole small-box">
+      <div class="grid">
+  {% endif %}
+
+  {% comment %}Product Grid Item{% endcomment %}
+  {% include 'product-grid-item-collage' %}
+
+  {% comment %}
+    Close out wrapper div for one-third reverse items
+  {% endcomment %}
+  {% if is_reverse_row__product and four_row_index__product == 2 %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if four_row_index__product == 3 %}
+        </div>
+      </div>
+    <div class="grid__row-separator"></div>
+  {% endif %}
+
+  {% comment %}
+    Increment the group of four counter
+  {% endcomment %}
+  {% if four_row_index__product <= 4 %}
+    {% assign four_row_index__product = four_row_index__product | plus: 1 %}
+  {% endif %}
+
+  {% continue %}
+{% endif %}
+{% if collection_product_count__product == 1 %}
+  {% comment %} Set full width when there is 1 product in a collection by making
+  `grid_item_width` an empty string {% endcomment %}
+  {% assign grids_item_width = 'eins-box' %}
+  {% include 'product-grid-item' %}
+  {% break %}
+{% elsif collection_product_count__product == '6' %}
+  {% assign grids_item_width = 'zweite-box' %}
+  {% include 'product-grid-item' %}
+  {% break %}
+{% else %}
+  {% comment %} Set item with to half if it isn't in a 3 row. {% endcomment %}
+  {% assign grids_item_width = 'one-whole medium--one-half large--one-half' %}
+  {% include 'product-grid-item' %}
+
+  {% comment %}add grid row separator between the last two rows{% endcomment %}
+  {% if remaining_length__product == 3 %}
+    <div class="grid__row-separator"></div>
+  {% endif %}
+
+  {% comment %} We still need to increment the three_row_index_product {% endcomment %}
+  {% if four_row_index__product <= 2 %}
+    {% assign four_row_index__product = four_row_index__product | plus: 1 %}
+  {% endif %}
+{% endif %}

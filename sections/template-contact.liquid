@@ -1,0 +1,141 @@
+<div class="grid">
+  <div class="grid__item large--one-third">
+    <div class="contact_item item_address">
+      <h3 class="item_title">{{ section.settings.item_1_title }}</h3>
+
+      <div class="contact_address contact_element">
+        <i class="fa fa-home"></i>
+        <h4>{{ section.settings.address_title }}</h4>
+        <p>{{ section.settings.address_text }}</p>
+      </div>
+
+      <div class="contact_phone contact_element">
+        <i class="fa fa-phone"></i>
+        <h4>{{ section.settings.phone_title }}</h4>
+        <a href="tel:{{ section.settings.phone_text | replace: ' ','' }}">{{ section.settings.phone_text }}</a>
+      </div>
+
+      <div class="contact_hours contact_element">
+        <i class="fa fa-calendar"></i>
+        <h4>{{ section.settings.hours_title }}</h4>
+        <p>{{ section.settings.hours_text }}</p>
+      </div>
+
+      <div class="contact_email contact_element">
+        <i class="fa fa-envelope"></i>
+        <h4>{{ section.settings.email_title }}</h4>
+        <a href="mailto:{{ section.settings.email_text }}">{{ section.settings.email_text }}</a><p></p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="grid__item large--two-thirds">
+    <div class="contact_item item_form">
+      <h3 class="item_title">{{ section.settings.item_2_title }}</h3>
+
+      <div class="form-vertical">
+          {% form 'contact' %}
+
+            {% comment %}
+              Successful message
+            {% endcomment %}
+            {% if form.posted_successfully? %}
+              <p class="note form-success">
+                {{ 'contact.form.post_success' | t }}
+              </p>
+            {% endif %}
+
+            {{ form.errors | default_errors }}
+
+            <div class="grid">
+              <div class="grid__item large--one-half">
+                <label for="ContactFormName" class="hidden-label">{{ 'contact.form.name' | t }}</label>
+                <input type="text" id="ContactFormName" class="input-full" name="contact[name]" placeholder="{{ 'contact.form.name' | t }}" autocapitalize="words" value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}">
+              </div>
+
+              <div class="grid__item large--one-half">
+                <label for="ContactFormEmail" class="hidden-label">{{ 'contact.form.email' | t }}</label>
+                <input type="email" id="ContactFormEmail" class="input-full" name="contact[email]" placeholder="{{ 'contact.form.email' | t }}" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}">
+              </div>
+            </div>
+
+            <label for="ContactFormPhone" class="hidden-label">{{ 'contact.form.phone' | t }}</label>
+            <input type="tel" id="ContactFormPhone" class="input-full" name="contact[phone]" placeholder="{{ 'contact.form.phone' | t }}" pattern="[0-9\-]*" value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}">
+
+            <label for="ContactFormMessage" class="hidden-label">{{ 'contact.form.message' | t }}</label>
+            <textarea rows="10" id="ContactFormMessage" class="input-full" name="contact[body]" placeholder="{{ 'contact.form.message' | t }}">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+
+            <input type="submit" class="btn" value="{{ 'contact.form.send' | t }}">
+
+          {% endform %}
+        </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Contact",
+  "class": "section section_template__contact",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contact info"
+    },
+    {
+      "type": "text",
+      "id": "item_1_title",
+      "label": "Contact block title"
+    },
+    {
+      "type": "text",
+      "id": "address_title",
+      "label": "Address title"
+    },
+    {
+      "type": "text",
+      "id": "address_text",
+      "label": "Address text"
+    },
+    {
+      "type": "text",
+      "id": "phone_title",
+      "label": "Phone title"
+    },
+    {
+      "type": "text",
+      "id": "phone_text",
+      "label": "Phone text"
+    },
+    {
+      "type": "text",
+      "id": "hours_title",
+      "label": "Hours title"
+    },
+    {
+      "type": "text",
+      "id": "hours_text",
+      "label": "Hours text"
+    },
+    {
+      "type": "text",
+      "id": "email_title",
+      "label": "Email title"
+    },
+    {
+      "type": "text",
+      "id": "email_text",
+      "label": "Email text"
+    },
+    {
+      "type": "header",
+      "content": "Contact form"
+    },
+    {
+      "type": "text",
+      "id": "item_2_title",
+      "label": "Contact form title"
+    }
+  ]
+}
+{% endschema %}

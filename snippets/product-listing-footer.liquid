@@ -1,0 +1,54 @@
+
+{% assign on_sale = false %}
+{% if product.compare_at_price > product.price %}
+  {% assign on_sale = true %}
+{% endif %}
+
+{% assign sold_out = true %}
+{% if product.available %}
+  {% assign sold_out = false %}
+{% endif %}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign compare_at_price = current_variant.compare_at_price -%}
+{%- assign price = current_variant.price -%}
+<div class="prod-list-item {% if sold_out %} is-sold-out{% endif %}">
+    <div class="grid-product-image-wrapper">
+      	<div class="product_img">
+		<a class="img_change" href="{{ product.url | within: collection }}">
+			<img class="img-1 img-responsive lazyload" data-sizes="auto" src="{{ "icon-loadings.svg" | asset_url }}" data-src="{{ product.featured_image.src | product_img_url: img_size , crop: 'center' }}" alt="{{ product.featured_image.alt | escape }}">
+		</a>
+		</div>
+    </div>
+    <div class="featured-prod-meta">
+ 	{% if block.settings.product_vendor_enable %}
+        <div class="grid-product-vendor">{{ product.vendor }}</div>
+  	{% endif %}
+	<a href="{{ product.url | within: collection }}" class="product-name">
+      <span class="grid-product-title">{{ product.title }}</span>
+    </a>  
+      <div class="grid-product-price-wrap">
+        <div class="product-price">
+		<div  data-price-container>
+          {% if compare_at_price > price %}
+          <span class="product-single__price--wrapper" aria-hidden="false">
+            <span id="ComparePrice-{{ section.id }}{{ product.id }}" class="product-single__price--compare-at">
+              {{ compare_at_price | money }}
+            </span>
+          </span>
+          <span id="ComparePriceA11y-{{ section.id }}{{ product.id }}" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+          {% else %}
+          <span id="ComparePriceA11y-{{ section.id }}{{ product.id }}" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+          {% endif %}
+
+          <span id="ProductPrice-{{ section.id }}{{ product.id }}"
+                class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+                content="{{ price | divided_by: 100.00 }}"
+                {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+            {{ price | money }}
+          </span>
+          </div>
+		</div>
+      </div>
+   	</div>
+</div>

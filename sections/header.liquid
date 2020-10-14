@@ -1,0 +1,1013 @@
+{% capture logo_size %}{{ section.settings.logo_width }}x{{ section.settings.logo_height }}{% endcapture %} 
+<style>
+.site-header__logo img {
+max-width: {{ section.settings.logo_width | escape | default: '180' | remove: 'px' | append: 'px' }};
+}
+@media screen and (max-width: 768px) {
+.site-header__logo img {
+max-width: 100%;
+}
+}
+</style>
+{% assign hero_full_height = true %}
+<div id="header" data-section-id="{{ section.id }}" data-section-type="header-section" data-template="{{ template.name }}">
+  <div id="NavDrawer" class="drawer drawer--left">
+    {% include 'drawer-menu' %}
+  </div>
+  <div class="header-container drawer__header-container">
+    <div class="header-wrapper">
+      {% comment %}  announcement  {% endcomment %}
+      {% if section.settings.show_announcement %}
+        {% if section.settings.home_page_only == false or template.name == 'index' %}
+          <style>
+            .box-announc {
+              background-color: {{ section.settings.color_bg }};
+            }
+          </style>
+
+          <div class="box-announc" {% if section.settings.background_toggle %} style="background-color: {{ section.settings.bg_color }}"{% endif %} {% if section.settings.background_image_toggle %} style="background-image: url( {{ section.settings.background_image | img_url: '2545x', crop: 'top' }} );"{% endif %}>
+            <div class="wrapper">
+             {% if section.settings.countdown_toggle %}
+                <div class="timer">
+                  <div id="timer_{{ forloop.index }}_{{ section.id }}" class="countdown_timer" data-date="{{ section.settings.countdown_date_year }}/{{ section.settings.countdown_date_month }}/{{ section.settings.countdown_date_day }}"></div>
+                </div>
+                <script>
+                $(document ).ready(function() {
+                  $('#timer_{{ forloop.index }}_{{ section.id }}').each(function() {
+                    var $this = $(this), finalDate = $(this).data('date');
+                    $this.countdown(finalDate, function(event) {
+                      $this.html(event.strftime('<div class="deals-time day"><div class="num-time">%D</div><div class="title-time">{{ 'general.countdown.days' | t }}</div></div> <div class="deals-time hour"><div class="num-time">%H</div> <div class="title-time">{{ 'general.countdown.hours' | t }}</div></div><div class="deals-time minute"><div class="num-time">%M</div><div class="title-time">{{ 'general.countdown.minutes' | t }}</div></div><div class="deals-time second"><div class="num-time">%S</div><div class="title-time">{{ 'general.countdown.seconds' | t }}</div></div>'));
+                    });
+                  });  
+                });
+              </script>
+              {% endif %}
+              <div class="box-text">
+                <div class="sale-1">
+                  <span class="sale">{{ section.settings.sale2 }}</span>
+                  <span>{{ section.settings.sale1 }}</span>
+                </div>
+                  <div class="item-text">
+                    {% if section.settings.column_richtext %}
+                    <div class="announcement-bar-message">{{ section.settings.column_richtext }}</div>
+                    {% endif %}
+                    {% if section.settings.text2 %}
+                    <p class="announcement-bar-message2">{{ section.settings.text2 | escape }}</p>
+                    {% endif %}
+                  </div>
+
+              </div>
+              {% if section.settings.btn_link.size > 0 and section.settings.btn_txt.size > 0 %}
+                <a class="btn count_btn" href="{{ section.settings.btn_link }}">{{ section.settings.btn_txt }}</a>
+              {% endif %}
+              
+              
+          </div>
+        </div>
+        {% endif %}
+      {% endif %}
+
+      <header class="site-header">
+        {% comment %}  header-row-1  {% endcomment %}
+        <div class="header-row-1 row_mobile">
+          <div id="header-close">
+            <div class="close_icon"></div>
+          </div>
+          <div class="wrapper">
+            <div class="grid headers-main">
+              <div class="top-item-contacts grid__item large--{{ section.settings.column-contact }}">
+                  <div class="top-header-item-contacts">
+                    {% if section.settings.contacts_address.size > 0 %}
+                      <span class="contact-address"><i class="fa fa-map-pin" aria-hidden="true"></i>{{ section.settings.contacts_address }}</span>
+                    {% endif %}
+
+                    {% if section.settings.contacts_phone.size > 0 %}
+                      <span class="contact-phone"><a href="tel:{{ section.settings.contacts_phone }}"><i class="fa fa-volume-control-phone" aria-hidden="true"></i>{{ section.settings.contacts_phone }}</a></span>
+                    {% endif %}
+
+                    {% if section.settings.contacts_email.size > 0 %}
+                      <span class="contact-email"><a href="mailto:{{ section.settings.contacts_email }}"><i class="fa fa-envelope" aria-hidden="true"></i>{{ section.settings.contacts_email }}</a></span>
+                    {% endif %}
+                    {% if section.settings.contacts_time.size > 0 %}
+                      <span class="contact-time"><i class="fa fa-calendar" aria-hidden="true"></i>{{ section.settings.contacts_time }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="top-item-social grid__item large--{{ section.settings.column-social }}">
+                  <div class="top-header-item-social">
+                    <ul class="style_1">
+                      {% if section.settings.social_fb.size > 0 %}
+                        <li class="fb"><a href="{{ section.settings.social_fb }}" title="facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if section.settings.social_tw.size > 0 %}
+                        <li class="tw"><a href="{{ section.settings.social_tw }}" title="twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if section.settings.social_inst.size > 0 %}
+                        <li class="inst"><a href="{{ section.settings.social_inst }}" title="instagram"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if section.settings.social_pin.size > 0 %}
+                        <li class="pin"><a href="{{ section.settings.social_pin }}" title="pinterest"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if section.settings.social_gplus.size > 0 %}
+                        <li class="gplus"><a href="{{ section.settings.social_gplus }}" title="google-plus"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if section.settings.social_yt.size > 0 %}
+                        <li class="yt"><a href="{{ section.settings.social_yt }}" title="youtube"><i class="fa fa-youtube" aria-hidden="true"></i></a></li>
+                      {% endif %}
+                    </ul>
+                  </div>
+               </div>
+               <div class="top-item-links grid__item large--{{ section.settings.column-link }}">
+                <div class="top-header-item-links">
+                 
+                  {% comment %}  HEADER CURRENCY  {% endcomment %}
+                  {% if section.settings.currency_selector %}
+                   <label class="currency-picker__wrapper">
+                    <select class="currency-picker" name="currencies" style="display: inline; width: auto; vertical-align: inherit;">
+                    {% assign codes = 'USD,EUR,GBP,CAD,ARS,AUD,BBD,BDT,BSD,BHD,BRL,BOB,BND,BGN,ILS,MMK,KYD,CLP,CNY,COP,CRC,HRK,CZK,DKK,DOP,XCD,EGP,XPF,FJD,GHS,GTQ,GYD,GEL,HKD,HUF,ISK,INR,IDR,NIS,JMD,JPY,JOD,KZT,KES,KWD,LVL,LTL,MXN,MYR,MUR,MDL,MAD,MNT,MZN,ANG,NZD,NGN,NOK,OMR,PKR,PYG,PEN,PHP,PLN,QAR,RON,RUB,SAR,RSD,SCR,SGD,SYP,ZAR,KRW,LKR,SEK,CHF,TWD,THB,TZS,TTD,TRY,UAH,AED,UYU,VEB,VND,ZMK' | split: ',' %}
+                    {% assign supported_codes = settings.supported_currencies | split: ' ' %}
+                    <option value="{{ shop.currency }}" selected="selected">{{ shop.currency }}</option>
+                    {% for code in supported_codes %}
+                      {% if code != shop.currency and codes contains code %}
+                      <option value="{{ code }}">{{ code }}</option>
+                      {% endif %}
+                    {% endfor %}
+                    </select>
+                  </label>
+                  {% endif %}
+                   <ul>
+                    {%- assign linklist = section.settings.links -%}
+                    {% assign top_col = canonical_url | replace: shop.url %}
+                    {%- assign handles = link.url | replace: shop.url -%}
+                    {% comment %}   HEADER ACCOUNT LINK   {% endcomment %}
+                    {% if shop.customer_accounts_enabled %}                    
+                        {% if customer %}
+                        <li class="item {% if top_col == handles %}active{% endif %}">
+                          <a href="/account/logout" title="{{ 'layout.customer.log_out' | t }}">{{ 'layout.customer.log_out' | t }}</a>
+                        </li>
+                        {% else %}
+                        <li class="item {% if top_col == handles %}active{% endif %}">
+                          <a href="/account" title="{{ 'layout.customer.log_in' | t }}">{{ 'layout.customer.log_in' | t }}</a>
+                        </li>    
+                        {% endif %}
+                    {% endif %}
+                    {% for link in linklists[linklist].links %}
+                      <li class="item {% if top_col == handles %}active{% endif %}">
+                        <a href="{{ link.url }}">{{ link.title }}</a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% comment %}   header-row-2  {% endcomment %}
+        <div class="header-row-2">
+          <div class="wrapper">
+              <div class="header-main">
+                <div class="logo">
+                  {% if template.name == 'index' %}
+                    <h1 class="site-header__logo large--left" itemscope itemtype="http://schema.org/Organization">
+                  {% else %}
+                    <div class="h1 site-header__logo large--left" itemscope itemtype="http://schema.org/Organization">
+                  {% endif %}
+                  {% if section.settings.logo_slogan.size > 0 %}
+                    {% assign logo_slogan = section.settings.logo_slogan %}
+                  {% endif %}
+
+                  {% case section.settings.logo_type %}
+                    {% when 'txt' %}
+                      <a class="header_logo" href="{{ shop.url }}">{{ shop.name }} <span class="logo_slogan">{{ logo_slogan }}</span></a>
+
+                    {% when 'img' %}
+                      {% if section.settings.logo_main.size > 0 %}
+                        <a id="id-logo" class="header_logo" href="{{ shop.url }}">
+                          <img src="{{ section.settings.logo_main | img_url: logo_size, crop:'center', scale: 2 }}" title="{{ logo_slogan }}" alt="{{ shop.name }}" style="max-width: {{ section.settings.logo_width }}px">
+                          <span class="logo_slogan">{{ logo_slogan }}</span>
+                        </a>
+                      {% else %}
+                        <a id="id-logo" class="header_logo" href="{{ shop.url }}">{{ shop.name }} <span class="logo_slogan">{{ logo_slogan }}</span></a>
+                      {% endif %}
+
+                  {% endcase %}
+                  {% if template.name == 'index' %}
+                    </h1>
+                  {% else %}
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="aless-block">
+                  <ul>
+                    {% comment %}  HEADER search  {% endcomment %}
+                    {% if section.settings.search_enable %}  
+                   <li class="search-button">
+                    
+                   {% include 'search-bar', search_btn_style: 'btn' %}
+                    <div id="search-toggle" class="toggle-search-modal">
+                      <span class="icon-fallback-text">
+                        <span class="icon icon-search" aria-hidden="true"></span>
+                        <span class="fallback-text">{{ 'general.search.title' | t }}</span>
+                      </span>
+                    </div>
+                  </li>
+                  {% endif %}
+                    <li class="header-toggle-t">
+                      <a id="header-toggle"><i class="fa fa-info" aria-hidden="true"></i></a>
+                    </li>
+                  {% comment %}  HEADER wishlist  {% endcomment %}
+                  {% if section.settings.wishlist_btn %}  
+                  <li class="wishlist-button">
+                    <a href="#"
+                       class="cm-wishlist-icon js-popup-button"
+                       data-js-information-input="wishlist"
+                       data-js-popup-button="wishlist-full"><i class="fa fa-heart-o" aria-hidden="true"></i>
+                        <span class="cm-wishlist-counter" data-js-wishlist-count="0">0</span>
+                    </a>
+                  </li>
+                  {% endif %}
+                  {% comment %}  HEADER compare  {% endcomment %}
+                  {% if section.settings.compare_btn %}  
+                  <li class="compare-button">
+                      <a href="#"
+                         class="cm-compare-icon js-popup-button"
+                         data-js-information-input="compare"
+                         data-js-popup-button="compare-full"><i class="fa fa-balance-scale" aria-hidden="true"></i>
+                          <span class="cm-compare-counter" data-js-compare-count="0">0</span>
+                      </a>
+                  </li>
+                  {% endif %}
+                   <li class="cart-button">
+                    <a href="/cart" class="cart-link js-drawer-open-button-right" aria-controls="CartDrawer">
+                      <span class="icon-fallback-text">
+                        <i class="fa fa-shopping-basket" aria-hidden="true"></i>
+                        <span class="fallback-text">{{ 'layout.cart.title' | t }}</span>
+                      </span>
+                      <span class="cart-link__bubble{% if cart.item_count > 0 %} cart-link__bubble--visible{% endif %}">{{ cart.item_count }}</span>
+                      <span class="cart-total">
+                        <span id="CartTotal"  class="total_cart">&nbsp;&ndash;&nbsp;{{ cart.total_price | money }}</span>
+                      </span>
+                    </a>
+                  </li>
+                 </ul>
+                </div>
+              </div>
+            </div>  
+        </div>
+        
+      </header>
+    </div>
+  </div>
+</div>
+
+
+{% schema %}
+{
+  "name": {
+    "de": "Header",
+    "en": "Header",
+    "es": "Encabezado",
+    "fr": "En-tête",
+    "it": "header",
+    "ja": "ヘッダー",
+    "pt-BR": "Cabeçalho"
+  },
+  "settings": [
+    // CONTACTS BLOCK /////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "header",
+      "content": "TOP CONTACTS BLOCK"
+    },
+    {
+      "type": "text",
+      "id": "contacts_address",
+      "label": "Contacts address",
+      "default": "8901 Marmora Road, Glasgow, D04 89GR."
+    },
+    {
+      "type": "text",
+      "id": "contacts_phone",
+      "label": "Contacts phone",
+      "default": "800-559-65-80"
+    },
+    {
+      "type": "text",
+      "id": "contacts_email",
+      "label": "Contacts email",
+      "default": "info@companyname.com"
+    },
+     {
+      "type": "text",
+      "id": "contacts_time",
+      "label": "Time work",
+      "default": "Monday - Friday: 08.00-20.00"
+    },
+    {
+     "type": "select",
+     "id": "column-contact",
+     "options": [
+        { "value": "one-whole", "label": "one-whole"},
+        { "value": "one-half", "label": "one-half"},
+        { "value": "one-third", "label": "one-third"},
+        { "value": "one-quarter", "label": "one-quarter"}
+     ],
+      "label": {
+        "de": "Spaltenbreite",
+        "en": "Column Width",
+        "es": "Ancho de columna",
+        "fr": "Largeur de colonne",
+        "it": "Larghezza della colonna",
+        "ja": "列幅",
+        "pt-BR": "Largura da coluna"
+      }
+    },
+    // SOCIAL BLOCK /////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "header",
+      "content": "TOP SOCIAL BLOCK"
+    },
+    
+    {
+      "type": "text",
+      "id": "social_fb",
+      "label": "Facebook"
+    },
+    {
+      "type": "text",
+      "id": "social_tw",
+      "label": "Twitter"
+    },
+    {
+      "type": "text",
+      "id": "social_inst",
+      "label": "Instagram"
+    },
+    {
+      "type": "text",
+      "id": "social_pin",
+      "label": "Pinterest"
+    },
+    {
+      "type": "text",
+      "id": "social_gplus",
+      "label": "Google+"
+    },
+    {
+      "type": "text",
+      "id": "social_yt",
+      "label": "Youtube"
+    },
+    {
+     "type": "select",
+     "id": "column-social",
+     "options": [
+        { "value": "one-whole", "label": "one-whole"},
+        { "value": "one-half", "label": "one-half"},
+        { "value": "one-third", "label": "one-third"},
+        { "value": "one-quarter", "label": "one-quarter"}
+     ],
+      "label": {
+        "de": "Spaltenbreite",
+        "en": "Column Width",
+        "es": "Ancho de columna",
+        "fr": "Largeur de colonne",
+        "it": "Larghezza della colonna",
+        "ja": "列幅",
+        "pt-BR": "Largura da coluna"
+      }
+    },
+    // LINKLIST BLOCK /////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "header",
+      "content": "TOP LINKLIST BLOCK"
+    },
+    {
+      "type": "link_list",
+      "id": "links",
+      "label": "Choose linklist"
+    },
+    {
+       "type": "select",
+       "id": "column-link",
+       "options": [
+          { "value": "one-whole", "label": "one-whole"},
+          { "value": "one-half", "label": "one-half"},
+          { "value": "one-third", "label": "one-third"},
+          { "value": "one-quarter", "label": "one-quarter"}
+       ],
+        "label": {
+          "de": "Spaltenbreite",
+          "en": "Column Width",
+          "es": "Ancho de columna",
+          "fr": "Largeur de colonne",
+          "it": "Larghezza della colonna",
+          "ja": "列幅",
+          "pt-BR": "Largura da coluna"
+        }
+    },
+    // MAIN LOGO //////////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "header",
+      "content": "Main Logo"
+    },
+    {
+      "type": "radio",
+      "id": "logo_type",
+      "label": "Logo type",
+      "options": [
+        {
+          "value": "txt",
+          "label": "Text logo"
+        },
+        {
+          "value": "img",
+          "label": "Image logo"
+        }
+      ]
+    },
+    {
+      "type":      "range",
+      "id":        "logo_width",
+      "min":       100,
+      "max":        200,
+      "step":       10,
+      "unit":       "px",
+      "label":     "Logo width",
+      "default":   160
+    },
+    {
+      "type":      "range",
+      "id":        "logo_height",
+      "min":       30,
+      "max":        80,
+      "step":       10,
+      "unit":       "px",
+      "label":     "Logo height",
+      "default":   40
+    },
+    {
+      "type": "header",
+      "content": "Retina logo information",
+      "info": "For a better display of the logo for retina display devices, load the logo twice as large as the required"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_main",
+      "label": "Logo image"
+    },
+    {
+      "type": "text",
+      "id": "logo_slogan",
+      "label": "Logo slogan"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+     {
+      "type": "checkbox",
+      "id": "search_enable",
+      "label": {
+        "de": "Suche aktivieren",
+        "en": "Enable search",
+        "es": "Habilitar búsqueda",
+        "fr": "Activer la recherche",
+        "it": "Abilita ricerca",
+        "ja": "検索を有効にする",
+        "pt-BR": "Ativar pesquisa"
+      }
+    },
+    {
+      "type": "checkbox",
+      "id": "currency_selector",
+      "label": "Show currency selector"
+    },
+    {
+      "type": "checkbox",
+      "id": "wishlist_btn",
+      "label": "Show Wishlist button"
+    },
+    {
+      "type": "checkbox",
+      "id": "compare_btn",
+      "label": "Show Compare button"
+    },
+    {
+      "type": "header",
+      "content": {
+        "de": "Ankündigungsleiste",
+        "en": "Announcement bar",
+        "es": "Barra de anuncios",
+        "fr": "Barre d'annonces",
+        "it": "Barra degli annunci",
+        "ja": "告知バー",
+        "pt-BR": "Barra de anúncio"
+      }
+    },
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": {
+        "de": "Ankündigung anzeigen",
+        "en": "Show announcement",
+        "es": "Mostrar anuncio",
+        "fr": "Afficher l'annonce",
+        "it": "Mostra annuncio",
+        "ja": "告知を表示する",
+        "pt-BR": "Exibir anúncio"
+      },
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "home_page_only",
+      "label": {
+        "de": "Nur Startseite",
+        "en": "Home page only",
+        "es": "Solo página de inicio",
+        "fr": "Page d'accueil uniquement",
+        "it": "Solo home page",
+        "ja": "ホームページのみ",
+        "pt-BR": "Apenas página inicial"
+      },
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "column_richtext",
+      "label": {
+        "de": "Title Banner",
+        "en": "Title Banner",
+        "es": "Title Banner",
+        "fr": "Title Banner",
+        "it": "Title Banner",
+        "ja": "Title Banner",
+        "pt-BR": "Title Banner"
+      },
+      "default": {
+        "de": "<p>Talk about your brand</p>",
+        "en": "<p>Talk about your brand</p>",
+        "es": "<p>Talk about your brand</p>",
+        "fr": "<p>Talk about your brand</p>",
+        "it": "<p>Talk about your brand</p>",
+        "ja": "<p>Talk about your brand</p>",
+        "pt-BR": "<p>Talk about your brand</p>"
+      }
+    },
+    {
+      "type": "text",
+      "id": "text2",
+      "label": {
+        "de": "Info",
+        "en": "Info",
+        "es": "Info",
+        "fr": "Info",
+        "it": "Info",
+        "ja": "Info",
+        "pt-BR": "Info"
+      },
+      "default": {
+        "de": "Hier Ankündigung platzieren",
+        "en": "Announce something here",
+        "es": "Anuncia algo aquí",
+        "fr": "Annoncer quelque chose ici",
+        "it": "Annuncia qualcosa qui",
+        "ja": "ここで告知してください",
+        "pt-BR": "Anuncie algo aqui"
+      }
+    },
+    {
+      "type": "text",
+      "id": "sale2",
+      "label": {
+        "de": "Sale",
+        "en": "Sale",
+        "es": "Sale",
+        "fr": "Sale",
+        "it": "Sale",
+        "ja": "Sale",
+        "pt-BR": "Sale"
+      },
+      "default": {
+        "de": "Sale",
+        "en": "Sale",
+        "es": "Sale",
+        "fr": "Sale",
+        "it": "Sale",
+        "ja": "Sale",
+        "pt-BR": "Sale"
+      }
+    },
+    {
+      "type": "text",
+      "id": "sale1",
+      "label": {
+        "de": "Sale Namber",
+        "en": "Sale Namber",
+        "es": "Sale Namber",
+        "fr": "Sale Namber",
+        "it": "Sale Namber",
+        "ja": "Sale Namber",
+        "pt-BR": "Sale Namber"
+      },
+      "default": {
+        "de": "35%",
+        "en": "35%",
+        "es": "35%",
+        "fr": "35%",
+        "it": "35%",
+        "ja": "35%",
+        "pt-BR": "35%"
+      }
+    },
+    {
+      "type": "text",
+      "id": "btn_txt",
+      "label": "Button text",
+      "default": "SHOP NOW"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button link"
+    },
+   
+    {
+      "type": "header",
+      "content": "Background image"
+    },
+    {
+      "type": "checkbox",
+      "id": "background_image_toggle",
+      "label": "Show background image",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Image",
+      "info": "The image should be more than 2050px wide to resize and crop properly"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": {
+        "de": "Background Color",
+        "en": "Background Color",
+        "es": "Background Color",
+        "fr": "Background Color",
+        "it": "Background Color",
+        "ja": "Background Color",
+        "pt-BR": "Background Color"
+      },
+      "default": "#1c1d1d"
+    },
+    {
+      "type": "header",
+      "content": "Countdown date"
+    }, 
+    {
+      "type": "checkbox",
+      "id": "countdown_toggle",
+      "label": "Show Countdown date",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "countdown_date_day",
+      "label": "Day",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        },
+        {
+          "value": "3",
+          "label": "3"
+        },
+        {
+          "value": "4",
+          "label": "4"
+        },
+        {
+          "value": "5",
+          "label": "5"
+        },
+        {
+          "value": "6",
+          "label": "6"
+        },
+        {
+          "value": "7",
+          "label": "7"
+        },
+        {
+          "value": "8",
+          "label": "8"
+        },
+        {
+          "value": "9",
+          "label": "9"
+        },
+        {
+          "value": "10",
+          "label": "10"
+        },
+        {
+          "value": "11",
+          "label": "11"
+        },
+        {
+          "value": "12",
+          "label": "12"
+        },
+        {
+          "value": "13",
+          "label": "13"
+        },
+        {
+          "value": "14",
+          "label": "14"
+        },
+        {
+          "value": "15",
+          "label": "15"
+        },
+        {
+          "value": "16",
+          "label": "16"
+        },
+        {
+          "value": "17",
+          "label": "17"
+        },
+        {
+          "value": "18",
+          "label": "18"
+        },
+        {
+          "value": "19",
+          "label": "19"
+        },
+        {
+          "value": "20",
+          "label": "20"
+        },
+        {
+          "value": "21",
+          "label": "21"
+        },
+        {
+          "value": "22",
+          "label": "22"
+        },
+        {
+          "value": "23",
+          "label": "23"
+        },
+        {
+          "value": "24",
+          "label": "24"
+        },
+        {
+          "value": "25",
+          "label": "25"
+        },
+        {
+          "value": "26",
+          "label": "26"
+        },
+        {
+          "value": "27",
+          "label": "27"
+        },
+        {
+          "value": "28",
+          "label": "28"
+        },
+        {
+           "value": "29",
+           "label": "29"
+        },
+        {
+          "value": "30",
+          "label": "30"
+        },
+        {
+          "value": "31",
+          "label": "31"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "countdown_date_month",
+      "label": "Month",
+      "options": [
+        {
+          "value": "01",
+          "label": "January"
+        },
+        {
+          "value": "02",
+          "label": "February"
+        },
+        {
+          "value": "03",
+          "label": "March"
+        },
+        {
+          "value": "04",
+          "label": "April"
+        },
+        {
+          "value": "05",
+          "label": "May"
+        },
+        {
+          "value": "06",
+          "label": "June"
+        },
+        {
+          "value": "07",
+          "label": "July"
+        },
+        {
+          "value": "08",
+          "label": "August"
+        },
+        {
+          "value": "09",
+          "label": "September"
+        },
+        {
+          "value": "10",
+          "label": "October"
+        },
+        {
+          "value": "11",
+          "label": "November"
+        },
+        {
+          "value": "12",
+          "label": "December"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "countdown_date_year",
+      "label": "Year",
+      "options": [
+        {
+          "value": "2018",
+          "label": "2018"
+        },
+        {
+          "value": "2019",
+          "label": "2019"
+        },
+        {
+          "value": "2020",
+          "label": "2020"
+        },
+        {
+          "value": "2021",
+          "label": "2021"
+        },
+        {
+          "value": "2022",
+          "label": "2022"
+        },
+        {
+          "value": "2023",
+          "label": "2023"
+        },
+        {
+          "value": "2024",
+          "label": "2024"
+        },
+        {
+          "value": "2025",
+          "label": "2025"
+        },
+        {
+          "value": "2026",
+          "label": "2026"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+{% javascript %}
+(function($) {
+  var mobFlag = 0;
+  var searchFlag = 0;
+  headerToggle = function() {
+    if ( $(window).width() > 992 ) {
+
+      $('.header-row-1').removeClass('row_mobile').addClass('row_desktop');
+
+      $('.header-row-1 .wrapper, #header-close').removeClass('on');
+
+      $('html, body').css('overflow', 'auto');
+
+      mobFlag = 0;   
+    }
+    else {
+      $('.header-row-1 .wrapper, #header-close').hide();
+
+      $('.header-row-1').removeClass('row_desktop').addClass('row_mobile');
+
+      if ( mobFlag == 0 ) {
+        headerMobile();
+        mobFlag = 1;
+      };
+    };
+  };
+
+  searchToggle = function() {
+    if ( $(window).width() > 992 ) {
+
+      $('#SearchModal').removeClass('row_mobile').addClass('row_desktop');
+
+      $('#SearchModal .wrappers, #search-close').removeClass('on');
+
+      $('html, body').css('overflow', 'auto');
+
+      searchFlag = 0;   
+    }
+    else {
+       $('#SearchModal .wrappers, #search-close').hide();
+
+      $('#SearchModal').removeClass('row_desktop').addClass('row_mobile');
+
+      if ( searchFlag == 0 ) {
+        searchMobile();
+        searchFlag = 1;
+      };
+    };
+  };
+
+  headerMobile = function() {
+    $('#header-toggle').on('click', function(){
+
+      $('.header-row-1 .wrapper, #header-close').show().addClass('on');
+
+      $('html, body').css({'overflow': 'hidden', 'position':'relative', 'top': '0', 'left': '0', 'right': '0'});
+      $('#shopify-section-header').css({'z-index': '12', 'position':'relative'});
+
+    });
+
+    $('#header-close').on('click', function() {
+
+      $('.header-row-1 .wrapper, #header-close').removeClass('on');
+
+      $('html, body').css({'overflow': 'auto', 'position':'static'});
+      $('#shopify-section-header').removeAttr('style');
+    });
+
+  };
+
+  searchMobile = function() {
+
+    $('#shopify-section-header #search-toggle').on('click', function(){
+      $('#SearchModal .wrappers, #search-close').show().addClass('on');
+
+      $('html, body').css({'overflow': 'hidden', 'position':'relative', 'top': '0', 'left': '0', 'right': '0'});
+      $('#SearchModal').css({'z-index': '12', 'position':'relative'});
+
+    });
+
+    $('#search-close').on('click', function() { 
+
+      $('#SearchModal .wrappers, #search-close').removeClass('on');
+
+      $('html, body').css({'overflow': 'auto', 'position':'static'});
+      $('#SearchModal').removeAttr('style');
+    });
+  };
+
+  $(window).on('load resize', function() {
+    headerToggle();
+    searchToggle();
+  });
+
+  $(document).on('shopify:section:load', '#shopify-section-header', function() {
+    headerToggle();
+  });
+  $(document).ready(function() {
+    searchToggle();
+  });
+})(jQuery); 
+{% endjavascript %}

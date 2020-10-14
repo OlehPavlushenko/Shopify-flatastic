@@ -1,0 +1,292 @@
+
+{% case block.type %}
+    {% when 'big_50' %}
+    
+    {% if section.settings.section_view == 'full_width' %}
+        {% case section.settings.section_height %}
+            {% when 'small' %}{%- assign img_size = '950x600' -%}
+            {% when 'medium' %}{%- assign img_size = '950x770' -%}
+            {% when 'large' %}{%- assign img_size = '950x900' -%}
+        {% endcase %}
+    {% else %}
+        {% case section.settings.section_height %}
+            {% when 'small'  %}{%- assign img_size = '570x494' -%}
+            {% when 'medium' %}{%- assign img_size = '570x540' -%}
+            {% when 'large'  %}{%- assign img_size = '570x577' -%}
+        {% endcase %}
+    {% endif %}
+        
+
+        <div class="col-sm-6 grid__item one-half banner_{{ block.type }}">
+            <div class="banner_item">
+            {% if block.settings.item_link.size > 0 %}
+            <a class="banner_caption" href="{{ block.settings.item_link }}">
+            {% endif %}
+                {% if block.settings.item_img.size > 0 %}
+                    <span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop:  block.settings.img_alignment }} );"></span>
+                {% else %}
+                    <span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+                        {{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+                    </span>
+                {% endif %}
+                {% if block.settings.item_subtitle.size > 0 or block.settings.item_title.size > 0 or block.settings.item_text.size > 0 or  block.settings.button_text.size > 0 %}
+                    <span class="caption_text">
+                        {% if block.settings.item_subtitle.size > 0 %}
+                            <span class="banner_subtitle">{{ block.settings.item_subtitle }}</span>
+                        {% endif %}
+
+                        {% if block.settings.item_title.size > 0 %}
+                            <span class="banner_title">{{ block.settings.item_title }}</span>
+                        {% endif %}
+
+                        {% if block.settings.item_text.size > 0 %}
+                            <p class="banner_text">{{ block.settings.item_text }}</p>
+                        {% endif %}
+
+                        {% if block.settings.item_link.size > 0 and block.settings.button_text.size > 0 %}
+                            <span class="btn banner_btn">{{ block.settings.button_text }}</span>
+                        {% endif %}
+                    </span>
+                {% endif %} 
+                {% if block.settings.item_link.size > 0 %}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+    {% when 'big_66' %}
+        {% if section.settings.section_view == 'full_width' %}
+        {% case section.settings.section_height %}
+            {% when 'small' %}{%- assign img_size = '1320x620' -%}
+            {% when 'medium' %}{%- assign img_size = '1320x720' -%}
+            {% when 'large' %}{%- assign img_size = '1320x820' -%}
+        {% endcase %}
+        {% else %}
+            {% case section.settings.section_height %}
+                {% when 'small'  %}{%- assign img_size = '870x494' -%}
+                {% when 'medium' %}{%- assign img_size = '870x540' -%}
+                {% when 'large'  %}{%- assign img_size = '870x577' -%}
+            {% endcase %}
+        {% endif %}
+        
+
+        <div class="col-sm-9 grid__item two-thirds banner_{{ block.type }}">
+            <div class="banner_item">
+                {% if block.settings.item_link.size > 0 %}
+                    <a class="banner_caption" href="{{ block.settings.item_link }}">
+                {% endif %}
+                {% if block.settings.item_img.size > 0 %}
+                    <span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+                {% else %}
+                    <span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+                        {{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+                    </span>
+                {% endif %}
+                    {% if block.settings.item_subtitle.size > 0 or block.settings.item_title.size > 0 or block.settings.item_text.size > 0 or  block.settings.button_text.size > 0 %}
+                    <span class="caption_text">
+                        {% if block.settings.item_subtitle.size > 0 %}
+                            <span class="banner_subtitle">{{ block.settings.item_subtitle }}</span>
+                        {% endif %}
+
+                        {% if block.settings.item_title.size > 0 %}
+                            <span class="banner_title">{{ block.settings.item_title }}</span>
+                        {% endif %}
+
+                        {% if block.settings.item_text.size > 0 %}
+                            <p class="banner_text">{{ block.settings.item_text }}</p>
+                        {% endif %}
+
+                        {% if block.settings.item_link.size > 0 and block.settings.button_text.size > 0 %}
+                            <span class="btn banner_btn">{{ block.settings.button_text }}</span>
+                        {% endif %}
+                    </span>
+                {% endif %}
+                {% if block.settings.item_link.size > 0 %}
+                    </a>
+                {% endif %} 
+            </div>
+        </div>
+            
+    {% when 'two_big_50' %}
+        {% if section.settings.section_view == 'full_width' %}
+        {% case section.settings.section_height %}
+            {% when 'small' %}{%- assign img_size = '950x300' -%}
+            {% when 'medium' %}{%- assign img_size = '950x385' -%}
+            {% when 'large' %}{%- assign img_size = '950x450' -%}
+        {% endcase %}
+        {% else %}
+            {% case section.settings.section_height %}
+                {% when 'small'  %}{%- assign img_size = '570x232' -%}
+                {% when 'medium' %}{%- assign img_size = '570x255' -%}
+                {% when 'large'  %}{%- assign img_size = '570x273' -%}
+            {% endcase %}
+        {% endif %}
+        
+
+        <div class="col-sm-6 grid__item one-half banner_{{ block.type }}">
+            <div class="banner_item">
+                <div class="bammer_item_1">
+                    {% if block.settings.item_link.size > 0 %}
+                        <a class="banner_caption" href="{{ block.settings.item_link }}">
+                    {% endif %}
+                    {% if block.settings.item_img.size > 0 %}
+                        <span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+                    {% else %}
+                        <span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+                            {{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+                        </span>
+                    {% endif %}
+                        {% if block.settings.item_subtitle.size > 0 or block.settings.item_title.size > 0 or block.settings.item_button_text.size > 0 %}
+                        <span class="caption_text">
+                            {% if block.settings.item_subtitle.size > 0 %}
+                                <span class="banner_subtitle">{{ block.settings.item_subtitle }}</span>
+                            {% endif %}
+
+                            {% if block.settings.item_title.size > 0 %}
+                                <span class="banner_title">{{ block.settings.item_title }}</span>
+                            {% endif %}
+                            {% if block.settings.item_link.size > 0 and block.settings.item_button_text.size > 0 %}
+                            <span class="btn banner_btn" href="{{ block.settings.item_link }}">{{ block.settings.item_button_text }}</span>
+                            {% endif %}
+                        </span>
+                        {% endif %}
+                    {% if block.settings.item_link.size > 0 %}
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="bammer_item_2">
+                    {% if block.settings.item2_link.size > 0 %}
+                        <a class="banner_caption" href="{{ block.settings.item2_link }}">
+                    {% endif %}
+                    {% if block.settings.item2_img.size > 0 %}
+                        <div class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item2_img | img_url: img_size, crop: block.settings.img2_alignment }} );"></div>
+                    {% else %}
+                        <div class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+                            {{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+                        </div>
+                    {% endif %}
+                    {% if block.settings.item2_subtitle.size > 0 or block.settings.item2_title.size > 0 or block.settings.item2_button_text.size > 0 %}
+                        <span class="caption_text">
+                            {% if block.settings.item2_subtitle.size > 0 %}
+                                <span class="banner_subtitle">{{ block.settings.item2_subtitle }}</span>
+                            {% endif %}
+
+                            {% if block.settings.item2_title.size > 0 %}
+                                <span class="banner_title">{{ block.settings.item2_title }}</span>
+                            {% endif %}
+                            {% if block.settings.item2_link.size > 0 and block.settings.item2_button_text.size > 0 %}
+                            <span class="btn banner_btn" href="{{ block.settings.item2_link }}">{{ block.settings.item2_button_text }}</span>
+                            {% endif %}
+                        </span>
+                    {% endif %} 
+                    {% if block.settings.item2_link.size > 0 %}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+
+    {% when 'two_small_25' %}
+        {% if section.settings.section_view == 'full_width' %}
+        {% case section.settings.section_height %}
+            {% when 'small' %}{%- assign img_size = '460x385' -%}
+            {% when 'medium' %}{%- assign img_size = '460x400' -%}
+            {% when 'large' %}{%- assign img_size = '460x420' -%}
+        {% endcase %}
+        {% else %}
+            {% case section.settings.section_height %}
+                {% when 'small'  %}{%- assign img_size = '270x232' -%}
+                {% when 'medium' %}{%- assign img_size = '270x255' -%}
+                {% when 'large'  %}{%- assign img_size = '270x273' -%}
+            {% endcase %}
+        {% endif %}
+
+        <div class="col-sm-3 grid__item one-quarter banner_{{ block.type }}">
+            <div class="banner_item">
+                <div class="bammer_item_1">
+                {% if block.settings.item_link.size > 0 %}
+                <a class="banner_caption" href="{{ block.settings.item_link }}">
+                {% endif %}
+                    {% if block.settings.item_img.size > 0 %}
+                        <span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+                    {% else %}
+                        <span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+                            {{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+                        </span>
+                    {% endif %}
+                    {% if block.settings.item_text.size > 0 %}
+                        <span class="caption_title">{{ block.settings.item_text }}</span>
+                    {% endif %}
+
+                    {% if block.settings.item_link.size > 0 %}  
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="bammer_item_2">
+                    {% if block.settings.item_link.size > 0 %}
+                    <a class="banner_caption" href="{{ block.settings.item_link2 }}">
+                    {% endif %}
+                    {% if block.settings.item2_img.size > 0 %}
+                        <span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item2_img | img_url: img_size, crop: block.settings.img2_alignment }} );"></span>
+                    {% else %}
+                        <span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+                            {{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+                        </span>
+                    {% endif %}                         
+                        {% if block.settings.item_text2.size > 0 %}
+                            <span class="caption_title">{{ block.settings.item_text2 }}</span>
+                        {% endif %}
+                    {% if block.settings.item_link.size > 0 %}  
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    {% when 'one_small_33' %}
+        {% if section.settings.section_view == 'full_width' %}
+        {% case section.settings.section_height %}
+            {% when 'small' %}{%- assign img_size = '680x620' -%}
+            {% when 'medium' %}{%- assign img_size = '680x720' -%}
+            {% when 'large' %}{%- assign img_size = '680x820' -%}
+        {% endcase %}
+        {% else %}
+            {% case section.settings.section_height %}
+                {% when 'small'  %}{%- assign img_size = '360x494' -%}
+                {% when 'medium' %}{%- assign img_size = '360x540' -%}
+                {% when 'large'  %}{%- assign img_size = '360x577' -%}
+            {% endcase %}
+        {% endif %}
+        
+
+        <div class="col-sm-3 grid__item one-third banner_{{ block.type }}">
+            <div class="banner_item">
+                {% if block.settings.item_link.size > 0 %}
+                <a href="{{ block.settings.item_link }}" class="banner_caption">
+                {% endif %}
+                {% if block.settings.item_img.size > 0 %}
+                    <span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+                {% else %}
+                    <span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+                        {{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+                    </span>
+                {% endif %}
+                {% if block.settings.item_subtitle.size > 0 or block.settings.item_title.size > 0 %}
+                <span class="caption_text">
+                    {% if block.settings.item_subtitle.size > 0 %}
+                        <span class="banner_subtitle">{{ block.settings.item_subtitle }}</span>
+                    {% endif %}
+
+                    {% if block.settings.item_title.size > 0 %}
+                        <span class="banner_title">{{ block.settings.item_title }}</span>
+                    {% endif %}
+                </span>
+                {% endif %}
+                {% if block.settings.item_link.size > 0 %}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+{% endcase %}

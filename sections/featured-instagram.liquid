@@ -1,0 +1,119 @@
+
+<div class="featured-instagram" id="{{ section.id }}" style="{% if section.settings.background_toggle %}background-color: {{ section.settings.bg_color }};{% endif %} padding-top: {{ section.settings.padding_box }}px;padding-bottom: {{ section.settings.padding_box_bot }}px;">
+{% if section.settings.section_view == 'boxed' %}
+	<div class="wrapper">
+{% else %}
+	<div class="wrapper full">
+{% endif %}
+	<div class="instagram_feed">
+		{% if section.settings.title.size > 0 %}
+			<div class="section-header">
+				<h2 class="section-header__title">{{ section.settings.title | escape }} <i>{{ section.settings.nick }}</i></h2>
+			</div>	
+		{% endif %}
+		<div id="instafeed_{{ section.id }}" class="instafeed_wrap grid" data-user="{{ section.settings.instagram_user_id }}" data-token="{{ section.settings.instagram_access_token }}" data-limit="{{ section.settings.instagram_img_number }}"></div>
+	</div>
+</div>
+</div>
+{% schema %}
+{
+	"name": "Instagram feed",
+	"class": "section section_homepage section_instagram",
+	"settings": [
+		{
+			"type": "text",
+			"id": "title",
+			"label": "Heading",
+			"default": "Instagram feed"
+		},
+		{
+			"type": "text",
+			"id": "nick",
+			"label": "Nick name"
+		},
+		{
+			"type": "select",
+			"id": "section_view",
+			"label": "Section view",
+			"default": "boxed",
+			"options": [
+				{
+					"label": "Boxed",
+					"value": "boxed"
+				},
+				{
+					"label": "Full width",
+					"value": "full_width"
+				}
+			]
+		},
+		{
+	      "type": "checkbox",
+	      "id": "background_toggle",
+	      "label": "Show background color",
+	      "default": true
+	    },
+	    {
+	      "type": "color",
+	      "id": "bg_color",
+	      "label": "Background color",
+	      "default": "#fafbfb"
+	    },
+	    {
+	      "type": "range",
+	      "id": "padding_box",
+	      "min": 0,
+	      "max": 100,
+	      "step": 1,
+	      "label": "Padding Top",
+	      "default": 30
+	    },
+	    {
+	      "type": "range",
+	      "id": "padding_box_bot",
+	      "min": 0,
+	      "max": 100,
+	      "step": 1,
+	      "label": "Padding Bottom",
+	      "default": 0
+	    },
+		{
+			"type": "text",
+			"id": "instagram_user_id",
+			"label": "Instagram user ID",
+			"info": "[You can find it here](\/\/instagram.pixelunion.net\/)"
+		},
+		{
+			"type": "text",
+			"id": "instagram_access_token",
+			"label": "Instagram access token",
+			"info": "[You can find it here](\/\/instagram.pixelunion.net\/)"
+		},
+		{
+			"type": "select",
+			"id": "instagram_img_number",
+			"label": "Number of images",
+			"options": [
+				{
+					"value": "6",
+					"label": "6"
+				},
+				{
+					"value": "12",
+					"label": "12"
+				},
+				{
+					"value": "18",
+					"label": "18"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Instagram feed",
+			"category": "Image"
+		}
+	]
+}
+{% endschema %}

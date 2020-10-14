@@ -1,0 +1,76 @@
+<div class="popup fixed-stretch d-none-important js-popup" tabindex="0">
+    <div class="popup__bg fixed-stretch cursor-pointer"></div>
+    <div class="popup__content position-relative d-flex d-none-important" data-js-popup-name="wishlist-full">
+        <div class="popup-wishlist-full">
+            <div class="popup-wishlist-full__head d-flex">
+                <span class="popup-wishlist-full__close ml-auto cursor-pointer js-popup-close">×</span>
+            </div>
+            <div class="popup-wishlist-full__content"></div>
+        </div>
+    </div>
+
+    <div class="popup__content position-relative d-flex justify-content-center d-none-important" data-js-popup-name="compare-full">
+        <div class="popup-compare-full">
+            <div class="popup-compare-full__head d-flex align-items-center">
+                <span class="popup-compare-full__close ml-auto cursor-pointer js-popup-close">×</span>
+            </div>
+            <div class="popup-compare-full__content"></div>
+        </div>
+    </div>
+
+    <div class="popup__content position-relative d-flex flex-center px-15 py-30 d-none-important" data-js-popup-name="confirm-transfer-data">
+        <div class="popup-confirm-transfer-data position-relative py-30 px-15">
+            <span class="popup-confirm-transfer-data__close position-absolute cursor-pointer js-popup-close">×</span>
+            <div class="popup-confirm-transfer-data__content d-flex flex-column mx-auto text-center">
+                <h4 class="mb-15">{{ 'general.cmproduct.cm_wischcompare' | t }}</h4>
+                <p class="mb-10">{{ 'general.cmproduct.cm_infowc' | t }}</p>
+                <ul class="list-unstyled mb-20" data-js-transfer-data-info></ul>
+                <div class="row">
+                    <div class="col-sm-6 offset-sm-3">
+                        <div class="btn btn--secondary " data-js-button-transfer-data>{{ 'general.cmproduct.cm_yes' | t }}</div>
+                        <div class="btn btn--secondary js-popup-close">{{ 'general.cmproduct.cm_no' | t }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="popup__content position-relative d-flex flex-center px-15 py-30 d-none-important inform-transfer-wish" data-js-popup-name="inform-transfer-wish">
+        <div class="popup-confirm-transfer-data position-relative py-15 px-15">
+            <span class="popup-confirm-transfer-data__close position-absolute cursor-pointer js-popup-close">×</span>
+            <div class="popup-confirm-transfer-data__content d-flex flex-column mx-auto">
+                <div class="product-store-lists-box">
+                    <img id="add-img" src="{{ "icon-loadings.svg" | asset_url }}" alt="add list">
+                    <div class="title"><a href=""></a></div>
+                 </div>
+                <p class="infowish d-none-important">{{ 'general.cmproduct.cm_infowish' | t }}</p>
+                <p class="infowishrem d-none-important">{{ 'general.cmproduct.cm_infowishrem' | t }}</p>
+                <p class="infocompare d-none-important">{{ 'general.cmproduct.cm_infocompare' | t }}</p>
+                <p class="infocomparerem d-none-important">{{ 'general.cmproduct.cm_infocomparerem' | t }}</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<template id="template-wishlist-ajax">
+    <div>
+        <div class="product-store-lists d-flex flex-row align-items-start mb-20" data-js-product="" data-product-handle="" data-product-variant-id="">
+            <div class="product-store-lists__image mr-15">
+                <a href="" class="d-block">
+                    <img src="//cdn.shopify.com/s/assets/no-image-100-c91dd4bdb56513f2cbf4fc15436ca35e9d4ecd014546c8d421b1aece861dfecf_100x.gif" srcset="//cdn.shopify.com/s/assets/no-image-100-c91dd4bdb56513f2cbf4fc15436ca35e9d4ecd014546c8d421b1aece861dfecf_100x.gif 1x, //cdn.shopify.com/s/assets/no-image-100-c91dd4bdb56513f2cbf4fc15436ca35e9d4ecd014546c8d421b1aece861dfecf_100x@2x.gif 2x" alt="">
+                </a>
+            </div>
+            <div class="product-store-lists__content d-flex flex-column align-items-start"><div class="product-store-lists__title mb-3">
+                    <h3 class="p m-0">
+                        <a href=""></a>
+                    </h3>
+                </div>
+                <div class="product-store-lists__variant"></div><div class="product-store-lists__price mt-10 mb-10">
+                    <span class="price" data-js-product-price="" data-js-show-sale-separator=""></span>
+                </div><span class="product-store-lists__remove btn-link js-store-lists-remove-wishlist">Remove</span></div>
+        </div>
+    </div>
+</template>
+
+<div class="scroll-offset-example"></div>
+

@@ -1,0 +1,393 @@
+{%- assign collection = collections[section.settings.home_featured_products] -%}
+<div id="CollectionSection{{ section.id }}" class="CollectionSection {{ section.settings.collection_products_grid }}s" data-section-id="{{ section.id }}123" data-section-type="collection-template" data-grid-type="{{ section.settings.collection_products_grid }}" {% if section.settings.background_toggle %} style="background-color: {{ section.settings.bg_color }}; padding: {{ section.settings.padding_box }}px 0 {{ section.settings.padding_box }}px 0"{% endif %}>
+  <div class="wrapper">
+    {% if section.settings.title != blank %}
+      <div class="section-header">
+        <h2 class="section-header__title">{{ section.settings.title | escape }}</h2>
+      </div>
+    {% endif %}
+
+    <div class="{% if section.settings.collection_products_grid == 'collage' %}grid grid-collage{% else %}grid-uniform{% endif %}">
+
+      {% comment %}
+        Loop through products in your Frontpage collection.
+        This collection is created by default, but you must add products to it.
+
+        See the snippet 'snippets/product-grid-collage.liquid'.
+
+        `is_reverse_row_product`, `three_row_index_product`, `collection_product_count_product`, and `divisible_by_three_product` are
+        all used by 'snippets/product-grid-collage.liquid'
+      {% endcomment %}
+
+      {% if section.settings.home_featured_products == blank or collections[section.settings.home_featured_products] == empty or collections[section.settings.home_featured_products].products_count == 0 %}
+
+      {% comment %}
+        For onboarding new users to your theme, we add some default products and onboarding tutorials to help populate their store
+      {% endcomment %}
+      {% unless emptyState %}
+        {% assign emptyState = true %}
+      {% endunless %}
+        {% include 'onboarding-featured-products' %}
+      {% else %}
+
+        {% if section.settings.collection_products_grid == 'collage' %}
+
+          {% assign is_reverse_row__product = false %}
+          {% assign four_row_index__product = 0 %}
+          {% assign collection_product_count__product = section.settings.products_limit %}
+          {% assign divisible_by_four__product = section.settings.products_limit | modulo:4 %}
+
+          {% for product in collections[section.settings.home_featured_products].products limit: section.settings.products_limit %}
+            {% include 'product-grid-collage' %}
+          {% endfor %}
+         
+        {% endif %}
+        {% if section.settings.collection_products_grid == 'grid' %}
+
+          {% assign grid_item_width = 'medium--one-half large--one-third' %}
+          {% for product in collections[section.settings.home_featured_products].products limit: section.settings.products_limit %}
+            {% include 'product-grid-item' %}
+          {% endfor %}
+
+        {% endif %}
+         {% if section.settings.collection_products_grid == 'list' %}
+
+          {% assign grid_item_width = 'one-whole' %}
+          {% for product in collections[section.settings.home_featured_products].products limit: section.settings.products_limit %}
+            {% include 'product-grid-itemllist' %}
+          {% endfor %}
+        {% endif %}  
+
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+
+{% schema %}
+{
+  "name": {
+    "de": "Featured Kategorie",
+    "en": "Featured collection",
+    "es": "colección destacada",
+    "fr": "Collection en vedette",
+    "it": "Collezione in evidenza",
+    "ja": "特集コレクション",
+    "pt-BR": "Coleção em destaque"
+  },
+  "class": "section_homepage index-section featured-products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": {
+        "de": "Überschrift",
+        "en": "Heading",
+        "es": "Título",
+        "fr": "Titre",
+        "it": "Heading",
+        "ja": "見出し",
+        "pt-BR": "Título"
+      },
+      "default": {
+        "de": "Featured Kategorie",
+        "en": "Featured collection",
+        "es": "colección destacada",
+        "fr": "Collection en vedette",
+        "it": "Collezione in evidenza",
+        "ja": "特集コレクション",
+        "pt-BR": "Coleção em destaque"
+      }
+    },
+    {
+      "type": "collection",
+      "id": "home_featured_products",
+      "label": {
+        "de": "Kategorie",
+        "en": "Collection",
+        "es": "colección",
+        "fr": "Collection",
+        "it": "collezione",
+        "ja": "コレクション",
+        "pt-BR": "Coleção"
+      }
+    },
+    {
+      "type": "checkbox",
+      "id": "background_toggle",
+      "label": "Show background color",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#fafbfb"
+    },
+    {
+      "type": "range",
+      "id": "padding_box",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Padding Top and Bottom",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "img_prod_size",
+      "label": "Image size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "img_alignment",
+      "label": "Image alignment",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        }
+      ]
+    },
+    {
+      "id": "products_limit",
+      "type": "select",
+      "label": "Show products if collage that (4,8,12,16)",
+      "options": [
+        {
+          "value": "2",
+          "label": "2"
+        },
+        {
+          "value": "3",
+          "label": "3"
+        },
+        {
+          "value": "4",
+          "label": "4"
+        },
+        {
+          "value": "6",
+          "label": "6"
+        },
+        {
+          "value": "8",
+          "label": "8"
+        },
+        {
+          "value": "9",
+          "label": "9"
+        },
+        {
+          "value": "12",
+          "label": "12"
+        },
+        {
+          "value": "16",
+          "label": "16"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "width_limit",
+      "label": {
+        "de": "Anzahl der Produkte in einer Reihe",
+        "en": "Number of products in a row",
+        "es": "Número de productos en una fila",
+        "fr": "Nombre de produits dans une rangée",
+        "it": "Numero di prodotti in fila",
+        "ja": "1行の商品数",
+        "pt-BR": "Número de produtos em uma fileira"
+      },
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "worts_limit_prod",
+      "label": {
+        "de": "Count of words in Title",
+        "en": "Count of words in Title",
+        "es": "Count of words in Title",
+        "fr": "Count of words in Title",
+        "it": "Count of words in Title",
+        "ja": "Count of words in Title",
+        "pt-BR": "Count of words in Title"
+      },
+      "min": 3,
+      "max": 100,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_animation_img",
+      "label": {
+        "de": "Animation Images",
+        "en": "Animation Images",
+        "es": "Animation Images",
+        "fr": "Animation Images",
+        "it": "Animation Images",
+        "ja": "Animation Images",
+        "pt-BR": "Animation Images"
+      },
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": {
+        "de": "Anbieter anzeigen",
+        "en": "Show vendor",
+        "es": "Mostrar proveedor",
+        "fr": "Afficher le distributeur",
+        "it": "Mostra fornitore",
+        "ja": "販売元を表示する",
+        "pt-BR": "Exibir fornecedor"
+      },
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "collection_products_grid",
+      "label": {
+        "de": "Rasterstil",
+        "en": "Grid style",
+        "es": "Estilo de cuadrícula",
+        "fr": "Style de grille",
+        "it": "Stile griglia",
+        "ja": "グリッドスタイル",
+        "pt-BR": "Estilo da grade"
+      },
+      "options": [
+        {
+          "value": "collage",
+          "label": {
+            "de": "Collage",
+            "en": "Collage",
+            "es": "Collage",
+            "fr": "Collage",
+            "it": "Collage",
+            "ja": "コラージュ",
+            "pt-BR": "Colagem"
+          }
+        },
+        {
+          "value": "grid",
+          "label": {
+            "de": "Raster",
+            "en": "Grid",
+            "es": "Cuadrícula",
+            "fr": "Grille",
+            "it": "Griglia",
+            "ja": "グリッド",
+            "pt-BR": "Grade"
+          }
+        },
+        {
+          "value": "list",
+          "label": {
+            "de": "List",
+            "en": "List",
+            "es": "List",
+            "fr": "List",
+            "it": "List",
+            "ja": "List",
+            "pt-BR": "List"
+          }
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": {
+        "de": "Featured Kategorie",
+        "en": "Featured collection",
+        "es": "colección destacada",
+        "fr": "Collection en vedette",
+        "it": "Collezione in evidenza",
+        "ja": "特集コレクション",
+        "pt-BR": "Coleção em destaque"
+      },
+      "category": {
+        "de": "Kategorie",
+        "en": "Collection",
+        "es": "Colección",
+        "fr": "Collection",
+        "it": "Collezione",
+        "ja": "コレクション",
+        "pt-BR": "Coleção"
+      }
+    }
+  ],
+  "blocks": []
+}
+{% endschema %}
+{% javascript %}
+$(function() { 
+  $('.CollectionSection div.grid-product').each(function() {        
+    var tip = $(this).find('div.count_holder_small'); 
+
+    $(this).hover(
+        function() { tip.appendTo('body'); },
+        function() { tip.appendTo(this); }
+    ).mousemove(function(e) {
+        var x = e.pageX + 60,
+            y = e.pageY - 50,
+            w = tip.width(),
+            h = tip.height(),
+            dx = $(window).width() - (x + w),
+            dy = $(window).height() - (y + h);
+
+        if ( dx < 50 ) x = e.pageX - w - 60;
+        if ( dy < 50 ) y = e.pageY - h + 130;
+
+        tip.css({ left: x, top: y });
+      });         
+  });
+});
+(function($) {
+  $('.product_item').each(function(){
+    var self = $(this);
+    if ( device.desktop() && self.find(".prod-img2").length > 0 ) {
+      self.on({
+        mouseenter: function(){
+          self.find(".prod-img1").stop().animate({"opacity": 0}, 200);
+          self.find(".prod-img2").stop().animate({"opacity": 1}, 200);
+        },
+        mouseleave: function(){
+          self.find(".prod-img1").stop().animate({"opacity": 1}, 200);
+          self.find(".prod-img2").stop().animate({"opacity": 0}, 200);
+        }
+      });
+    }     
+  });
+})(jQuery);
+{% endjavascript %} 

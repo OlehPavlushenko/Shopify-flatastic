@@ -1,0 +1,963 @@
+<div class="wrapper{% if section.settings.section_view != 'boxed' %} fullwidth{% endif %}"> 
+	<div class="grid">
+		{% for block in section.blocks %}
+			{% case block.type %}
+				{% when 'big_50' %}
+				{% if section.settings.section_view == 'full_width' %}
+					{% case section.settings.section_height %}
+						{% when 'small' %}{%- assign img_size = '950x600' -%}
+						{% when 'medium' %}{%- assign img_size = '950x770' -%}
+						{% when 'large' %}{%- assign img_size = '950x900' -%}
+					{% endcase %}
+				{% else %}
+					{% case section.settings.section_height %}
+						{% when 'small'  %}{%- assign img_size = '570x494' -%}
+						{% when 'medium' %}{%- assign img_size = '570x540' -%}
+						{% when 'large'  %}{%- assign img_size = '570x577' -%}
+					{% endcase %}
+				{% endif %}
+					
+
+					<div class="col-sm-6 grid__item one-half banner_{{ block.type }}">
+						<div class="banner_item">
+						{% if block.settings.item_link.size > 0 %}
+						<a class="banner_caption" href="{{ block.settings.item_link }}">
+						{% endif %}
+							{% if block.settings.item_img.size > 0 %}
+								<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop:  block.settings.img_alignment }} );"></span>
+							{% else %}
+								<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+									{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+								</span>
+							{% endif %}
+							{% if block.settings.item_subtitle.size > 0 or block.settings.item_title.size > 0 or block.settings.item_text.size > 0 or  block.settings.button_text.size > 0 %}
+								<div class="caption_text">
+									{% if block.settings.item_subtitle.size > 0 %}
+										<span class="banner_subtitle">{{ block.settings.item_subtitle }}</span>
+									{% endif %}
+
+									{% if block.settings.item_title.size > 0 %}
+										<div class="banner_title">{{ block.settings.item_title }}</div>
+									{% endif %}
+
+									{% if block.settings.item_text.size > 0 %}
+										<p class="banner_text">{{ block.settings.item_text }}</p>
+									{% endif %}
+
+									{% if block.settings.item_link.size > 0 and block.settings.button_text.size > 0 %}
+										<span class="btn banner_btn">{{ block.settings.button_text }}</span>
+									{% endif %}
+								</div>
+							{% endif %}	
+							{% if block.settings.item_link.size > 0 %}
+							</a>
+							{% endif %}
+						</div>
+					</div>
+
+				{% when 'big_66' %}
+					{% if section.settings.section_view == 'full_width' %}
+					{% case section.settings.section_height %}
+						{% when 'small' %}{%- assign img_size = '1320x620' -%}
+						{% when 'medium' %}{%- assign img_size = '1320x720' -%}
+						{% when 'large' %}{%- assign img_size = '1320x820' -%}
+					{% endcase %}
+					{% else %}
+						{% case section.settings.section_height %}
+							{% when 'small'  %}{%- assign img_size = '870x494' -%}
+							{% when 'medium' %}{%- assign img_size = '870x540' -%}
+							{% when 'large'  %}{%- assign img_size = '870x577' -%}
+						{% endcase %}
+					{% endif %}
+					
+
+					<div class="col-sm-9 grid__item two-thirds banner_{{ block.type }}">
+						<div class="banner_item">
+							{% if block.settings.item_link.size > 0 %}
+								<a class="banner_caption" href="{{ block.settings.item_link }}">
+							{% endif %}
+							{% if block.settings.item_img.size > 0 %}
+								<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+							{% else %}
+								<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+									{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+								</span>
+							{% endif %}
+								{% if block.settings.item_subtitle.size > 0 or block.settings.item_title.size > 0 or block.settings.item_text.size > 0 or  block.settings.button_text.size > 0 %}
+								<div class="caption_text">
+									{% if block.settings.item_subtitle.size > 0 %}
+										<span class="banner_subtitle">{{ block.settings.item_subtitle }}</span>
+									{% endif %}
+
+									{% if block.settings.item_title.size > 0 %}
+										<div class="banner_title">{{ block.settings.item_title }}</div>
+									{% endif %}
+
+									{% if block.settings.item_text.size > 0 %}
+										<p class="banner_text">{{ block.settings.item_text }}</p>
+									{% endif %}
+
+									{% if block.settings.item_link.size > 0 and block.settings.button_text.size > 0 %}
+										<span class="btn banner_btn">{{ block.settings.button_text }}</span>
+									{% endif %}
+								</div>
+							{% endif %}
+							{% if block.settings.item_link.size > 0 %}
+								</a>
+							{% endif %}	
+						</div>
+					</div>
+
+				{% when 'big_66_3item' %}
+					<div class="col-sm-9 grid__item two-thirds banner_{{ block.type }}">
+						<div class="grid">
+							{% if section.settings.section_view == 'full_width' %}
+									{%- assign img_size_left = '675x390' -%}
+									{%- assign img_size_right = '675x390' -%}
+									{%- assign img_size_bottom = '1300x390' -%}
+							{% else %}
+									{%- assign img_size_left = '375x390' -%}
+									{%- assign img_size_right = '375x390' -%}
+									{%- assign img_size_bottom = '750x390' -%}
+							{% endif %}
+						<div class="banner_item banner_left one-half grid__item"><div class="box-hidden">
+
+							{% if block.settings.item1_link.size > 0 %}
+								<a class="banner_caption" href="{{ block.settings.item1_link }}">
+							{% endif %}
+							{% if block.settings.item1_img.size > 0 %}
+								<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item1_img | img_url: img_size_left, crop: block.settings.img1_alignment }} );"></span>
+							{% else %}
+								<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+									{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+								</span>
+							{% endif %}
+							{% if block.settings.item1_subtitle.size > 0 or block.settings.item1_title.size > 0 %}
+								<div class="caption_text">
+									{% if block.settings.item1_subtitle.size > 0 %}
+										<span class="banner_subtitle">{{ block.settings.item1_subtitle }}</span>
+									{% endif %}
+									{% if block.settings.item1_title.size > 0 %}
+										<div class="banner_title">{{ block.settings.item1_title }}</div>
+									{% endif %}	
+								</div>
+							{% endif %}	
+							{% if block.settings.item1_link.size > 0 %}
+								</a>
+							{% endif %}	
+						</div></div>
+						
+						<div class="banner_item banner_right one-half grid__item"><div class="box-hidden">
+							{% if block.settings.item2_link.size > 0 %}
+								<a class="banner_caption" href="{{ block.settings.item2_link }}">
+							{% endif %}
+							{% if block.settings.item2_img.size > 0 %}
+								<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item2_img | img_url: img_size_right, crop: block.settings.img2_alignment }} );"></span>
+							{% else %}
+								<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+									{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+								</span>
+							{% endif %}
+
+							{% if block.settings.item2_subtitle.size > 0 or block.settings.item2_title.size > 0 %}
+								<div class="caption_text">
+									{% if block.settings.item2_subtitle.size > 0 %}
+										<span class="banner_subtitle">{{ block.settings.item2_subtitle }}</span>
+									{% endif %}
+									{% if block.settings.item2_title.size > 0 %}
+										<div class="banner_title">{{ block.settings.item2_title }}</div>
+									{% endif %}	
+								</div>
+							{% endif %}	
+							{% if block.settings.item2_link.size > 0 %}
+								</a>
+							{% endif %}	
+						</div></div>
+						</div>
+						<div class="banner_item banner_bottom">
+							{% if block.settings.item3_link.size > 0 %}
+								<a class="banner_caption" href="{{ block.settings.item3_link }}">
+							{% endif %}
+							{% if block.settings.item3_img.size > 0 %}
+								<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item3_img | img_url: img_size_bottom, crop: block.settings.img3_alignment }} );"></span>
+							{% else %}
+								<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+									{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+								</span>
+							{% endif %}
+
+							{% if block.settings.item3_subtitle.size > 0 or block.settings.item3_title.size > 0 %}
+								<div class="caption_text">
+									{% if block.settings.item3_subtitle.size > 0 %}
+										<span class="banner_subtitle">{{ block.settings.item3_subtitle }}</span>
+									{% endif %}
+									{% if block.settings.item3_title.size > 0 %}
+										<div class="banner_title">{{ block.settings.item3_title }}</div>
+									{% endif %}	
+								</div>
+							{% endif %}	
+							{% if block.settings.item3_link.size > 0 %}
+								</a>
+							{% endif %}	
+						</div>
+					</div>
+
+						
+				{% when 'two_big_50' %}
+					{% if section.settings.section_view == 'full_width' %}
+					{% case section.settings.section_height %}
+						{% when 'small' %}{%- assign img_size = '950x300' -%}
+						{% when 'medium' %}{%- assign img_size = '950x385' -%}
+						{% when 'large' %}{%- assign img_size = '950x450' -%}
+					{% endcase %}
+					{% else %}
+						{% case section.settings.section_height %}
+							{% when 'small'  %}{%- assign img_size = '570x232' -%}
+							{% when 'medium' %}{%- assign img_size = '570x255' -%}
+							{% when 'large'  %}{%- assign img_size = '570x273' -%}
+						{% endcase %}
+					{% endif %}
+					
+
+					<div class="col-sm-6 grid__item one-half banner_{{ block.type }}">
+						<div class="banner_item">
+							<div class="bammer_item_1">
+								{% if block.settings.item_link.size > 0 %}
+									<a class="banner_caption" href="{{ block.settings.item_link }}">
+								{% endif %}
+								{% if block.settings.item_img.size > 0 %}
+									<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+								{% else %}
+									<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+										{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+									</span>
+								{% endif %}
+									{% if block.settings.item_subtitle.size > 0 or block.settings.item_title.size > 0 or block.settings.item_button_text.size > 0 %}
+									<div class="caption_text">
+										{% if block.settings.item_subtitle.size > 0 %}
+											<span class="banner_subtitle">{{ block.settings.item_subtitle }}</span>
+										{% endif %}
+
+										{% if block.settings.item_title.size > 0 %}
+											<div class="banner_title">{{ block.settings.item_title }}</div>
+										{% endif %}
+										{% if block.settings.item_link.size > 0 and block.settings.item_button_text.size > 0 %}
+										<span class="btn banner_btn" href="{{ block.settings.item_link }}">{{ block.settings.item_button_text }}</span>
+										{% endif %}
+									</div>
+									{% endif %}
+								{% if block.settings.item_link.size > 0 %}
+								</a>
+								{% endif %}
+							</div>
+
+							<div class="bammer_item_2">
+								{% if block.settings.item2_link.size > 0 %}
+									<a class="banner_caption" href="{{ block.settings.item2_link }}">
+								{% endif %}
+								{% if block.settings.item2_img.size > 0 %}
+									<div class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item2_img | img_url: img_size, crop: block.settings.img2_alignment }} );"></div>
+								{% else %}
+									<div class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+										{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+									</div>
+								{% endif %}
+								{% if block.settings.item2_subtitle.size > 0 or block.settings.item2_title.size > 0 or block.settings.item2_button_text.size > 0 %}
+									<div class="caption_text">
+										{% if block.settings.item2_subtitle.size > 0 %}
+											<span class="banner_subtitle">{{ block.settings.item2_subtitle }}</span>
+										{% endif %}
+
+										{% if block.settings.item2_title.size > 0 %}
+											<div class="banner_title">{{ block.settings.item2_title }}</div>
+										{% endif %}
+										{% if block.settings.item2_link.size > 0 and block.settings.item2_button_text.size > 0 %}
+										<span class="btn banner_btn" href="{{ block.settings.item2_link }}">{{ block.settings.item2_button_text }}</span>
+										{% endif %}
+									</div>
+								{% endif %}	
+								{% if block.settings.item2_link.size > 0 %}
+									</a>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					
+
+				{% when 'two_small_25' %}
+					{% if section.settings.section_view == 'full_width' %}
+					{% case section.settings.section_height %}
+						{% when 'small' %}{%- assign img_size = '460x385' -%}
+						{% when 'medium' %}{%- assign img_size = '460x400' -%}
+						{% when 'large' %}{%- assign img_size = '460x420' -%}
+					{% endcase %}
+					{% else %}
+						{% case section.settings.section_height %}
+							{% when 'small'  %}{%- assign img_size = '270x232' -%}
+							{% when 'medium' %}{%- assign img_size = '270x255' -%}
+							{% when 'large'  %}{%- assign img_size = '270x273' -%}
+						{% endcase %}
+					{% endif %}
+
+					<div class="col-sm-3 grid__item one-quarter banner_{{ block.type }}">
+						<div class="banner_item">
+							<div class="bammer_item_1">
+							{% if block.settings.item_link.size > 0 %}
+							<a class="banner_caption" href="{{ block.settings.item_link }}">
+							{% endif %}
+								{% if block.settings.item_img.size > 0 %}
+									<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+								{% else %}
+									<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+										{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+									</span>
+								{% endif %}
+								{% if block.settings.item_text.size > 0 %}
+									<span class="caption_title">{{ block.settings.item_text }}</span>
+								{% endif %}
+
+								{% if block.settings.item_link.size > 0 %}	
+								</a>
+								{% endif %}
+							</div>
+							<div class="bammer_item_2">
+								{% if block.settings.item_link.size > 0 %}
+								<a class="banner_caption" href="{{ block.settings.item_link2 }}">
+								{% endif %}
+								{% if block.settings.item2_img.size > 0 %}
+									<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item2_img | img_url: img_size, crop: block.settings.img2_alignment }} );"></span>
+								{% else %}
+									<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+										{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+									</span>
+								{% endif %}							
+									{% if block.settings.item_text2.size > 0 %}
+										<span class="caption_title">{{ block.settings.item_text2 }}</span>
+									{% endif %}
+								{% if block.settings.item_link.size > 0 %}	
+								</a>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+
+				{% when 'one_small_33' %}
+					{% if section.settings.section_view == 'full_width' %}
+					{% case section.settings.section_height %}
+						{% when 'small' %}{%- assign img_size = '680x620' -%}
+						{% when 'medium' %}{%- assign img_size = '680x720' -%}
+						{% when 'large' %}{%- assign img_size = '680x820' -%}
+					{% endcase %}
+					{% else %}
+						{% case section.settings.section_height %}
+							{% when 'small'  %}{%- assign img_size = '360x494' -%}
+							{% when 'medium' %}{%- assign img_size = '360x540' -%}
+							{% when 'large'  %}{%- assign img_size = '360x577' -%}
+						{% endcase %}
+					{% endif %}
+					
+
+					<div class="col-sm-3 grid__item one-third banner_{{ block.type }}">
+						<div class="banner_item">
+							{% if block.settings.item_link.size > 0 %}
+							<a href="{{ block.settings.item_link }}" class="banner_caption">
+							{% endif %}
+							{% if block.settings.item_img.size > 0 %}
+								<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+							{% else %}
+								<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+									{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+								</span>
+							{% endif %}
+							{% if block.settings.item_subtitle.size > 0 or block.settings.item_title.size > 0 %}
+							<div class="caption_text">
+								{% if block.settings.item_subtitle.size > 0 %}
+									<span class="banner_subtitle">{{ block.settings.item_subtitle }}</span>
+								{% endif %}
+
+								{% if block.settings.item_title.size > 0 %}
+									<div class="banner_title">{{ block.settings.item_title }}</div>
+								{% endif %}
+							</div>
+							{% endif %}
+							{% if block.settings.item_link.size > 0 %}
+							</a>
+							{% endif %}
+						</div>
+					</div>
+			{% endcase %}
+		{% endfor %}
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "Banners",
+	"class": "section section_homepage section_banners",
+	"max_blocks": 4,
+	"settings": [
+		{
+			"type": "select",
+			"id": "section_height",
+			"label": "Section height",
+			"options": [
+				{
+					"label": "Small (494px)",
+					"value": "small"
+				},
+				{
+					"label": "Medium (540px)",
+					"value": "medium"
+				},
+				{
+					"label": "Large (577px)",
+					"value": "large"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "section_view",
+			"label": "Section view",
+			"default": "boxed",
+			"options": [
+				{
+					"label": "Boxed",
+					"value": "boxed"
+				},
+				{
+					"label": "Full width",
+					"value": "full_width"
+				}
+			]
+		}
+	],
+	"blocks": [
+
+		// BIG BANNER 50%  //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "big_50",
+			"name": "Big banner(50%)",
+			"limit": 2,
+			"settings": [
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item_img",
+					"label": "Banner image"
+				},
+				{
+					"type": "text",
+					"id": "item_subtitle",
+					"label": "Caption subtitle"
+				},
+				{
+					"type": "richtext",
+					"id": "item_title",
+					"label": "Caption title"
+				},
+				{
+					"type": "text",
+					"id": "item_text",
+					"label": "Caption text"
+				},
+				{
+					"type": "url",
+					"id": "item_link",
+					"label": "Link",
+					"info": "Optional"
+				},
+				{
+					"type": "text",
+					"id": "button_text",
+					"label": "Button text"
+				}
+			]
+		},
+
+
+		// BIG BANNER 66% //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "big_66",
+			"name": "Big banner(66%)",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item_img",
+					"label": "Banner image"
+				},
+				{
+					"type": "text",
+					"id": "item_subtitle",
+					"label": "Caption subtitle"
+				},
+				{
+					"type": "richtext",
+					"id": "item_title",
+					"label": "Caption title"
+				},
+				
+				{
+					"type": "text",
+					"id": "item_text",
+					"label": "Caption text"
+				},
+				{
+					"type": "url",
+					"id": "item_link",
+					"label": "Link",
+					"info": "Optional"
+				},
+				{
+					"type": "text",
+					"id": "button_text",
+					"label": "Button text"
+				}
+			]
+		},
+
+
+		// BIG BANNER 66% WITH 3 ITEMS //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "big_66_3item",
+			"name": "Three banners (66%)",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "header",
+					"content": "Left banner"
+				},
+				{
+					"type": "select",
+					"id": "img1_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item1_img",
+					"label": "Banner image (870x381)"
+				},
+				{
+					"type": "text",
+					"id": "item1_subtitle",
+					"label": "Caption subtitle"
+				},
+				{
+					"type": "richtext",
+					"id": "item1_title",
+					"label": "Caption title"
+				},				
+				
+				{
+					"type": "url",
+					"id": "item1_link",
+					"label": "Link",
+					"info": "Optional"
+				},
+				
+				
+				{
+					"type": "header",
+					"content": "Right banner"
+				},
+				{
+					"type": "select",
+					"id": "img2_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item2_img",
+					"label": "Banner image (870x381)"
+				},
+				{
+					"type": "text",
+					"id": "item2_subtitle",
+					"label": "Caption subtitle"
+				},
+
+				{
+					"type": "richtext",
+					"id": "item2_title",
+					"label": "Caption title"
+				},
+				{
+					"type": "url",
+					"id": "item2_link",
+					"label": "Link",
+					"info": "Optional"
+				},
+
+				{
+					"type": "header",
+					"content": "Bottom banner"
+				},
+				{
+					"type": "select",
+					"id": "img3_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item3_img",
+					"label": "Banner image (870x381)"
+				},
+				{
+					"type": "text",
+					"id": "item3_subtitle",
+					"label": "Caption subtitle"
+				},
+				{
+					"type": "richtext",
+					"id": "item3_title",
+					"label": "Caption title"
+				},
+				{
+					"type": "url",
+					"id": "item3_link",
+					"label": "Link",
+					"info": "Optional"
+				}
+			]
+		},
+
+
+		// TWO BIG BANNERS 50%  //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "two_big_50",
+			"name": "Two big banners(50%)",
+			"limit": 2,
+			"settings": [
+				{
+					"type": "paragraph",
+					"content": "Banner 1"
+				},
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item_img",
+					"label": "Banner 1 image"
+				},
+				{
+					"type": "text",
+					"id": "item_subtitle",
+					"label": "Banner 1 subtitle"
+				},
+				{
+					"type": "richtext",
+					"id": "item_title",
+					"label": "Banner 1 title"
+				},
+				{
+					"type": "text",
+					"id": "item_button_text",
+					"label": "Banner 1 button text"
+				},
+				{
+					"type": "url",
+					"id": "item_link",
+					"label": "Banner 1 link",
+					"info": "Optional"
+				},
+				{
+					"type": "paragraph",
+					"content": "Banner 2"
+				},
+				{
+					"type": "select",
+					"id": "img2_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item2_img",
+					"label": "Banner 2 image"
+				},
+				{
+					"type": "text",
+					"id": "item2_subtitle",
+					"label": "Banner 2 subtitle"
+				},
+				{
+					"type": "richtext",
+					"id": "item2_title",
+					"label": "Banner 2 title"
+				},
+				{
+					"type": "text",
+					"id": "item2_button_text",
+					"label": "Banner 2 button text"
+				},
+				{
+					"type": "url",
+					"id": "item2_link",
+					"label": "Banner 2 link",
+					"info": "Optional"
+				}
+			]
+		},
+
+		// TWO SMALL BANNERS 25%  //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "two_small_25",
+			"name": "Two small banners(25%)",
+			"settings": [
+				{
+					"type": "paragraph",
+					"content": "Banner 1"
+				},
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item_img",
+					"label": "Banner 1 image"
+				},
+				
+				{
+					"type": "url",
+					"id": "item_link",
+					"label": "Banner 1 link",
+					"info": "Optional"
+				},
+				{
+					"type": "text",
+					"id": "item_text",
+					"label": "Banner 1 caption"
+				},
+				{
+					"type": "paragraph",
+					"content": "Banner 2"
+				},
+			    {
+					"type": "select",
+					"id": "img2_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item2_img",
+					"label": "Banner 2 image"
+				},
+				
+				{
+					"type": "url",
+					"id": "item2_link",
+					"label": "Banner 2 link",
+					"info": "Optional"
+				},
+				{
+					"type": "text",
+					"id": "item_text2",
+					"label": "Banner 2 caption"
+				}
+			]
+		},
+
+		// ONE SMALL BANNER 33%  //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "one_small_33",
+			"name": "One small banner(33%)",
+			"settings": [
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item_img",
+					"label": "Banner image"
+				},
+				{
+					"type": "text",
+					"id": "item_subtitle",
+					"label": "Banner subtitle"
+				},
+				{
+					"type": "richtext",
+					"id": "item_title",
+					"label": "Banner title"
+				},
+				{
+					"type": "url",
+					"id": "item_link",
+					"label": "Link",
+					"info": "Optional"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Banners",
+			"category": "Image",
+			"blocks": [
+				{
+					"type": "big_50"
+				},
+				{
+					"type": "big_50"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

@@ -1,0 +1,115 @@
+<!-- /templates/article.liquid -->
+{% assign number_of_comments = article.comments_count %}
+
+{% if comment and comment.created_at %}
+  {% assign number_of_comments = article.comments_count | plus: 1 %}
+{% endif %}
+<div>
+  <article class="article_item">
+    <h2 class="section-header__title">{{ article.title }}</h2>
+    {% if article.image %}
+      <div class="flexible_block">
+        {% if section.settings.img_size == 'master' %}
+          {%- assign article_img = article.image | img_url: 'master' -%}
+        {% else %}
+          {%- assign article_img = article.image | img_url: '1170x', crop: section.settings.img_alignment -%}
+        {% endif %}
+        <div class="layer-1">
+          <img src="{{ article_img }}" alt="{{ article_img.alt }}">
+        </div>
+      </div>
+    {% endif %}
+    <div class="info-block">
+    <p class="article_info">
+      <span>
+        <time class="article_time" datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M' }}">{{ article.published_at | date: '%A, %B %d, %Y' }}</time>
+      </span>
+
+      <span class="article_author">{{ article.author }}</span>
+
+      {% if blog.comments_enabled? %}
+        <span class="article_comments">{{ article.comments_count }} {{ 'blog.articles.comments' | t }}</span>
+      {% endif %}
+    </p>
+
+    <div class="article_content">
+      {{ article.content }}
+    </div>
+
+    {% if article.tags.size > 0 %}
+      <ul class="tags tags--article inline-list">
+        {% include 'tags-article' %}
+      </ul>
+    {% endif %}
+     {% if section.settings.social_sharing_blog %}
+      {% include 'social-sharing', share_title: article.title, share_permalink: article.url, share_image: article.image %}
+      {% endif %}
+      </div>
+      <div class="clearfix"></div>
+  </article>
+</div>
+
+{% schema %}
+{
+  "name": "Article page",
+  "class": "section_template section_template__article",
+  "settings": [
+    {
+      "type": "select",
+      "id": "img_size",
+      "label": "Images size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        },
+        {
+          "value": "master",
+          "label": "Original"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "img_alignment",
+      "label": "Images alignment",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        }
+      ]
+    },
+    {
+        "type": "checkbox",
+        "id": "social_sharing_blog",
+        "label": {
+          "de": "Social-Sharing-Schaltflächen anzeigen",
+          "en": "Show social sharing buttons",
+          "es": "Mostrar botones para compartir en redes sociales",
+          "fr": "Afficher les boutons de partage social",
+          "it": "Mostra i pulsanti per la condivisione sui social",
+          "ja": "ソーシャル共有ボタンを表示する",
+          "pt-BR": "Exibir botões de compartilhamento em redes sociais"
+        },
+        "default": true
+      }
+  ]
+}
+{% endschema %}

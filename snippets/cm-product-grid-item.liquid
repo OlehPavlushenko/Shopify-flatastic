@@ -1,0 +1,61 @@
+{%- if current_variant_id -%}
+    {%- for variant in product.variants -%}
+        {%- if variant.id == current_variant_id -%}
+            {%- assign current_variant = variant -%}
+            {%- break -%}
+        {%- endif -%}
+    {%- endfor -%}
+{%- else -%}
+    {%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- endif -%}
+
+{%- assign url = current_variant.url | within: collection -%}
+{%- assign price = current_variant.price -%}
+{%- assign compare_at_price = current_variant.compare_at_price -%}
+{%- if product.selected_variant.id == product.selected_or_first_available_variant.id and current_variant.image != blank -%}
+    {%- assign image = current_variant.image -%}
+    {%- assign hover_image = null -%}
+{%- else -%}
+    {%- assign image = product.images[0] -%}
+    {%- assign hover_image = product.images[1] -%}
+{%- endif -%}
+
+
+<a href="{{ url }}">
+    <img src="{{ image | img_url: '380x380', crop: 'center' }}"
+         alt="{{ product.title }}">
+          {% for var in product.variants limit:1 %}
+          {% assign varQ = var.inventory_quantity %}
+       
+        <div class="paddingtop8 eins-prod">
+          <span class="vmicon vm2-{% if varQ == 0 %}nostock{% elsif varQ < 10 %}lowstock{% else %}normalstock{% endif %}"></span>
+          <span class="stock-level">{{ 'products.product.stock_level' | t }} : <span>{{ varQ }}</span> {{ 'products.product.stock_items' | t }}</span>
+        </div>
+         {% endfor %}
+</a>
+
+<p class="cm-title"><a href="{{ url }}">{{ product.title }}</a></p>
+    {%- assign current_variant = product.selected_or_first_available_variant -%}
+    {%- assign compare_at_price = current_variant.compare_at_price -%}
+    {%- assign price = current_variant.price -%}
+    <div class="data-price"  data-price-container>
+    {% if compare_at_price > price %}
+      <span class="product-single__price--wrapper" aria-hidden="false">
+        <span id="ComparePrice-{{ section.id }}{{ product.id }}" class="product-single__price--compare-at">
+          {{ compare_at_price | money }}
+        </span>
+      </span>
+      <span id="ComparePriceA11y-{{ section.id }}{{ product.id }}" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+    {% else %}
+      <span id="ComparePriceA11y-{{ section.id }}{{ product.id }}" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+    {% endif %}
+
+    <span id="ProductPrice-{{ section.id }}{{ product.id }}"
+      class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+      content="{{ price | divided_by: 100.00 }}"
+      {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+      {{ price | money }}
+    </span>
+  </div>
+
+{%- assign current_variant_id = null -%}

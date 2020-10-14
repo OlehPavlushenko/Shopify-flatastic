@@ -1,0 +1,162 @@
+{% comment %}
+  Collection template, used on collection.liquid and collection.image.liquid
+{% endcomment %}
+<div class="section-header">
+  {% if section.settings.show_collection_title %}
+  <h2 class="section-header__title list-box">{{ collection.title }}</h2>
+   {% endif %}
+  {% if section.settings.show_collection_image and collection.image %}
+  <div class="collection-image">
+    <img class="img-responsive lazyload" data-sizes="auto" src="{{ "icon-loadings.svg" | asset_url }}" data-src="{{ collection.image.src | img_url: '400x', crop:'center' }}" alt="{{ collection.title }}">
+  </div>
+  {% endif %}
+  {% if section.settings.show_collection_des and collection.description != blank %}
+    <div class="catdesc rtes">
+      {{ collection.description }}
+    </div>
+  {% endif %}
+  <div class="clearfix"></div>
+  {% assign has_cat = false %}
+  {% for block in section.blocks %}
+    {% if collection.title contains collections[block.settings.custom_collection].title %}
+      {% assign has_cat = true %}
+    {% endif %}
+  {% endfor %}
+  {% if has_cat %}
+    <div class="category-column">
+      <div class="grid">
+      {% for block in section.blocks %}
+          {%- assign block_counter = 1 -%}
+
+          {% if collections[block.settings.custom_collection].title.size > 0 %}
+            {% if collection.title contains collections[block.settings.custom_collection].title %}
+              {%- assign block_counter = block_counter | plus: 1 -%}
+                {% case block.type %}
+                  {% when 'sub_collection' %}
+                    {% if block.settings.show_collection and block.settings.linklist_collections_name != blank %}
+                      {% for link in linklists[block.settings.linklist_collections_name].links %}
+
+                      {% assign _collection = link.object %}
+
+                      <div class="grid__item large--two-tenths">
+                        <a href="{{ _collection.url }}"><span><img class="img-responsive lazyload" data-sizes="auto" src="{{ "icon-loadings.svg" | asset_url }}" data-src="{{ _collection.image.src | img_url: '220x260', crop:'center' }}" alt="{{ _collection.title }}"><span></a>
+                        <div class="category-info">
+                          <div class="category">
+                            <h5 class="category-info__title">{{ _collection.title }} ({{ _collection.products.size }})</h5>
+                          </div>
+                        </div>
+                      </div>
+                      {% endfor %}
+                    {% endif %}
+                {% endcase %}
+            {% endif %}
+          {% endif %}
+      {% endfor %}
+    </div>
+  </div> 
+  {% endif %} 
+  {% if section.settings.show_collection and section.settings.linklist_collections_name != blank %}
+  <div class="category-column">
+    <div class="grid">
+      {% for link in linklists[section.settings.linklist_collections_name].links %}
+
+      {% assign _collection = link.object %}
+
+      <div class="grid__item large--two-tenths">
+        <a href="{{ _collection.url }}"><span><img src="{{ _collection.image.src | img_url: '400x480', crop:'center' }}" alt="#"><span></a>
+        <div class="category-info">
+          <div class="category">
+            <h5 class="category-info__title">{{ _collection.title }} ({{ _collection.products.size }})</h5>
+          </div>
+        </div>
+      </div>
+
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  <div class="clearfix"></div>
+    <div class="grid--full collection-sorting{% if section.settings.collection_sort_enable %} collection-sorting--enabled{% endif %}">
+      {% if section.settings.collection_sort_enable %}
+      {% include 'collection-sorting' %}
+      {% endif %}
+      <span class="collection_products"><span>{{ collection.products_count }}</span> {{ 'layout.collection_listing.products' | t }}</span>
+      {% if section.settings.collection_products_grid == 'grid' %}
+      <div id="navigation" class="navigation_grid">
+        <span>{{ 'layout.collection_listing.view' | t }}</span>
+          <a class="active hasTooltip Cgrid" href="#" title="" data-original-title="Grid"><i class="fa fa-th"></i></a>
+          <a class="hasTooltip Clist" href="#" title="" data-original-title="List"><i class="fa fa-th-list"></i></a>
+      </div>
+      {% endif %}
+      {% if section.settings.collection_products_grid == 'list' %}
+      <div id="navigation" class="navigation_list">
+        <span>{{ 'layout.collection_listing.view' | t }}</span>
+          <a class="hasTooltip Cgrid" href="#" title="" data-original-title="Grid"><i class="fa fa-th"></i></a>
+          <a class="active hasTooltip Clist" href="#" title="" data-original-title="List"><i class="fa fa-th-list"></i></a>
+      </div>
+      {% endif %}
+    </div>
+</div>
+{% paginate collection.products by section.settings.products_limit %}
+{% if section.settings.collection_products_grid == 'grid' %}
+  <div class="box-uniform"><div id="vsloading">
+    <img id="page_preloader__img" src="{{ 'shopify_loader2.gif' | asset_url }}" alt="">
+  </div>
+  <div class="grid-uniform"> 
+    <div class="grid-uniform-prod" data-count="{{collection.products_count}}">
+
+    {% assign grid_item_width = 'medium--one-half large--one-third' %}
+    {% for product in collection.products %}
+    
+      {% include 'product-grid-item' %}
+    {% else %}
+      {% if collection.handle == 'all' %}
+        {% comment %}
+          Add default products to help with onboarding for collections/all only
+        {% endcomment %}
+        {% include 'onboarding-featured-products' %}
+      {% else %}
+        {% comment %}
+          If collection exists but is empty, display message
+        {% endcomment %}
+        <div class="grid__item text-center">
+          <p>{{ 'collections.general.no_matches' | t }}</p>
+        </div>
+      {% endif %}
+    {% endfor %}
+    {% if paginate.pages > 1 %}
+      {% include 'pagination' %}
+    {% endif %}
+  </div></div></div>
+{% endif %}
+{% if section.settings.collection_products_grid == 'list' %}
+<div class="box-uniform"><div id="vsloading">
+    <img id="page_preloader__img" src="{{ 'shopify_loader2.gif' | asset_url }}" alt="">
+  </div>
+<div class="grid-uniform"><div class="grid-uniform-prod">
+    {% assign grid_item_width = 'one-whole' %}
+    {% for product in collection.products %}
+      {% include 'product-grid-itemllist' %}
+    {% else %}
+      {% if collection.handle == 'all' %}
+        {% comment %}
+          Add default products to help with onboarding for collections/all only
+        {% endcomment %}
+        {% include 'onboarding-featured-products' %}
+      {% else %}
+        {% comment %}
+          If collection exists but is empty, display message
+        {% endcomment %}
+        <div class="grid__item text-center">
+          <p>{{ 'collections.general.no_matches' | t }}</p>
+        </div>
+      {% endif %}
+    {% endfor %}
+    {% if paginate.pages > 1 %}
+      {% include 'pagination' %}
+    {% endif %}
+  </div></div></div>
+{% endif %}
+<div class="clearfix"></div>
+{% endpaginate %}
+

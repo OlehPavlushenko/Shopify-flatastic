@@ -1,0 +1,99 @@
+{% if template.name != "index" %}
+<div class="breadcrumbs">
+	<div class="wrapper">
+		<ul>
+			<li><a href="/">{{ 'layout.breadcrumbs.home' | t }}</a></li>
+
+			{% case template %}{% unless template == 'index' or template == 'cart' or template == 'list-collections' %}
+				<nav class="breadcrumb" role="navigation" aria-label="breadcrumbs">
+				  <a href="/" title="Home">Home</a>
+				  {% if template contains 'page' %}
+				    <span aria-hidden="true">&rsaquo;</span>
+				    <span>{{ page.title }}</span>
+				  {% elsif template contains 'product' %}
+				    {% if collection.url %}
+				      <span aria-hidden="true">&rsaquo;</span>
+				      {{ collection.title | link_to: collection.url }}
+				    {% endif %}
+				    <span aria-hidden="true">&rsaquo;</span>
+				    <span>{{ product.title }}</span>
+				  {% elsif template contains 'collection' and collection.handle %}
+				    <span aria-hidden="true">&rsaquo;</span>
+				    {% if current_tags %}
+				      {% capture url %}/collections/{{ collection.handle }}{% endcapture %}
+				      {{ collection.title | link_to: url }}
+				      <span aria-hidden="true">&rsaquo;</span>
+				      <span>{{ current_tags | join: " + " }}</span>
+				    {% else %}
+				      <span>{{ collection.title }}</span>
+				    {% endif %}
+				  {% elsif template == 'blog' %}
+				    <span aria-hidden="true">&rsaquo;</span>
+				    {% if current_tags %}
+				      {{ blog.title | link_to: blog.url }}
+				      <span aria-hidden="true">&rsaquo;</span>
+				      <span>{{ current_tags | join: " + " }}</span>
+				    {% else %}
+				    <span>{{ blog.title }}</span>
+				    {% endif %}
+				  {% elsif template == 'article' %}
+				    <span aria-hidden="true">&rsaquo;</span>
+				    {{ blog.title | link_to: blog.url }}
+				    <span aria-hidden="true">&rsaquo;</span>
+				    <span>{{ article.title }}</span>
+				  {% else %}
+				   <span aria-hidden="true">&rsaquo;</span>
+				   <span>{{ page_title }}</span>
+				  {% endif %}
+				</nav>
+				{% endunless %}
+				{% when 'list-collections' %}
+					<li><span>{{ 'layout.breadcrumbs.collections' | t }}</span></li>
+
+				{% when 'collection', 'collection.4', 'collection.12', 'collection.16' %}
+					{% if current_tags %}
+						<li><a href="/collections/">{{ 'layout.breadcrumbs.collections' | t }}</a></li>
+						<li><a href="{{ collection.url }}">{{ collection.title }}</a></li>
+						<li><span>{{ current_tags }}</span></li>
+					{% else %}
+						<li><a href="/collections/">{{ 'layout.breadcrumbs.collections' | t }}</a></li>
+						<li><span>{{ collection.title }}</span></li>
+					{% endif %}
+
+				{% when 'product' %}
+					{% if collection.id.size > 0 %}
+						<li><a href="/collections/">{{ 'layout.breadcrumbs.collections' | t }}</a></li>
+						<li><a href="{{ collection.url }}">{{ collection.title }}</a></li>
+					{% else %}
+						<li><a href="/collections/all">{{ 'layout.breadcrumbs.products' | t }}</a></li>
+					{% endif %}
+					<li><span>{{ product.title }}</span></li>
+
+				{% when 'blog' %}
+					{% if canonical_url contains 'tagged' %}
+						<li><a href="{{ blog.url }}">{{ blog.title }}</a></li>
+						<li><span>{{ current_tags }}</span></li>
+					{% else %}
+						<li><span>{{ blog.title }}</span></li>
+					{% endif %}
+
+				{% when 'article' %}
+					<li><a href="{{ blog.url }}">{{ blog.title }}</a></li>
+					<li><span>{{ article.title }}</span></li>
+
+				{% when 'search' %}
+					<li><span>{{ 'layout.breadcrumbs.search' | t }}{% if search.terms %}: {{ search.terms }}{% endif %}</span></li>
+
+				{% when 'customers/addresses', 'customers/order' %}
+					<li><a href="/account">{{ 'layout.breadcrumbs.account' | t }}</a></li>
+					<li><span>{{ page_title }}</span></li>
+				{% when 'page', 'page.contact', 'cart' %}
+					<li><span>{{ page_title }}</span></li>
+
+				{% else %}
+					<li><span>{{ page_title }}</span></li>
+
+			{% endcase %}
+		</ul>
+	</div>
+</div>{% endif %}

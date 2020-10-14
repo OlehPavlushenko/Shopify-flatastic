@@ -1,0 +1,1238 @@
+<div id="pseudo_sticky_block"></div>
+<!-- begin site-nav -->
+<div class="header-navigation">
+    <div class="aless-block">
+      <ul>
+      {% comment %}  HEADER wishlist  {% endcomment %}
+      {% if section.settings.wishlist_btn %}  
+      <li class="wishlist-button">
+        <a href="#"
+           class="cm-wishlist-icon js-popup-button"
+           data-js-information-input="wishlist"
+           data-js-popup-button="wishlist-full"><i class="fa fa-heart-o" aria-hidden="true"></i>
+            <span class="cm-wishlist-counter" data-js-wishlist-count="0">0</span>
+        </a>
+      </li>
+      {% endif %}
+      {% comment %}  HEADER compare  {% endcomment %}
+      {% if section.settings.compare_btn %}  
+      <li class="compare-button">
+          <a href="#"
+             class="cm-compare-icon js-popup-button"
+             data-js-information-input="compare"
+             data-js-popup-button="compare-full"><i class="fa fa-balance-scale" aria-hidden="true"></i>
+              <span class="cm-compare-counter" data-js-compare-count="0">0</span>
+          </a>
+      </li>
+      {% endif %}
+       <li class="cart-button">
+        <a href="/cart" class="cart-link js-drawer-open-button-right" aria-controls="CartDrawer">
+          <span class="icon-fallback-text">
+            <i class="fa fa-shopping-basket" aria-hidden="true"></i>
+            <span class="fallback-text">{{ 'layout.cart.title' | t }}</span>
+          </span>
+          <span class="cart-link__bubble{% if cart.item_count > 0 %} cart-link__bubble--visible{% endif %}">{{ cart.item_count }}</span>
+        </a>
+      </li>
+     </ul>
+    </div>
+    <nav id="megamenu" class="megamenu">
+      <h2 id="megamenu_mobile_toggle"><i class="fa fa-bars" aria-hidden="true"></i>{{ 'general.header.menu' | t }}</h2>
+
+      <div id="megamenu_mobile_close">
+        <div class="close_icon"></div>
+      </div>
+
+      <ul id="megamenu_level__1" class="level_1">
+        {% for block in section.blocks %}
+          {% assign canonical_url_trim = canonical_url | replace: shop.url %}
+          {% assign block_url_trim = block.settings.link | replace: shop.url %}
+          {% if canonical_url_trim == "/" %}{% assign canonical_url_trim = "" %}{% endif %}
+
+          <li class="level_1__item {% case block.type %}{% when 'link-linklist' %}level_2__small{% when 'link-4linklists' %}level_2__links {{ block.settings.position }}{% when 'link-8banners' %}level_2__brands {{ block.settings.position-b }}{% when 'link-products' %}level_2__products{% when 'link-blog' %}level_2__blog{% endcase %}">
+            <a id="{{ block.id }}-{{ forloop.index }}" class="level_1__link {% if block_url_trim == canonical_url_trim %}curent{% endif %}" href="{{ block.settings.link }}">{{ block.settings.title }}
+              {% if block.settings.links.size > 0 or block.settings.links_1.size > 0 or block.settings.links_2.size > 0 or block.settings.links_3.size > 0 or block.settings.links_4.size > 0 or block.settings.products.size > 0 or block.settings.blog.size > 0 or block.settings.banner_1_link.size > 0 %}<i class="level_1__trigger megamenu_trigger" data-submenu="menu_{{ block.id }}"></i>{% endif  %} 
+            </a>
+
+            {% case block.type %}
+              {% when 'link-linklist' %}
+                {% if block.settings.links.size > 0 %}
+                  <ul class="level_2" id="menu_{{ block.id }}">
+                    <li class="punkte">
+                      <div>
+                        {%- assign links_small = block.settings.links -%}
+                        <ul class="level_3">
+                          {% assign tmp_col_size = collection.id | size | plus:0 %}
+                          {% for link in linklists[links_small].links %}
+                          {% comment %} {{ link.title }}: active: {{ link.active }}, child_active: {{ link.child_active }} {% endcomment %}
+                          
+
+                            {%- assign child_list_handle = link.title | handleize -%}
+
+                            {%- assign link_count = 0 -%}
+                            {% for childlink in linklists[child_list_handle].links %}
+                              {%- assign link_count = link_count | plus: 1 -%}
+                            {% endfor %}
+
+                            {% if link.title contains ';' %}
+                            {%- assign titlemitbadge = link.title | split: ',' | split: ';' -%}
+                            {%- assign titlemitbadgetext = titlemitbadge[0] | split: '["' -%}
+                            {%- assign titlemitbadgename = titlemitbadge[1] -%}
+                            {%- assign titlemitbadgecolor = titlemitbadge[2] | split: '"]' -%}
+                            {% assign idhandles = titlemitbadgetext | camelcase %}
+                            {% else %}
+                              {%- assign titlemitbadgetext = link.title -%}
+                              {%- assign titlemitbadgename = false -%}
+                              {%- assign titlemitbadgecolor = false -%}  
+                              {% assign idhandles = titlemitbadgetext | camelcase %}
+                            {% endif %}
+                            
+                            
+                            <li class="level_3__item {% if link_count > 0 %}with_ul{% endif %}">
+                              <a id="{{ block.id }}-{{ forloop.index }}-{{ idhandles }}" class="level_3__link {% if link.active == true %}curent{% endif %}" href="{{ link.url }}">{{ titlemitbadgetext }}{% if link_count > 0 %}<i class="level_3__trigger megamenu_trigger" data-submenu="submenu_{{ block.id }}-{{ forloop.index }}"></i>{% endif %}{% if titlemitbadgename %}<span style="background:{{ titlemitbadgecolor }};" class="badge">{{ titlemitbadgename }}</span>{% endif %}</a>
+
+                              {% if link_count > 0 %}
+                                <ul class="level_3_2 droped_linklist" id="submenu_{{ block.id }}-{{ forloop.index }}">
+                                  {% for childlink in linklists[child_list_handle].links %}
+                                    {%- assign child_list_2_handle = childlink.title | handleize -%}
+                                      {% if tmp_col_size > 0 %}
+                                        {% assign tmp_col = canonical_url | replace: shop.url %}
+                                        {% assign handles = childlink.url %}
+                                      {% endif %}
+                                    {%- assign link_count = 0 -%}
+                                    {% for childlink in linklists[child_list_2_handle].links %}
+                                      {%- assign link_count = link_count | plus: 1 -%}
+                                    {% endfor %}
+                                    {% if childlink.title contains ';' %}
+
+                                    {%- assign titlemitbadge = childlink.title | split: ',' | split: ';' -%}
+                                    {%- assign titlemitbadgetext = titlemitbadge[0] | split: '["' -%}
+                                    {%- assign titlemitbadgename = titlemitbadge[1] -%}
+                                    {%- assign titlemitbadgecolor = titlemitbadge[2] | split: '"]' -%}
+                                    {% else %}
+                                      {%- assign titlemitbadgetext = childlink.title -%}
+                                      {%- assign titlemitbadgename = false -%}
+                                      {%- assign titlemitbadgecolor = false -%}  
+                                    {% endif %} 
+                                    <li class="level_3_2_item {% if link_count > 0 %}with_ul{% endif %}">
+                                      <a id="{{ block.id }}-{{ forloop.index0 }}-2-{{ idhandles }}"  class="level_3_2_link {% if tmp_col_size > 0 and tmp_col == handles %}curent{% endif %}" href="{{ childlink.url }}">{{ titlemitbadgetext }}{% if link_count > 0 %}<i class="level_3__trigger megamenu_trigger" data-submenu="subsubmenu_{{ block.id }}-{{ forloop.index }}"></i>{% endif %}{% if titlemitbadgename %}<span style="background:{{ titlemitbadgecolor }}" class="badge">{{ titlemitbadgename }}</span>{% endif %}</a>
+
+                                      {% if link_count > 0 %}
+                                        <ul class="level_3_3 droped_linklist" id="subsubmenu_{{ block.id }}-{{ forloop.index }}">
+                                          {% for childlink in linklists[child_list_2_handle].links %}
+                                          {% if tmp_col_size > 0 %}
+                                            {% assign tmp_col = canonical_url | replace: shop.url %}
+                                            {% assign handles = childlink.url %}
+                                          {% endif %}
+                                          {% if childlink.title contains ';' %}
+                                            {%- assign titlemitbadge = childlink.title | split: ',' | split: ';' -%}
+                                            {%- assign titlemitbadgetext = titlemitbadge[0] | split: '["' -%}
+                                            {%- assign titlemitbadgename = titlemitbadge[1] -%}
+                                            {%- assign titlemitbadgecolor = titlemitbadge[2] | split: '"]' -%}
+                                            {% else %}
+                                              {%- assign titlemitbadgetext = childlink.title -%}
+                                              {%- assign titlemitbadgename = false -%}
+                                              {%- assign titlemitbadgecolor = false -%}  
+                                            {% endif %}
+                                            <li class="level_3_3_item">
+                                              <a id="{{ block.id }}-{{ forloop.index }}-3-{{ idhandles }}" class="level_3_3_link {% if tmp_col_size > 0 and tmp_col == handles %}curent{% endif %}" href="{{ childlink.url }}">{{ titlemitbadgetext }}{% if titlemitbadgename %}<span style="background:{{ titlemitbadgecolor }}" class="badge">{{ titlemitbadgename }}</span>{% endif %}</a>
+                                            </li>
+                                          {% endfor %}
+                                        </ul>
+                                      {% endif %}
+                                    </li>
+                                  {% endfor %}
+                                </ul>
+                              {% endif %}
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    </li>
+                  </ul>
+                {% endif %}
+
+              {% when 'link-4linklists' %}
+                {% if block.settings.links_1.size > 0 or block.settings.links_2.size > 0 or block.settings.links_3.size > 0 or block.settings.links_4.size > 0 %}
+                  <ul class="level_2 {{ block.settings.column-width }} {{ block.settings.position }}" id="menu_{{ block.id }}">
+                    {% if block.settings.products.size > 0  %}
+                    <li class="container-box two-third {% if block.settings.links_1.size > 0 and block.settings.links_2.size > 0 and block.settings.links_3.size > 0 and block.settings.links_4.size > 0 %} box-four {% elsif block.settings.links_1.size > 0 and block.settings.links_2.size > 0 and block.settings.links_3.size > 0 %} box-three {% elsif block.settings.links_1.size > 0 and block.settings.links_2.size > 0 %} box-two {% else %} box-one {% endif %}">
+                    {% else %}
+                    <li class="container-box one-whole {% if block.settings.links_1.size > 0 and block.settings.links_2.size > 0 and block.settings.links_3.size > 0 and block.settings.links_4.size > 0 %} box-four {% elsif block.settings.links_1.size > 0 and block.settings.links_2.size > 0 and block.settings.links_3.size > 0 %} box-three {% elsif block.settings.links_1.size > 0 and block.settings.links_2.size > 0 %} box-two {% else %} box-one {% endif %}
+                    ">
+                    {% endif %}
+                      {% for i in (1..4) %}
+                        {% capture list %}links_{{ i }}{% endcapture %}
+                        {% capture item_image %}image_{{ i }}{% endcapture %}
+                        {% capture title_link %}title_{{ i }}_link{% endcapture %}
+
+                        {%- assign list = block.settings[list] -%}
+                        {%- assign item_image = block.settings[item_image] -%}
+                        {% if list.size > 0 %}
+                        <div class="megamenu_col__item count_{{ i }}">
+
+                          <h3  class="desctop with_ul {% if block.settings.show_title %}visible{% endif %}">
+                            {% if block.settings[title_link].size > 0  %}
+                              {% assign top_col = canonical_url | replace: shop.url %}
+                              {% assign handles = block.settings[title_link] %}
+                              <a id="{{ block.id }}-{{ forloop.index }}-{{ idhandles }}a" class="tf {% if top_col == handles %}curent{% endif %}" href="{{ block.settings[title_link] }}">{% endif %}
+                              {{ linklists[list].title }}  {% if block.settings[title_link].size > 0  %}</a>
+                            {% endif %}
+                          </h3>
+
+                          {% if item_image %}
+                            {% if block.settings[title_link].size > 0  %}<a href="{{ block.settings[title_link] }}">{% endif %}
+                            <img class="img-responsive lazyload" data-sizes="auto" src="{{ "icon-loadings.svg" | asset_url }}" data-src="{{ item_image | img_url: '400x', crop:'center' }}" alt="{{ linklists[list].title }}">
+                            {% if block.settings[title_link].size > 0  %}</a>{% endif %}
+                          {% endif %}
+                           <h3 class="mobile with_ul">
+                            {% if block.settings[title_link].size > 0  %}
+                              {% assign top_col = canonical_url | replace: shop.url %}
+                              {% assign handles = block.settings[title_link] %}
+                              <a id="{{ block.id }}-{{ forloop.index }}-{{ idhandles }}" class="tf {% if top_col == handles %}curent{% endif %}" href="{{ block.settings[title_link] }}">{% endif %}
+                                {{ linklists[list].title }} <i class="level_2__trigger megamenu_trigger" data-submenu="menu_{{ block.id }}-{{ i }}"></i>
+                              {% if block.settings[title_link].size > 0  %}</a>
+                            {% endif %}
+                          </h3>
+                          <ul class="level_3" id="menu_{{ block.id }}-{{ i }}">
+                            {% assign tmp_col_size = collection.id | size | plus:0 %}
+                            {% for link in linklists[list].links %}
+                            {%- assign child_list_handle = link.title | handleize -%}
+                            {%- assign link_count = 0 -%}
+                            {% for childlink in linklists[child_list_handle].links %}
+                              {%- assign link_count = link_count | plus: 1 -%}
+                            {% endfor %}
+                              <li class="level_3__item {% if link_count > 0 %}with_ul{% endif %} {% if link.type == "collection_link" or link.type == "collections_link"  %}colections{% endif %}">
+                                {% if link.title contains ';' %}
+                                {%- assign titlemitbadge = link.title | split: ',' | split: ';' -%}
+                                {%- assign titlemitbadgetext = titlemitbadge[0] | split: '["' -%}
+                                {%- assign titlemitbadgename = titlemitbadge[1] -%}
+                                {%- assign titlemitbadgecolor = titlemitbadge[2] | split: '"]' -%}
+                                {% assign idhandles = titlemitbadgetext | camelcase %}
+                                {% else %}
+                                  {%- assign titlemitbadgetext = link.title -%}
+                                  {%- assign titlemitbadgename = false -%}
+                                  {%- assign titlemitbadgecolor = false -%}
+                                  {% assign idhandles = titlemitbadgetext | camelcase %}  
+                                {% endif %}
+                                <a id="{{ block.id }}-{{ forloop.index }}-{{ idhandles }}" class="level_3__link {% if link.active == true %}curent{% endif %}" href="{{ link.url }}">{{ titlemitbadgetext }}{% if link_count > 0 %}<i class="level_3__trigger megamenu_trigger" data-submenu="submenu_{{ block.id }}-{{ forloop.index }}-{{ i }}"></i>{% endif %}{% if titlemitbadgename %}<span style="background:{{ titlemitbadgecolor }}" class="badge">{{ titlemitbadgename }}</span>{% endif %}</a>
+                                {% if link_count > 0 %}
+                                <ul class="level_3_2 droped_linklist" id="submenu_{{ block.id }}-{{ forloop.index }}-{{ i }}">
+                                  {% for childlink in linklists[child_list_handle].links %}
+                                    {%- assign child_list_2_handle = childlink.title | handleize -%}
+                                    {% if tmp_col_size > 0 %}
+                                      {% assign tmp_col = canonical_url | replace: shop.url %}
+                                      {% assign handles = childlink.url %}
+                                    {% endif %}
+                                    {%- assign link_count = 0 -%}
+                                    {% for childlink in linklists[child_list_2_handle].links %}
+                                      {%- assign link_count = link_count | plus: 1 -%}
+                                    {% endfor %}
+                                    {% if childlink.title contains ';' %}
+                                    {%- assign titlemitbadge = childlink.title | split: ',' | split: ';' -%}
+                                    {%- assign titlemitbadgetext = titlemitbadge[0] | split: '["' -%}
+                                    {%- assign titlemitbadgename = titlemitbadge[1] -%}
+                                    {%- assign titlemitbadgecolor = titlemitbadge[2] | split: '"]' -%}
+                                    {% else %}
+                                      {%- assign titlemitbadgetext = childlink.title -%}
+                                      {%- assign titlemitbadgename = false -%}
+                                      {%- assign titlemitbadgecolor = false -%}  
+                                    {% endif %}
+                                    <li class="level_3_2_item {% if link_count > 0 %}with_ul{% endif %}">
+                                      <a id="{{ block.id }}-{{ forloop.index0 }}-2-{{ idhandles }}" class="level_3_2_link {% if tmp_col_size > 0 and tmp_col == handles %}curent{% endif %}" href="{{ childlink.url }}">{{ titlemitbadgetext }}{% if link_count > 2 %}<i class="level_3__trigger megamenu_trigger" data-submenu="subsubmenu_{{ block.id }}-{{ forloop.index }}-{{ i }}"></i>{% endif %}{% if titlemitbadgename %}<span style="background:{{ titlemitbadgecolor }}" class="badge">{{ titlemitbadgename }}</span>{% endif %}</a>
+
+                                      {% if link_count > 0 %}
+                                        <ul class="level_3_3 droped_linklist" id="subsubmenu_{{ block.id }}-{{ forloop.index }}-{{ i }}">
+                                          {% for childlink in linklists[child_list_2_handle].links %}
+                                          {% if tmp_col_size > 0 %}
+                                            {% assign tmp_col = canonical_url | replace: shop.url %}
+                                            {% assign handles = childlink.url %}
+                                          {% endif %}
+                                          {% if childlink.title contains ';' %}
+                                            {%- assign titlemitbadge = childlink.title | split: ',' | split: ';' -%}
+                                            {%- assign titlemitbadgetext = titlemitbadge[0] | split: '["' -%}
+                                            {%- assign titlemitbadgename = titlemitbadge[1] -%}
+                                            {%- assign titlemitbadgecolor = titlemitbadge[2] | split: '"]' -%}
+                                            {% else %}
+                                              {%- assign titlemitbadgetext = childlink.title -%}
+                                              {%- assign titlemitbadgename = false -%}
+                                              {%- assign titlemitbadgecolor = false -%}  
+                                            {% endif %}
+                                            <li class="level_3_3_item">
+                                              <a id="{{ block.id }}-{{ forloop.index0 }}-3-{{ idhandles }}" class="level_3_3_link {% if tmp_col_size > 0 and tmp_col == handles %}curent{% endif %}" href="{{ childlink.url }}">{{ titlemitbadgetext }}{% if titlemitbadgename %}<span style="background:{{ titlemitbadgecolor }}" class="badge">{{ titlemitbadgename }}</span>{% endif %}</a>
+                                            </li>
+                                          {% endfor %}
+                                        </ul>
+                                      {% endif %}
+                                    </li>
+                                  {% endfor %}
+                                </ul>
+                              {% endif %}
+                              </li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                       {% endif %}
+                      {% endfor %}
+                     
+                    </li>
+                    {% if block.settings.products.size > 0  %}
+                    <li class="container-box one-third">
+                    <div>
+                      <h3 class="prod-section">{{ block.settings.prod_title }} <i class="level_2__trigger megamenu_trigger" data-submenu="menu_{{ block.id }}-{{ i }}"></i></h3>
+                    {%- assign products = block.settings.products -%}
+
+                    {% if products.size > 0 %}
+                      
+                    {% case block.settings.prod_img_size %}
+                      {% when 'small'  %}{%- assign prod_img_size = '270x190' -%}
+                      {% when 'medium' %}{%- assign prod_img_size = '270x270' -%}
+                      {% when 'large'  %}{%- assign prod_img_size = '270x341' -%}
+                    {% endcase %}               
+                        <ul class="level_3 box-prod {% if sold_out %} is-sold-out{% endif %}" id="menu_{{ block.id }}-{{ i }}">
+                          <li>
+                          {% for product in collections[products].products limit:block.settings.prod_limit %}
+
+                            {% assign on_sale = false %}
+                            {% if product.compare_at_price > product.price %}
+                              {% assign on_sale = true %}
+                            {% endif %}
+
+                            {% assign sold_out = true %}
+                            {% if product.available %}
+                              {% assign sold_out = false %}
+                            {% endif %}
+
+                            {%- assign current_variant = product.selected_or_first_available_variant -%}
+                            {%- assign compare_at_price = current_variant.compare_at_price -%}
+                            {%- assign price = current_variant.price -%}
+                            <div class="col-item">
+                              <div class="product">
+                                <div class="grid-product-image-wrapper">
+                                    <div class="product_img">
+                                      <a class="img_change" href="{{ product.url | within: collection }}">
+                                        <img class="img__1 img-responsive lazyload" data-sizes="auto" src="{{ "icon-loadings.svg" | asset_url }}" data-src="{{ product.featured_image.src | product_img_url: prod_img_size, crop: 'center' }}" alt="{{ product.featured_image.alt | escape }}">
+                                      </a>
+                                    </div>
+                                </div>
+                                <div class="product-info">
+                                <p class="grid-product-vendor">{{ product.vendor }}</p>
+                                <a href="{{ product.url | within: collection }}" class="product-name">
+                                  <span class="grid-product-title">{{ product.title }}</span>
+                                </a>  
+                                <div class="grid-product-price-wrap">
+                                  <div class="product-price">
+                                    <div  data-price-container>
+                                      {% if compare_at_price > price %}
+                                      <span class="product-single__price--wrapper" aria-hidden="false">
+                                        <span id="ComparePrice-{{ section.id }}{{ product.id }}" class="product-single__price--compare-at">
+                                          {{ compare_at_price | money }}
+                                        </span>
+                                      </span>
+                                      <span id="ComparePriceA11y-{{ section.id }}{{ product.id }}" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+                                      {% else %}
+                                      <span id="ComparePriceA11y-{{ section.id }}{{ product.id }}" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+                                      {% endif %}
+
+                                      <span id="ProductPrice-{{ section.id }}{{ product.id }}"
+                                            class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+                                            content="{{ price | divided_by: 100.00 }}"
+                                            {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+                                        {{ price | money }}
+                                      </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          {% endfor %}
+                           </li>
+                        </ul>
+                      </div>
+                    {% endif %}
+                    </li>
+                    {% endif %}
+                    {% case block.settings.img_size_ban %}
+                      {% when 'small'  %}{%- assign img_size_ban = '570x200' -%}
+                      {% when 'medium' %}{%- assign img_size_ban = '570x400' -%}
+                      {% when 'large'  %}{%- assign img_size_ban = '570x500' -%}
+                    {% endcase %}             
+                    {% if block.settings.ban_1_image.size > 0 or block.settings.ban_2_image.size > 0 %}
+                     <li class="container-box one-whole brands-list">
+                        <ul class="brands-list-ul" id="menu_{{ block.id }}_brands">
+                          <li>
+                               
+                            {% for i in (1..2) %}
+                              {% capture item_link %}ban_{{ i }}_link{% endcapture %}
+                              {% capture items_image %}ban_{{ i }}_image{% endcapture %}
+                              {% capture item_text %}ban_{{ i }}_text{% endcapture %}
+
+                              {% if block.settings[items_image].size > 0 and block.settings[item_link].size > 0 %}
+                                <div class="megamenu-col-item">
+                                  <a href="{{ block.settings[item_link] }}">
+                                     {% if block.settings[items_image].size > 0 %}
+                                    <img class="img-responsive lazyload" data-sizes="auto" src="{{ "icon-loadings.svg" | asset_url }}" data-src="{{ block.settings[items_image] | img_url: img_size_ban, crop: 'center' }}" alt="{{ block.settings[item_text] }}"> 
+                                     {% endif %}
+                                  {% if block.settings[item_text].size > 0 %}
+                                    <div class="ban_title">{{ block.settings[item_text] }}</div>
+                                  {% endif %}
+                                  </a>
+                                </div>
+                              {% endif %}
+                            {% endfor %}
+                          </li>
+                        </ul>
+                    </li>
+                     {% endif %}
+                  </ul>
+                {% endif %}
+
+              {% when 'link-8banners' %}
+                {% if block.settings.banner_1_link.size > 0 or block.settings.links_2.size > 0 or block.settings.links_3.size > 0 or block.settings.links_4.size > 0 or block.settings.links_5.size > 0 or block.settings.links_5.size > 0 or block.settings.links_7.size > 0 or block.settings.links_8.size > 0 or block.settings.links_9.size > 0 or block.settings.links_10.size > 0 or block.settings.links_11.size > 0 or block.settings.links_12.size > 0 %}
+                  <ul class="level_2 brands {{ block.settings.column-width-b }} {{ block.settings.position-b }}" id="menu_{{ block.id }}">
+                    <li class="container-box {{ block.settings.column-width-r }}">
+                    {% if block.settings.prod_title_brand.size > 0 %}<h3>{{ block.settings.prod_title_brand }}</h3>{% endif %}
+
+                      {% case block.settings.brand_img_size %}
+                      {% when 'small'  %}{%- assign brand_img_size = '470x300' -%}
+                      {% when 'medium' %}{%- assign brand_img_size = '470x400' -%}
+                      {% when 'large'  %}{%- assign brand_img_size = '470x500' -%}
+                    {% endcase %}          
+                      {% for i in (1..12) %}
+                        {% capture item_link %}banner_{{ i }}_link{% endcapture %}
+                        {% capture item_image %}banner_{{ i }}_image{% endcapture %}
+                        {% capture item_text %}banner_{{ i }}_text{% endcapture %}
+                        {% assign top_col = canonical_url | replace: shop.url %}
+                        {% assign handles = block.settings[item_link] %}
+                        {% if item_image and block.settings[item_link].size > 0 %}
+                          <div class="megamenu_col__item {% if block.settings.align_text %}align_center{% endif %}">
+                          
+                            <a class="tf {% if top_col == handles %}curent{% endif %}" href="{{ block.settings[item_link] }}"><img class="img-responsive lazyload" data-sizes="auto" src="{{ "icon-loadings.svg" | asset_url }}" data-src="{{ block.settings[item_image] | img_url: brand_img_size, crop:'center' }}" alt="{{ block.settings[item_text] }}">
+                              
+                            {% if item_text.size > 0 %}
+                              <div class="ban_title">{{ block.settings[item_text] }}</div>
+                            {% endif %}
+                            </a>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </li>
+                  </ul>
+                {% endif %}
+            {% endcase %}
+
+          </li>
+
+        {% endfor %}
+      </ul>
+    </nav>
+</div>
+      
+<!-- //site-nav -->
+{% schema %}
+{
+  "name": {
+    "de": "Megamenu",
+    "en": "Megamenu",
+    "es": "Megamenu",
+    "fr": "Megamenu",
+    "it": "Megamenu",
+    "ja": "Megamenu",
+    "pt-BR": "Megamenu"
+  },
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "header",
+      "content": {
+        "de": "Ankündigungsleiste",
+        "en": "Announcement bar",
+        "es": "Barra de anuncios",
+        "fr": "Barre d'annonces",
+        "it": "Barra degli annunci",
+        "ja": "告知バー",
+        "pt-BR": "Barra de anúncio"
+      }
+    },
+    {
+      "type": "checkbox",
+      "id": "wishlist_btn",
+      "label": "Show Wishlist button in mobile"
+    },
+    {
+      "type": "checkbox",
+      "id": "compare_btn",
+      "label": "Show Compare button in mobile"
+    }
+  ],
+  "blocks": [
+
+
+    // LINK ///////////////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "link-simple",
+      "name": "Simple link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Item"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    },
+
+
+    // LINK + LINKLIST ////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "link-linklist",
+      "name": "Link + linklist",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Item"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "link_list",
+          "id": "links",
+          "label": "Choose linklist"
+        }
+      ]
+    },
+
+
+    // LINK + 4 LINKLISTS /////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "link-4linklists",
+      "name": "4 linklists",
+      "settings": [
+        {
+         "type": "select",
+         "id": "column-width",
+         "options": [
+            { "value": "one-whole", "label": "one-whole"},
+            { "value": "two-third", "label": "two-third"},
+            { "value": "one-half", "label": "one-half"},
+            { "value": "one-third", "label": "one-third"},
+            { "value": "one-quarter", "label": "one-quarter"}
+         ],
+          "label": {
+            "de": "Width Box",
+            "en": "Width Box",
+            "es": "Width Box",
+            "fr": "Width Box",
+            "it": "Width Box",
+            "ja": "Width Box",
+            "pt-BR": "Width Box"
+          }
+        },
+        {
+         "type": "select",
+         "id": "position",
+         "options": [
+            { "value": "left", "label": "left"},
+            { "value": "right", "label": "right"},
+            { "value": "center", "label": "center"}
+         ],
+          "label": {
+            "de": "Position reltive to item",
+            "en": "Position reltive to item",
+            "es": "Position reltive to item",
+            "fr": "Position reltive to item",
+            "it": "Position reltive to item",
+            "ja": "Position reltive to item",
+            "pt-BR": "Position reltive to item"
+          }
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Item"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "header",
+          "content": "Information In Left column"
+        }, 
+        {
+          "type": "checkbox",
+          "id": "show_title",
+          "label": "Show title",
+          "default": false
+        },
+        {
+          "type": "image_picker",
+          "id": "image_1",
+          "label": "Image 1"
+        },
+        {
+          "type": "link_list",
+          "id": "links_1",
+          "label": "Linklist #1"
+        },
+        {
+          "type": "url",
+          "id": "title_1_link",
+          "label": "Title Link(ex. Link list is Collection Woman = Link Woman)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Image 2"
+        },
+        {
+          "type": "link_list",
+          "id": "links_2",
+          "label": "Linklist #2"
+        },
+        {
+          "type": "url",
+          "id": "title_2_link",
+          "label": "Title Link(ex. Link list is Collection Woman = Link Woman)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_3",
+          "label": "Image 3"
+        },
+        {
+          "type": "link_list",
+          "id": "links_3",
+          "label": "Linklist #3"
+        },
+        {
+          "type": "url",
+          "id": "title_3_link",
+          "label": "Title Link(ex. Link list is Collection Woman = Link Woman)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_4",
+          "label": "Image 4"
+        },
+        {
+          "type": "link_list",
+          "id": "links_4",
+          "label": "Linklist #4"
+        },
+        {
+          "type": "url",
+          "id": "title_4_link",
+          "label": "Title Link(ex. Link list is Collection Woman = Link Woman)"
+        },
+        {
+          "type": "header",
+          "content": "Information In Right column"
+        },
+       {
+          "type": "text",
+          "id": "prod_title",
+          "label": {
+            "de": "Überschrift",
+            "en": "Heading",
+            "es": "Título",
+            "fr": "Titre",
+            "it": "Heading",
+            "ja": "見出し",
+            "pt-BR": "Título"
+          },
+          "default": {
+            "de": "Beliebte Produkt",
+            "en": "Popular Product",
+            "es": "Producto popular",
+            "fr": "Produit populaire",
+            "it": "Prodotto popolare",
+            "ja": "人気商品",
+            "pt-BR": "Produto Popular"
+          }
+        },
+        {
+          "type": "collection",
+          "id": "products",
+          "label": "Choose collection"
+        },
+        {
+          "type": "range",
+          "id": "prod_limit",
+          "label": {
+            "de": "Unid",
+            "en": "Items",
+            "es": "Artículos",
+            "fr": "Articles",
+            "it": "Elementi",
+            "ja": "アイテム",
+            "pt-BR": "Unid"
+          },
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "select",
+          "id": "prod_img_size",
+          "label": "Image size",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "medium",
+              "label": "Medium"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Information In Bottom column"
+        },
+        {
+          "type": "select",
+          "id": "img_size_ban",
+          "label": "Image size",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "medium",
+              "label": "Medium"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Banner 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "ban_1_image",
+          "label": "Banner 1 image"
+        },
+        {
+          "type": "url",
+          "id": "ban_1_link",
+          "label": "Banner_1_link"
+        },
+        {
+          "type": "text",
+          "id": "ban_1_text",
+          "label": "Banner 1 text"
+        },
+        {
+          "type": "header",
+          "content": "Banner 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "ban_2_image",
+          "label": "Banner 2 image"
+        },
+        {
+          "type": "url",
+          "id": "ban_2_link",
+          "label": "Banner_2_link"
+        },
+        {
+          "type": "text",
+          "id": "ban_2_text",
+          "label": "Banner 2 text"
+        }
+      ]
+    },
+
+
+
+    // LINK + 8 BANNERS /////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "link-8banners",
+      "name": "Link + 8 banners",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Item"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+         "type": "select",
+         "id": "column-width-b",
+         "options": [
+            { "value": "one-whole", "label": "one-whole"},
+            { "value": "two-third", "label": "two-third"},
+            { "value": "one-half", "label": "one-half"},
+            { "value": "one-third", "label": "one-third"}
+         ],
+          "label": {
+            "de": "Width Box",
+            "en": "Width Box",
+            "es": "Width Box",
+            "fr": "Width Box",
+            "it": "Width Box",
+            "ja": "Width Box",
+            "pt-BR": "Width Box"
+          }
+        },
+        {
+         "type": "select",
+         "id": "position-b",
+         "options": [
+            { "value": "left", "label": "left"},
+            { "value": "right", "label": "right"},
+            { "value": "center", "label": "center"}
+         ],
+          "label": {
+            "de": "Position reltive to item",
+            "en": "Position reltive to item",
+            "es": "Position reltive to item",
+            "fr": "Position reltive to item",
+            "it": "Position reltive to item",
+            "ja": "Position reltive to item",
+            "pt-BR": "Position reltive to item"
+          }
+        },
+        {
+         "type": "select",
+         "id": "column-width-r",
+         "options": [
+            { "value": "box-four", "label": "4"},
+            { "value": "box-three", "label": "3"},
+            { "value": "box-two", "label": "2"},
+            { "value": "box-one", "label": "1"}
+         ],
+          "label": {
+            "de": "Count items in row",
+            "en": "Count items in row",
+            "es": "Count items in row",
+            "fr": "Count items in row",
+            "it": "Count items in row",
+            "ja": "Count items in row",
+            "pt-BR": "Count items in row"
+          }
+        },
+        {
+          "type": "text",
+          "id": "prod_title_brand",
+          "label": {
+            "de": "Überschrift",
+            "en": "Heading",
+            "es": "Título",
+            "fr": "Titre",
+            "it": "Heading",
+            "ja": "見出し",
+            "pt-BR": "Título"
+          },
+          "default": {
+            "de": "Beliebte Produkt",
+            "en": "Popular Product",
+            "es": "Producto popular",
+            "fr": "Produit populaire",
+            "it": "Prodotto popolare",
+            "ja": "人気商品",
+            "pt-BR": "Produto Popular"
+          }
+        },
+        {
+          "type": "select",
+          "id": "brand_img_size",
+          "label": "Image size",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "medium",
+              "label": "Medium"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Banner 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "banner_1_image",
+          "label": "Banner 1 image"
+        },
+        {
+          "type": "url",
+          "id": "banner_1_link",
+          "label": "Banner_1_link"
+        },
+        {
+          "type": "text",
+          "id": "banner_1_text",
+          "label": "Banner 1 text"
+        },
+        {
+          "type": "header",
+          "content": "Banner 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "banner_2_image",
+          "label": "Banner 2 image"
+        },
+        {
+          "type": "url",
+          "id": "banner_2_link",
+          "label": "Banner_2_link"
+        },
+        {
+          "type": "text",
+          "id": "banner_2_text",
+          "label": "Banner 2 text"
+        },
+        {
+          "type": "header",
+          "content": "Banner 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "banner_3_image",
+          "label": "Banner 3 image"
+        },
+        {
+          "type": "url",
+          "id": "banner_3_link",
+          "label": "Banner_3_link"
+        },
+        {
+          "type": "text",
+          "id": "banner_3_text",
+          "label": "Banner 3 text"
+        },
+        {
+          "type": "header",
+          "content": "Banner 4"
+        },
+        {
+          "type": "image_picker",
+          "id": "banner_4_image",
+          "label": "Banner 4 image"
+        },
+        {
+          "type": "url",
+          "id": "banner_4_link",
+          "label": "Banner_4_link"
+        },
+        {
+          "type": "text",
+          "id": "banner_4_text",
+          "label": "Banner 4 text"
+        },
+        {
+          "type": "header",
+          "content": "Banner 5"
+        },
+        {
+          "type": "image_picker",
+          "id": "banner_5_image",
+          "label": "Banner 5 image"
+        },
+        {
+          "type": "url",
+          "id": "banner_5_link",
+          "label": "Banner_5_link"
+        },
+        {
+          "type": "text",
+          "id": "banner_5_text",
+          "label": "Banner 5 text"
+        },
+        {
+          "type": "header",
+          "content": "Banner 6"
+        },
+        {
+          "type": "image_picker",
+          "id": "banner_6_image",
+          "label": "Banner 6 image"
+        },
+        {
+          "type": "url",
+          "id": "banner_6_link",
+          "label": "Banner_6_link"
+        },
+        {
+          "type": "text",
+          "id": "banner_6_text",
+          "label": "Banner 6 text"
+        },
+        {
+          "type": "header",
+          "content": "Banner 7"
+        },
+        {
+          "type": "image_picker",
+          "id": "banner_7_image",
+          "label": "Banner 7 image"
+        },
+        {
+          "type": "url",
+          "id": "banner_7_link",
+          "label": "Banner_7_link"
+        },
+        {
+          "type": "text",
+          "id": "banner_7_text",
+          "label": "Banner 7 text"
+        },
+        {
+          "type": "header",
+          "content": "Banner 8"
+        },
+        {
+          "type": "image_picker",
+          "id": "banner_8_image",
+          "label": "Banner 8 image"
+        },
+        {
+          "type": "url",
+          "id": "banner_8_link",
+          "label": "Banner_8_link"
+        },
+        {
+          "type": "text",
+          "id": "banner_8_text",
+          "label": "Banner 8 text"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+{% javascript %}
+(function($) {
+
+// MEGAMENU /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  var mobFlag = 0;
+
+  megamenuToggle = function() {
+    if ( $(window).width() > 991 ) {
+
+      $('#megamenu').removeClass('megamenu_mobile').addClass('megamenu_desktop');
+      $('.header-navigation .aless-block').remove();
+      $('#megamenu h3.mobile').remove();
+      
+      $('#megamenu_level__1').superfish();
+
+      $('#megamenu_mobile_toggle, .megamenu_trigger').off('.mobileMenu').removeClass('off active');
+
+      $('#megamenu_level__1, #megamenu_mobile_close').removeClass('on');
+
+      $('html, body').css('overflow', 'auto');
+
+      mobFlag = 0;
+      
+      turnMenuDropdownSide();
+    }
+    else {
+
+      $('#megamenu_level__1, #megamenu_mobile_close').hide();
+      $('#megamenu').removeClass('megamenu_desktop').addClass('megamenu_mobile');
+      $('#megamenu h3.desctop').remove();
+      $('#megamenu_level__1').superfish('destroy');
+
+      if ( mobFlag == 0 ) {
+        menuMobile();
+        mobFlag = 1;
+      };
+
+      if( $('#megamenu .level_1__link').hasClass('curent') ){
+
+        $('#megamenu .level_1__link.curent').next().slideToggle(300);
+
+      }
+    };
+  };
+
+  menuMobile = function() {
+    $('#megamenu_mobile_toggle').on('click.mobileMenu', function(){
+      $('#megamenu_level__1, #megamenu_mobile_close').show().addClass('on');
+
+      $('html, body').css({'overflow': 'hidden', 'position':'relative', 'top': '0', 'left': '0', 'right': '0'});
+
+    });
+
+    $('#megamenu_mobile_close').on('click', function() {
+      $('#megamenu_level__1, #megamenu_mobile_close').removeClass('on');
+
+      $('html, body').css({'overflow': 'auto', 'position':'static'});
+
+    });
+
+    $('.megamenu_trigger').on('click.mobileMenu', function() {
+      var targetMenu = '#' + $(this).data('submenu');
+
+      $(targetMenu).slideToggle(300);
+
+      $(this).toggleClass('active');
+
+      return false;
+    });
+
+    
+
+  };
+
+
+  // WATCH MENU DROP SIDE
+  turnMenuDropdownSide = function() {
+    $('#megamenu .level_2__small').each(function(i){
+      if ( ($(this).offset().left + 470) > $(window).width() ){
+        $(this).find('.droped_linklist').addClass('left_side');
+      }
+    });
+  };
+
+  // STICKY MENU v.1 //////////////////////////////////////////////////////////////////////////////////////////////////////////
+  stickyHeader = function() {
+
+    var target = $('.header-navigation');
+    var pseudo = $('#pseudo_sticky_block');
+    var stick_class = 'megamenu_stuck';
+
+    $(window).on('load scroll resize', function() {
+
+      if ( $(window).width() > 991 ) {
+        var scrolledValue = parseInt( $(window).scrollTop() );
+        var offsetValue = parseInt( pseudo.offset().top );
+        var headHeight = target.outerHeight();
+
+        if ( scrolledValue > offsetValue ) {
+          target.addClass( stick_class );
+          pseudo.css({ 'height' : headHeight });
+          $('#shopify-section-header').addClass('cart_stuck');
+          
+        }
+        else {
+          target.removeClass( stick_class );
+          $('#shopify-section-header').removeClass('cart_stuck');
+          pseudo.css({ 'height' : 0 });
+        };
+      }
+      else {
+        target.removeClass( stick_class );
+        $('#shopify-section-header').removeClass('cart_stuck');
+        pseudo.css({ 'height' : 0 });
+      };
+
+    });
+
+    $(window).on('load', function() {
+      setTimeout( 
+        function(){ $(window).trigger('scroll') }
+      , 180 );
+    });
+
+  };
+
+  stickyHeader();
+  $(window).on('load resize', function() {
+    megamenuToggle();
+  });
+
+
+  $(document).on('shopify:section:load', '#shopify-section-megamenu', function() {
+    megamenuToggle();
+    stickyHeader();
+  });
+
+  function changeactive(id){
+    $.cookie("mycookie", id, {path: "/collections"});
+  }
+  function delCookie(){
+    $.cookie("mycookie", null, {path: "/collections"});
+    $.cookie("mycookie");
+  }
+  $(document).ready(function() {
+    //alert("Hallo. Ich heiße Oleh Pavlushenko;)"); 
+    if ( $(window).width() < 992 ) {
+      var paddtop = $("#shopify-section-header .header-row-2").outerHeight(true);
+      $('html, body').css('padding-top', paddtop+'px');
+
+      mobFlag = 0;   
+    }
+ 
+    if($.cookie("mycookie")!=null){
+
+      $('#megamenu li a').removeClass('curent');
+      $('#megamenu li a#'+$.cookie("mycookie")).addClass('curent');
+      $('#megamenu li a#'+$.cookie("mycookie")).parents('.with_ul').addClass('curent').parents('.with_ul').addClass('curent');
+      $('#megamenu li a#'+$.cookie("mycookie")).parents('.level_2__small').addClass('curent');
+      $('#megamenu li a#'+$.cookie("mycookie")).parents('.level_2__links').addClass('curent');
+      $('#megamenu li a#'+$.cookie("mycookie")).parents('.megamenu_col__item').addClass('curent'); 
+      $('#megamenu a#'+$.cookie("mycookie")).parents('.level_2__links').addClass('curent');
+      $('.sidebar_widget__linklist a.curent').parents('.with_ul').addClass('curent').parents('.with_ul').addClass('curent'); 
+
+      
+    } else{
+      $('.sidebar_widget__linklist a.curent').parents('.with_ul').addClass('curent').parents('.with_ul').addClass('curent'); 
+      $('#megamenu .level_2__small ul.level_3 li a').removeClass('curent'); 
+      $('#megamenu .level_2__links ul.level_3 li.colections a').removeClass('curent'); 
+      $('#megamenu .level_2__links ul.level_3 li a.curent').parents('.level_2__links').addClass('curent');
+      $('#megamenu .level_2__brands a.curent').parents('.level_2__brands').addClass('curent');
+
+    }
+
+    $('#megamenu .level_3 li a , #megamenu h3 a').on('click', function() {
+      changeactive($(this).attr("id")); 
+      $('#megamenu li a#'+$(this).attr("id")).addClass('curent');
+      $('#megamenu h3 a#'+$(this).attr("id")).addClass('curent');
+    });
+
+    $('#megamenu a.level_1__link , #megamenu .level_2__brands a , .sidebar_widget__linklist a').on('click', function() {
+      delCookie();
+      $(this).addClass('curent'); 
+    });
+
+  });
+  $(window).load(function() {
+    $("#megamenu").show();
+  });
+  $(document).on('shopify:section:load', '#shopify-section-megamenu', function() {
+    $("#megamenu").show();
+  }); 
+          
+})(jQuery);
+{% endjavascript %} 

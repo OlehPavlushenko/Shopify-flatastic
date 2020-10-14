@@ -1,0 +1,26 @@
+<!-- snippets/footeter-blog.liquid -->
+
+<div class="blog-title">
+  <a class="article-heading-link" href="{{ article.url }}">{{ article.title }}</a>
+</div>
+{% if block.settings.blog_show_excerpt %}
+  <div class="rte rte-indented-images">
+    {{ article.excerpt_or_content | strip_html | truncatewords: 30 }}
+  </div>
+{% endif %}
+
+{% if block.settings.blog_show_author or block.settings.blog_show_date %}
+  <div class="featured-blog-meta">
+    {% if block.settings.blog_show_author %}
+      <span class="featured-blog-author">
+        {{ article.author }}
+      </span>
+    {% endif %}
+    {% if block.settings.blog_show_date %}
+      <div class="featured-blog-date">
+        <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}" class="date">{{ article.published_at | date: format: 'month_day_year' }}</time>
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+<!-- <a href="{{ article.url }}" class="text-link">{{ 'blogs.article.read_more' | t }} </a> */ -->

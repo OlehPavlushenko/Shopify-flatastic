@@ -1,0 +1,946 @@
+<!-- /templates/collection.liquid -->
+<div class="content-box">
+  {% assign has_bann_top = false %}
+  {% for block in section.blocks %}
+    {% if collection.title contains collections[block.settings.custom_collection].title %}
+      {% assign has_bann_top = true %}
+    {% endif %}
+  {% endfor %}
+  {% if has_bann_top %}
+  <div class="wrappers top-banner"> 
+    <div class="grid">
+      {% for block in section.blocks %}
+        {% if block.settings.section_direct == 'top' %}
+          {%- assign block_counter = 1 -%}
+          {% if collections[block.settings.custom_collection].title.size > 0 %}
+            {% if collection.title contains collections[block.settings.custom_collection].title %}
+              {%- assign block_counter = block_counter | plus: 1 -%}
+                {% include 'banner-collection' section_direct:block.settings.section_direct %}
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div> 
+  {% endif %}   
+<div id="CollectionSection" class="CollectionSection {{ section.settings.collection_products_grid }}s" data-section-id="{{ section.id }}" data-section-type="collection-template" data-grid-type="{{ section.settings.collection_products_grid }}">
+  {% include 'collection-template' %}
+</div>
+{%- if section.settings.show_product_recent -%}
+  {% include 'recently-viewed' %}
+{%- endif -%}
+{% assign has_bann_bot = false %}
+  {% for block in section.blocks %}
+    {% if collection.title contains collections[block.settings.custom_collection].title %}
+      {% assign has_bann_bot = true %}
+    {% endif %}
+  {% endfor %}
+{% if has_bann_bot %}
+<div class="wrappers bottom-banner"> 
+    <div class="grid">
+      {% for block in section.blocks %}
+        {% if block.settings.section_direct == 'bottom' %}
+          {%- assign block_counter = 1 -%}
+          {% if collections[block.settings.custom_collection].title.size > 0 %}
+            {% if collection.title contains collections[block.settings.custom_collection].title %}
+              {%- assign block_counter = block_counter | plus: 1 -%}
+                {% include 'banner-collection' section_direct:block.settings.section_direct %}
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>    
+{% endif %}
+</div>
+<script>
+  (function($) {
+  /* Product Tag Filters - Good for any number of filters on any type of collection pages */
+  var collFilters = jQuery('.coll-filter');
+  collFilters.change(function() {
+    var newTags = [];
+    collFilters.each(function() {
+      if (jQuery(this).val()) {
+        newTags.push(jQuery(this).val());
+      }
+    });
+    if (newTags.length) {
+      var query = newTags.join('+');
+      window.location.href = jQuery('{{ 'tag' | link_to_tag: 'tag' }}').attr('href').replace('/' + 'tag', '/' + query);
+    }
+    else {
+      {% if collection.handle %}
+      window.location.href = '/collections/{{ collection.handle }}';
+      {% elsif collection.products.first.type == collection.title %}
+      window.location.href = '{{ collection.title | url_for_type }}';
+      {% elsif collection.products.first.vendor == collection.title %}
+      window.location.href = '{{ collection.title | url_for_vendor }}';
+      {% endif %}
+    }
+  });
+})(jQuery); 
+</script>
+
+{% schema %}
+{
+  "name": {
+    "de": "Kategorieseiten",
+    "en": "Collection pages",
+    "es": "Páginas de colección",
+    "fr": "Pages de collection",
+    "it": "Pagine delle collezioni",
+    "ja": "コレクションページ",
+    "pt-BR": "Páginas de Coleções"
+  },
+  "class": "page_content_box",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_collection_image",
+      "label": "Display Image Category?",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_title",
+      "label": "Display Image title?",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_des",
+      "label": "Display Image description?",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "collection_sort_enable",
+      "label": {
+        "de": "Kategoriesortierung aktivieren",
+        "en": "Enable collection sorting",
+        "es": "Habilitar la la función ordenar colecciones",
+        "fr": "Activer le tri de la collection",
+        "it": "Abilita ordinamento collezione",
+        "ja": "コレクションの並べ替えを有効にする",
+        "pt-BR": "Ativar a ordenação de coleções"
+      }
+    },
+    {
+      "type": "select",
+      "id": "collection_products_grid",
+      "label": {
+        "de": "Rasterstil",
+        "en": "Grid style",
+        "es": "Estilo de cuadrícula",
+        "fr": "Style de grille",
+        "it": "Stile griglia",
+        "ja": "グリッドスタイル",
+        "pt-BR": "Estilo da grade"
+      },
+
+      "options": [
+        {
+          "value": "grid",
+          "label": {
+            "de": "Raster",
+            "en": "Grid",
+            "es": "Cuadrícula",
+            "fr": "Grille",
+            "it": "Griglia",
+            "ja": "グリッド",
+            "pt-BR": "Grade"
+          }
+        },
+        {
+          "value": "list",
+          "label": {
+            "de": "List",
+            "en": "List",
+            "es": "List",
+            "fr": "List",
+            "it": "List",
+            "ja": "List",
+            "pt-BR": "List"
+          }
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "img_prod_size",
+      "label": "Image size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "img_alignment",
+      "label": "Image alignment",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        }
+      ]
+    },
+    {
+      "id": "products_limit",
+      "type": "select",
+      "label": "Show products in Row , if collage that (4,8,12,16)",
+      "options": [
+        {
+          "value": "2",
+          "label": "2"
+        },
+        {
+          "value": "3",
+          "label": "3"
+        },
+        {
+          "value": "4",
+          "label": "4"
+        },
+        {
+          "value": "6",
+          "label": "6"
+        },
+        {
+          "value": "8",
+          "label": "8"
+        },
+        {
+          "value": "9",
+          "label": "9"
+        },
+        {
+          "value": "12",
+          "label": "12"
+        },
+         {
+          "value": "15",
+          "label": "15"
+        },
+        {
+          "value": "16",
+          "label": "16"
+        },
+        {
+          "value": "24",
+          "label": "24"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "width_limit",
+      "label": {
+        "de": "Anzahl der Produkte in einer Reihe",
+        "en": "Number of products in a row",
+        "es": "Número de productos en una fila",
+        "fr": "Nombre de produits dans une rangée",
+        "it": "Numero di prodotti in fila",
+        "ja": "1行の商品数",
+        "pt-BR": "Número de produtos em uma fileira"
+      },
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "worts_limit_prod",
+      "label": {
+        "de": "Count of words in Title",
+        "en": "Count of words in Title",
+        "es": "Count of words in Title",
+        "fr": "Count of words in Title",
+        "it": "Count of words in Title",
+        "ja": "Count of words in Title",
+        "pt-BR": "Count of words in Title"
+      },
+      "min": 3,
+      "max": 100,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_animation_img",
+      "label": {
+        "de": "Animation Images",
+        "en": "Animation Images",
+        "es": "Animation Images",
+        "fr": "Animation Images",
+        "it": "Animation Images",
+        "ja": "Animation Images",
+        "pt-BR": "Animation Images"
+      },
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": {
+        "de": "Anbieter anzeigen",
+        "en": "Show vendor",
+        "es": "Mostrar proveedor",
+        "fr": "Afficher le distributeur",
+        "it": "Mostra fornitore",
+        "ja": "販売元を表示する",
+        "pt-BR": "Exibir fornecedor"
+      },
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_recent",
+      "label": {
+        "de": "Show dynamic recently products",
+        "en": "Show dynamic recently products",
+        "zh-TW": "Show dynamic recently products"
+      },
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "heading_recent",
+      "label": {
+        "da": "Overskrift",
+        "de": "Überschrift",
+        "en": "Heading Recently Viewed Products",
+        "es": "Título",
+        "fi": "Otsake",
+        "fr": "En-tête",
+        "hi": "शीर्षक",
+        "it": "Heading",
+        "ja": "見出し",
+        "ko": "제목",
+        "ms": "Tajuk",
+        "nb": "Overskrift",
+        "nl": "Kop",
+        "pt-BR": "Título",
+        "pt-PT": "Título",
+        "sv": "Rubrik",
+        "th": "ส่วนหัว",
+        "zh-CN": "标题",
+        "zh-TW": "標題"
+      },
+      "default": {
+        "en": "Recently Viewed Products"
+      }
+    },
+    {
+      "type": "header",
+      "content": "Banner Block"
+    },
+    {
+      "type": "select",
+      "id": "section_height",
+      "label": "Section height",
+      "options": [
+        {
+          "label": "Small (494px)",
+          "value": "small"
+        },
+        {
+          "label": "Medium (540px)",
+          "value": "medium"
+        },
+        {
+          "label": "Large (577px)",
+          "value": "large"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "sub_collection",
+      "name": "List Subcategories",
+      "settings": [
+        // FOR COLLECTIONS ////////////////////////////////////////////////////////////////////////////////////
+        {
+          "type": "collection",
+          "id": "custom_collection",
+          "label": "Collection",
+          "info": "Content will only be shown from this collection."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_collection",
+          "label": "Display Sub Collections?",
+          "default": true
+        },
+        {
+          "type": "link_list",
+          "id": "linklist_collections_name",
+          "label": "List Sub Collections "
+        }
+      ]
+    },
+    
+
+    // BIG BANNER 50%  //////////////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "big_50",
+      "name": "Big banner(50%)",
+      "settings": [
+        {
+          "type": "select",
+          "id": "section_direct",
+          "label": "Section placement",
+          "default": "top",
+          "options": [
+            {
+              "label": "Top",
+              "value": "top"
+            },
+            {
+              "label": "Bottom",
+              "value": "bottom"
+            }
+          ]
+        },
+        // FOR COLLECTIONS ////////////////////////////////////////////////////////////////////////////////////
+        {
+          "type": "collection",
+          "id": "custom_collection",
+          "label": "Collection",
+          "info": "Content will only be shown from this collection."
+        },
+        {
+          "type": "select",
+          "id": "img_alignment",
+          "label": "Image alignment",
+          "options": [
+            {
+              "value": "top",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "bottom",
+              "label": "Bottom"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "item_img",
+          "label": "Banner image"
+        },
+        {
+          "type": "text",
+          "id": "item_subtitle",
+          "label": "Caption subtitle"
+        },
+        {
+          "type": "richtext",
+          "id": "item_title",
+          "label": "Caption title"
+        },
+        {
+          "type": "text",
+          "id": "item_text",
+          "label": "Caption text"
+        },
+        {
+          "type": "url",
+          "id": "item_link",
+          "label": "Link",
+          "info": "Optional"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button text"
+        }
+      ]
+    },
+
+
+    // BIG BANNER 66% //////////////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "big_66",
+      "name": "Big banner(66%)",
+      "settings": [
+        {
+          "type": "select",
+          "id": "section_direct",
+          "label": "Section placement",
+          "default": "top",
+          "options": [
+            {
+              "label": "Top",
+              "value": "top"
+            },
+            {
+              "label": "Bottom",
+              "value": "bottom"
+            }
+          ]
+        },
+        // FOR COLLECTIONS ////////////////////////////////////////////////////////////////////////////////////
+         {
+          "type": "collection",
+          "id": "custom_collection",
+          "label": "Collection",
+          "info": "Content will only be shown from this collection."
+        },
+        {
+          "type": "select",
+          "id": "img_alignment",
+          "label": "Image alignment",
+          "options": [
+            {
+              "value": "top",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "bottom",
+              "label": "Bottom"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "item_img",
+          "label": "Banner image"
+        },
+        {
+          "type": "text",
+          "id": "item_subtitle",
+          "label": "Caption subtitle"
+        },
+        {
+          "type": "richtext",
+          "id": "item_title",
+          "label": "Caption title"
+        },
+        
+        {
+          "type": "text",
+          "id": "item_text",
+          "label": "Caption text"
+        },
+        {
+          "type": "url",
+          "id": "item_link",
+          "label": "Link",
+          "info": "Optional"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button text"
+        }
+      ]
+    },
+
+
+    // TWO BIG BANNERS 50%  //////////////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "two_big_50",
+      "name": "Two big banners(50%)",
+      "settings": [
+       {
+          "type": "select",
+          "id": "section_direct",
+          "label": "Section placement",
+          "default": "top",
+          "options": [
+            {
+              "label": "Top",
+              "value": "top"
+            },
+            {
+              "label": "Bottom",
+              "value": "bottom"
+            }
+          ]
+        },
+        // FOR COLLECTIONS ////////////////////////////////////////////////////////////////////////////////////
+         {
+          "type": "collection",
+          "id": "custom_collection",
+          "label": "Collection",
+          "info": "Content will only be shown from this collection."
+        },
+        {
+          "type": "paragraph",
+          "content": "Banner 1"
+        },
+        {
+          "type": "select",
+          "id": "img_alignment",
+          "label": "Image alignment",
+          "options": [
+            {
+              "value": "top",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "bottom",
+              "label": "Bottom"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "item_img",
+          "label": "Banner 1 image"
+        },
+        {
+          "type": "text",
+          "id": "item_subtitle",
+          "label": "Banner 1 subtitle"
+        },
+        {
+          "type": "richtext",
+          "id": "item_title",
+          "label": "Banner 1 title"
+        },
+        {
+          "type": "text",
+          "id": "item_button_text",
+          "label": "Banner 1 button text"
+        },
+        {
+          "type": "url",
+          "id": "item_link",
+          "label": "Banner 1 link",
+          "info": "Optional"
+        },
+        {
+          "type": "paragraph",
+          "content": "Banner 2"
+        },
+        {
+          "type": "select",
+          "id": "img2_alignment",
+          "label": "Image alignment",
+          "options": [
+            {
+              "value": "top",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "bottom",
+              "label": "Bottom"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "item2_img",
+          "label": "Banner 2 image"
+        },
+        {
+          "type": "text",
+          "id": "item2_subtitle",
+          "label": "Banner 2 subtitle"
+        },
+        {
+          "type": "richtext",
+          "id": "item2_title",
+          "label": "Banner 2 title"
+        },
+        {
+          "type": "text",
+          "id": "item2_button_text",
+          "label": "Banner 2 button text"
+        },
+        {
+          "type": "url",
+          "id": "item2_link",
+          "label": "Banner 2 link",
+          "info": "Optional"
+        }
+      ]
+    },
+
+    // TWO SMALL BANNERS 25%  //////////////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "two_small_25",
+      "name": "Two small banners(25%)",
+      "settings": [
+        {
+          "type": "select",
+          "id": "section_direct",
+          "label": "Section placement",
+          "default": "top",
+          "options": [
+            {
+              "label": "Top",
+              "value": "top"
+            },
+            {
+              "label": "Bottom",
+              "value": "bottom"
+            }
+          ]
+        },
+        // FOR COLLECTIONS ////////////////////////////////////////////////////////////////////////////////////
+         {
+          "type": "collection",
+          "id": "custom_collection",
+          "label": "Collection",
+          "info": "Content will only be shown from this collection."
+        },
+        {
+          "type": "paragraph",
+          "content": "Banner 1"
+        },
+        {
+          "type": "select",
+          "id": "img_alignment",
+          "label": "Image alignment",
+          "options": [
+            {
+              "value": "top",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "bottom",
+              "label": "Bottom"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "item_img",
+          "label": "Banner 1 image"
+        },
+        
+        {
+          "type": "url",
+          "id": "item_link",
+          "label": "Banner 1 link",
+          "info": "Optional"
+        },
+        {
+          "type": "text",
+          "id": "item_text",
+          "label": "Banner 1 caption"
+        },
+        {
+          "type": "paragraph",
+          "content": "Banner 2"
+        },
+          {
+          "type": "select",
+          "id": "img2_alignment",
+          "label": "Image alignment",
+          "options": [
+            {
+              "value": "top",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "bottom",
+              "label": "Bottom"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "item2_img",
+          "label": "Banner 2 image"
+        },
+        
+        {
+          "type": "url",
+          "id": "item2_link",
+          "label": "Banner 2 link",
+          "info": "Optional"
+        },
+        {
+          "type": "text",
+          "id": "item_text2",
+          "label": "Banner 2 caption"
+        }
+      ]
+    },
+
+    // ONE SMALL BANNER 33%  //////////////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "one_small_33",
+      "name": "One small banner(33%)",
+      "settings": [
+        {
+          "type": "select",
+          "id": "section_direct",
+          "label": "Section placement",
+          "default": "top",
+          "options": [
+            {
+              "label": "Top",
+              "value": "top"
+            },
+            {
+              "label": "Bottom",
+              "value": "bottom"
+            }
+          ]
+        },
+        // FOR COLLECTIONS ////////////////////////////////////////////////////////////////////////////////////
+         {
+          "type": "collection",
+          "id": "custom_collection",
+          "label": "Collection",
+          "info": "Content will only be shown from this collection."
+        },
+        {
+          "type": "select",
+          "id": "img_alignment",
+          "label": "Image alignment",
+          "options": [
+            {
+              "value": "top",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "bottom",
+              "label": "Bottom"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "item_img",
+          "label": "Banner image"
+        },
+        {
+          "type": "text",
+          "id": "item_subtitle",
+          "label": "Banner subtitle"
+        },
+        {
+          "type": "richtext",
+          "id": "item_title",
+          "label": "Banner title"
+        },
+        {
+          "type": "url",
+          "id": "item_link",
+          "label": "Link",
+          "info": "Optional"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+{% javascript %}
+$(function() {
+  $('#CollectionSection div.grid-product').each(function() {        
+    var tip = $(this).find('div.count_holder_small'); 
+
+    $(this).hover(
+        function() { tip.appendTo('body'); },
+        function() { tip.appendTo(this); }
+    ).mousemove(function(e) {
+        var x = e.pageX + 60,
+            y = e.pageY - 50,
+            w = tip.width(),
+            h = tip.height(),
+            dx = $(window).width() - (x + w),
+            dy = $(window).height() - (y + h);
+
+        if ( dx < 50 ) x = e.pageX - w - 60;
+        if ( dy < 50 ) y = e.pageY - h + 130;
+
+        tip.css({ left: x, top: y });
+      });         
+  });
+});
+(function($) {
+  $('.product_item').each(function(){
+    var self = $(this)
+    if ( device.desktop() && self.find(".prod-img2").length > 0 ) {
+      self.on({
+        mouseenter: function(){
+          self.find(".prod-img1").stop().animate({"opacity": 0}, 200);
+          self.find(".prod-img2").stop().animate({"opacity": 1}, 200);
+        },
+        mouseleave: function(){
+          self.find(".prod-img1").stop().animate({"opacity": 1}, 200);
+          self.find(".prod-img2").stop().animate({"opacity": 0}, 200);
+        }
+      });
+    }     
+  });
+})(jQuery);
+jQuery(document).ready(function($) {
+  $('#navigation .Cgrid').on('click', function(){
+    $('.Cgrid').addClass('active');
+    $('.Clist').removeClass('active');
+    $('#CollectionSection .grid-uniform').addClass("list-hidden");
+    $('#CollectionSection').addClass('grids').removeClass('lists');
+    $('#CollectionSection .grid-uniform .grid-uniform-prod').find('.grid__item').removeClass('large--one-half'); 
+    setTimeout(function(){
+      $('#CollectionSection .grid-uniform').removeClass("list-hidden");
+    }, 300);
+  return false;
+  });
+  $('#navigation .Clist').on('click', function(){ 
+    $('.Clist').addClass('active');
+    $('.Cgrid').removeClass('active');
+    $('#CollectionSection .grid-uniform').addClass("list-hidden");
+    $('#CollectionSection').removeClass('grids').addClass('lists');     
+    $('#CollectionSection .grid-uniform .grid-uniform-prod').find('.grid__item').addClass('large--one-half');
+     setTimeout(function(){
+      $('#CollectionSection .grid-uniform').removeClass("list-hidden"); 
+    }, 300); 
+  return false;
+  });
+});
+{% endjavascript %} 

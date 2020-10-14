@@ -1,0 +1,272 @@
+{% case section.settings.img_size %}
+	{% when 'small'  %}{%- assign img_size = '2050x540' -%}
+	{% when 'medium' %}{%- assign img_size = '2050x640' -%}
+	{% when 'large' %}{%- assign img_size = '2050x740' -%} 
+{% endcase %}
+<div class="lookbook-box" id="{{ section.id }}" style="{% if section.settings.background_toggle %}background-color: {{ section.settings.bg_color }};{% endif %} padding-top: {{ section.settings.padding_box }}px;padding-bottom: {{ section.settings.padding_box_bot }}px;">
+
+	{% if section.settings.section_view == 'boxed' %}
+	<div class="lookbook_wrap wrapper">
+{% else %}
+	<div class="lookbook_wrap wrapper full">
+{% endif %}
+	<div class="lookbook_img">
+		{%- if section.settings.image.size > 0 -%}
+			<div class="img_placeholder__wrap img_placeholder__{{ section.settings.img_size }}" style="background-image: url( {{ section.settings.image | img_url: img_size, crop: section.settings.img_alignment }} );"></div>
+		{%- else -%}
+			<div class="img_placeholder__wrap img_placeholder__{{ section.settings.img_size }}">
+				{{ 'lifestyle-1' | placeholder_svg_tag: 'img_placeholder' }}
+			</div>
+		{%- endif -%}
+		<div class="lookbook_container">
+		{%- for block in section.blocks -%}
+			{%- assign itemProduct = all_products[block.settings.item_product] -%}
+			{%- assign current_variant = itemProduct.selected_or_first_available_variant -%}
+			{%- assign compare_at_price = current_variant.compare_at_price -%}
+			{%- assign price = current_variant.price -%}
+
+			<div class="lookbook_item caption_{{ block.settings.item_horizontal_align }} caption_{{ block.settings.item_vertical_align }}" style="left: {{ block.settings.item_x }}%;top: {{ block.settings.item_y }}%;">
+				{%- if itemProduct.id.size > 0 -%}
+					<a class="lookbook_item__bullet" href="{{ itemProduct.url | within: collection }}">
+						<i class="fa fa-plus" aria-hidden="true"></i>
+					</a>
+
+					<a class="lookbook_item__caption" href="{{ itemProduct.url | within: collection }}">
+						<img src="{{ itemProduct.featured_image.src | product_img_url: '120x140', crop: 'top'  }}" alt="{{ itemProduct.featured_image.alt }}">
+						<span class="product_name">{{ itemProduct.title | truncate:38 }}</span>
+						<div  data-price-container>
+			            {% if compare_at_price > price %}
+			              <span class="product-single__price--wrapper" aria-hidden="false">
+			                <span id="ComparePrice" class="product-single__price--compare-at">
+			                  {{ compare_at_price | money }}
+			                </span>
+			              </span>
+			              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+			            {% else %}
+			              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+			            {% endif %}
+
+			            <span id="ProductPrice"
+			              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+			              itemprop="price"
+			              content="{{ price | divided_by: 100.00 }}"
+			              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+			              {{ price | money }}
+			            </span>
+			          </div>
+					</a>
+				{%- else -%}
+					<i class="fa fa-plus lookbook_item__bullet" aria-hidden="true"></i>
+				{%- endif -%}
+
+			</div>
+
+		{%- endfor -%}
+	</div>
+	</div>
+</div>	
+</div>
+
+
+
+{% schema %}
+{
+	"name": "Lookbook",
+	"class": "section section_homepage section_lookbook",
+	"max_blocks": 7,
+	"settings": [
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "Image",
+			"info": "Image size 2048x740px."
+		},
+		{
+			"type": "select",
+			"id": "img_size",
+			"label": "Image size",
+			"options": [
+				{
+					"value": "small",
+					"label": "Small"
+				},
+				{
+					"value": "medium",
+					"label": "Medium"
+				},
+				{
+					"value": "large",
+					"label": "Large"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "img_alignment",
+			"label": "Image alignment",
+			"options": [
+				{
+					"value": "top",
+					"label": "Top"
+				},
+				{
+					"value": "center",
+					"label": "Middle"
+				},
+				{
+					"value": "bottom",
+					"label": "Bottom"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "section_view",
+			"label": "Section view",
+			"default": "boxed",
+			"options": [
+				{
+					"label": "Boxed",
+					"value": "boxed"
+				},
+				{
+					"label": "Full width",
+					"value": "full_width"
+				}
+			]
+		},
+		{
+	      "type": "checkbox",
+	      "id": "background_toggle",
+	      "label": "Show background color",
+	      "default": true
+	    },
+	    {
+	      "type": "color",
+	      "id": "bg_color",
+	      "label": "Background color",
+	      "default": "#fafbfb"
+	    },
+	    {
+	      "type": "range",
+	      "id": "padding_box",
+	      "min": 0,
+	      "max": 100,
+	      "step": 1,
+	      "label": "Padding Top",
+	      "default": 30
+	    },
+	    {
+	      "type": "range",
+	      "id": "padding_box_bot",
+	      "min": 0,
+	      "max": 100,
+	      "step": 1,
+	      "label": "Padding Bottom",
+	      "default": 0
+	    }
+	],
+	"blocks": [
+		{
+			"type": "item",
+			"name": "Lookbook product",
+			"settings": [
+				{
+					"type": "header",
+					"content": "Product"
+				},
+				{
+					"type": "product",
+					"id": "item_product",
+					"label": "Product"
+				},
+				{
+					"type":    "range",
+					"id":      "item_x",
+					"min":     1,
+					"max":     100,
+					"step":    1,
+					"unit":    "%",
+					"label":   "Horizontal position",
+					"default": 50
+				},
+				{
+					"type":    "range",
+					"id":      "item_y",
+					"min":     1,
+					"max":     100,
+					"step":    1,
+					"unit":    "%",
+					"label":   "Vertical position",
+					"default": 50
+				},
+				{
+					"type": "radio",
+					"id": "item_horizontal_align",
+					"label": "Caption horizontal align",
+					"default": "left",
+					"options": [
+						{
+							"value": "left",
+							"label": "Left"
+						},
+						{
+							"value": "right",
+							"label": "Right"
+						}
+					]
+				},
+				{
+					"type": "radio",
+					"id": "item_vertical_align",
+					"label": "Caption vertical align",
+					"default": "bottom",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Lookbook",
+			"category": "Products"
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(document).ready(function($) {
+	$(window).on('load resize', function() {
+		
+		if ( $(window).width() < 991 ) {
+			$('.lookbook_item__bullet').each(function(i) {
+				var self = $(this);
+				var productLink = self.attr('href');
+				var prodCaption = self.siblings('.lookbook_item__caption');
+					
+				self.on('click', function(e){
+					e.preventDefault();
+					prodCaption.show(300);
+				});
+
+				prodCaption.on('click', function(e){
+					document.location.href = productLink;
+				});
+			});
+		};
+
+
+	});
+
+});
+{% endjavascript %}

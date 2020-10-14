@@ -1,0 +1,2248 @@
+<div class="wrapper-box-collage"  style="{% if section.settings.background_toggle %}background-color: {{ section.settings.bg_color }};{% endif %} padding-top: {{ section.settings.padding_box }}px;padding-bottom: {{ section.settings.padding_box_bot }}px;"> 
+
+<div class="wrapper"> 
+	 {% if section.settings.title != blank %}
+      <div class="section-header">
+        <h2 class="section-header__title">{{ section.settings.title | escape }}</h2>
+      </div>
+    {% endif %}
+	<div class="grid">
+		{% for block in section.blocks %}
+			{% case block.type %}
+				{% when 'big_50' %}
+					{% case section.settings.section_height %}
+						{% when 'small'  %}{%- assign img_size = '570x494' -%}
+						{% when 'medium' %}{%- assign img_size = '570x540' -%}
+						{% when 'large'  %}{%- assign img_size = '570x577' -%}
+					{% endcase %}
+
+					<div class="col-sm-6 grid__item one-half banner_{{ block.type }}">
+						<div class="banner_item">
+							{%- assign product = all_products[block.settings.item_product] -%}
+							{%- assign current_variant = product.selected_or_first_available_variant -%}
+							{%- assign vendor = product.vendor -%}
+							{%- assign title = product.title -%}
+							{%- assign compare_at_price = current_variant.compare_at_price -%}
+							{%- assign price = current_variant.price -%}
+							{% if block.settings.item_img.size > 0 and block.settings.item_product.size > 0  %}	
+								<span class="2 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+							{% else %}
+								{% if block.settings.item_product.size > 0  %}	
+									<span class="1 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ product.images[0] | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+								{% else %}
+									<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+										{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+									</span>
+								{% endif %}
+							{% endif %}
+							
+							{%- if product.id.size > 0 -%}
+								<span class="caption_text">
+									<div class="collage_item">
+									
+
+									<div id="CollageProductSection-{{ block.id }}" data-section-id="{{ block.id }}" data-section-type="product-template">
+									      <div class="block-info">
+        
+									        {% if block.settings.show_vendor %}
+									          <h6 class="product-vendor" itemprop="brand">{{ vendor }}</h6>
+									        {% endif %}
+
+									        <div class="product-title" itemprop="name"><a href="{{ product.url | within: collection }}">{{ product.title | strip_html | truncate: block.settings.worts_limit_prod }}</a></div>
+
+
+									        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+									        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="price-container">
+									          <div data-price-container>
+									            {% comment %}
+									              Optionally show the 'compare at' or original price of the product.
+									            {% endcomment %}
+									            {% if compare_at_price > price %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper" aria-hidden="false">
+									                <span id="ComparePrice" class="product-price--compare-at">
+									                  {{ compare_at_price | money }}
+									                </span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+									            {% else %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper hide" aria-hidden="true">
+									                <span id="ComparePrice" class="product-price--compare-at"></span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+									            {% endif %}
+
+									            <span id="ProductPrice"
+									              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+									              itemprop="price"
+									              content="{{ price | divided_by: 100.00 }}"
+									              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+									              {{ price | money }}
+									            </span>
+									          </div>
+
+									          {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+									            <div class="product-policies rte">
+									              {%- if shop.taxes_included -%}
+									                {{ 'products.general.include_taxes' | t }}
+									              {%- endif -%}
+									              {%- if shop.shipping_policy.body != blank -%}
+									                {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+									              {%- endif -%}
+									            </div>
+									          {%- endif -%}
+
+									          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+									          <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+									            {% capture "form_classes" %}
+									              product-form{% if product.has_only_default_variant %} product-form--no-variants{% endif %}
+									            {%- endcapture %}
+
+									            {% capture "form_id" %}AddToCartForm--{{ block.id }}{%- endcapture %}
+
+									            {% form 'product', product, class:form_classes, id:form_id %}
+									              <select name="id" id="ProductSelect" class="product-single__variants no-js">
+									                {% for variant in product.variants %}
+									                  {% if variant.available %}
+									                    <option {% if variant == product.selected_or_first_available_variant %}
+									                      selected="selected" {% endif %}
+									                      data-sku="{{ variant.sku }}"
+									                      value="{{ variant.id }}">
+									                      {{ variant.title }} - {{ variant.price | money_with_currency }}
+									                    </option>
+									                  {% else %}
+									                    <option disabled="disabled">
+									                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+									                    </option>
+									                  {% endif %}
+									                {% endfor %}
+									              </select>           
+									              <div class="product-add-to-cart">
+									                {% if product.variants.size == 1 %}
+									                <button type="submit" name="add" id="AddToCart--{{ block.id }}" class="btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+									                  <span class="btn__text">
+									                    {% if current_variant.available %}
+									                      {{ 'products.product.add_to_cart' | t }}
+									                    {% else %}
+									                      {{ 'products.product.sold_out' | t }}
+									                    {% endif %}
+									                  </span>
+									                </button>
+									                {% else %}
+									                <a class="btn btn-options" href="{{ product.url | within: collection }}">{{ 'products.product.choose_variant_button' | t }}</a>
+									                {% endif %}
+									                {% if section.settings.enable_payment_button %}
+									                  {{ form | payment_button }}
+									                {% endif %}
+
+
+									              </div>
+									            {% endform %}
+
+									        </div>
+									      </div>
+									  {% unless product.empty == empty %}
+									  <script type="application/json" id="ProductJson-{{ block.id }}">
+									    {{ product | json }}
+									  </script>
+									{% endunless %}
+									</div>
+								</div>	
+								</span>
+							{% endif %}		
+						</div>
+					</div>
+
+				{% when 'big_66' %}
+					{% case section.settings.section_height %}
+						{% when 'small'  %}{%- assign img_size = '870x494' -%}
+						{% when 'medium' %}{%- assign img_size = '870x540' -%}
+						{% when 'large'  %}{%- assign img_size = '870x577' -%}
+					{% endcase %}
+
+					<div class="col-sm-9 grid__item two-thirds banner_{{ block.type }}">
+						<div class="banner_item">
+							{%- assign product = all_products[block.settings.item_product] -%}
+							{%- assign current_variant = product.selected_or_first_available_variant -%}
+							{%- assign vendor = product.vendor -%}
+							{%- assign title = product.title -%}
+							{%- assign compare_at_price = current_variant.compare_at_price -%}
+							{%- assign price = current_variant.price -%}
+							{% if block.settings.item_img.size > 0 and block.settings.item_product.size > 0  %}	
+								<span class="2 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+							{% else %}
+								{% if block.settings.item_product.size > 0  %}	
+									<span class="1 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ product.images[0] | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+								{% else %}
+									<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+										{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+									</span>
+								{% endif %}
+							{% endif %}
+							
+							{%- if product.id.size > 0 -%}
+								<span class="caption_text">
+									<div class="collage_item">
+									
+
+									<div id="CollageProductSection-{{ block.id }}" data-section-id="{{ block.id }}" data-section-type="product-template">
+									      <div class="block-info">
+        
+									        {% if block.settings.show_vendor %}
+									          <h6 class="product-vendor" itemprop="brand">{{ vendor }}</h6>
+									        {% endif %}
+
+									        <div class="product-title" itemprop="name"><a href="{{ product.url | within: collection }}">{{ product.title | strip_html | truncate: block.settings.worts_limit_prod }}</a></div>
+
+
+									        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+									        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="price-container">
+									          <div data-price-container>
+									            {% comment %}
+									              Optionally show the 'compare at' or original price of the product.
+									            {% endcomment %}
+									            {% if compare_at_price > price %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper" aria-hidden="false">
+									                <span id="ComparePrice" class="product-price--compare-at">
+									                  {{ compare_at_price | money }}
+									                </span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+									            {% else %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper hide" aria-hidden="true">
+									                <span id="ComparePrice" class="product-price--compare-at"></span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+									            {% endif %}
+
+									            <span id="ProductPrice"
+									              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+									              itemprop="price"
+									              content="{{ price | divided_by: 100.00 }}"
+									              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+									              {{ price | money }}
+									            </span>
+									          </div>
+
+									          {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+									            <div class="product-policies rte">
+									              {%- if shop.taxes_included -%}
+									                {{ 'products.general.include_taxes' | t }}
+									              {%- endif -%}
+									              {%- if shop.shipping_policy.body != blank -%}
+									                {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+									              {%- endif -%}
+									            </div>
+									          {%- endif -%}
+
+									          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+									          <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+									            {% capture "form_classes" %}
+									              product-form{% if product.has_only_default_variant %} product-form--no-variants{% endif %}
+									            {%- endcapture %}
+
+									            {% capture "form_id" %}AddToCartForm--{{ block.id }}{%- endcapture %}
+
+									            {% form 'product', product, class:form_classes, id:form_id %}
+									              <select name="id" id="ProductSelect" class="product-single__variants no-js">
+									                {% for variant in product.variants %}
+									                  {% if variant.available %}
+									                    <option {% if variant == product.selected_or_first_available_variant %}
+									                      selected="selected" {% endif %}
+									                      data-sku="{{ variant.sku }}"
+									                      value="{{ variant.id }}">
+									                      {{ variant.title }} - {{ variant.price | money_with_currency }}
+									                    </option>
+									                  {% else %}
+									                    <option disabled="disabled">
+									                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+									                    </option>
+									                  {% endif %}
+									                {% endfor %}
+									              </select>           
+									              <div class="product-add-to-cart">
+									                {% if product.variants.size == 1 %}
+									                <button type="submit" name="add" id="AddToCart--{{ block.id }}" class="btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+									                  <span class="btn__text">
+									                    {% if current_variant.available %}
+									                      {{ 'products.product.add_to_cart' | t }}
+									                    {% else %}
+									                      {{ 'products.product.sold_out' | t }}
+									                    {% endif %}
+									                  </span>
+									                </button>
+									                {% else %}
+									                <a class="btn btn-options" href="{{ product.url | within: collection }}">{{ 'products.product.choose_variant_button' | t }}</a>
+									                {% endif %}
+									                {% if section.settings.enable_payment_button %}
+									                  {{ form | payment_button }}
+									                {% endif %}
+
+
+									              </div>
+									            {% endform %}
+
+									        </div>
+									      </div>
+									  {% unless product.empty == empty %}
+									  <script type="application/json" id="ProductJson-{{ block.id }}">
+									    {{ product | json }}
+									  </script>
+									{% endunless %}
+									</div>
+								</div>	
+								</span>
+							{% endif %}		
+						</div>
+					</div>
+
+				{% when 'big_66_3item' %}
+					<div class="col-sm-9 grid__item two-thirds banner_{{ block.type }}">
+						<div class="grid">
+						<div class="banner_item banner_left one-half grid__item"><div class="box-hidden">
+							<div class="bammer_item_1">
+								{%- assign product = all_products[block.settings.item1_product] -%}
+								{%- assign current_variant = product.selected_or_first_available_variant -%}
+								{%- assign vendor = product.vendor -%}
+								{%- assign title = product.title -%}
+								{%- assign compare_at_price = current_variant.compare_at_price -%}
+								{%- assign price = current_variant.price -%}
+								{% if block.settings.item1_img.size > 0 and block.settings.item1_product.size > 0  %}	
+								<span class="2 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item1_img | img_url: '375x290', crop: block.settings.img1_alignment }} );"></span>
+								{% else %}
+									{% if block.settings.item1_product.size > 0  %}	
+										<span class="1 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ product.images[0] | img_url: '375x290', crop: block.settings.img1_alignment }} );"></span>
+									{% else %}
+										<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+											{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+										</span>
+									{% endif %}
+								{% endif %}
+									
+								{%- if product.id.size > 0 -%}
+								<span class="caption_text">
+									<div class="collage_item">
+									
+
+									<div id="CollageProductSection-{{ block.id }}-1" data-section-id="{{ block.id }}-1" data-section-type="product-template">
+									      <div class="block-info">
+        
+									        {% if block.settings.show1_vendor %}
+									          <h6 class="product-vendor" itemprop="brand">{{ vendor }}</h6>
+									        {% endif %}
+
+									        <div class="product-title" itemprop="name"><a href="{{ product.url | within: collection }}">{{ product.title | strip_html | truncate: block.settings.worts_limit1_prod }}</a></div>
+
+
+									        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+									        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="price-container">
+									          <div data-price-container>
+									            {% comment %}
+									              Optionally show the 'compare at' or original price of the product.
+									            {% endcomment %}
+									            {% if compare_at_price > price %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper" aria-hidden="false">
+									                <span id="ComparePrice" class="product-price--compare-at">
+									                  {{ compare_at_price | money }}
+									                </span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+									            {% else %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper hide" aria-hidden="true">
+									                <span id="ComparePrice" class="product-price--compare-at"></span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+									            {% endif %}
+
+									            <span id="ProductPrice"
+									              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+									              itemprop="price"
+									              content="{{ price | divided_by: 100.00 }}"
+									              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+									              {{ price | money }}
+									            </span>
+									          </div>
+
+									          {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+									            <div class="product-policies rte">
+									              {%- if shop.taxes_included -%}
+									                {{ 'products.general.include_taxes' | t }}
+									              {%- endif -%}
+									              {%- if shop.shipping_policy.body != blank -%}
+									                {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+									              {%- endif -%}
+									            </div>
+									          {%- endif -%}
+
+									          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+									          <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+									            {% capture "form_classes" %}
+									              product-form{% if product.has_only_default_variant %} product-form--no-variants{% endif %}
+									            {%- endcapture %}
+
+									            {% capture "form_id" %}AddToCartForm--{{ block.id }}-1{%- endcapture %}
+
+									            {% form 'product', product, class:form_classes, id:form_id %}
+									              <select name="id" id="ProductSelect" class="product-single__variants no-js">
+									                {% for variant in product.variants %}
+									                  {% if variant.available %}
+									                    <option {% if variant == product.selected_or_first_available_variant %}
+									                      selected="selected" {% endif %}
+									                      data-sku="{{ variant.sku }}"
+									                      value="{{ variant.id }}">
+									                      {{ variant.title }} - {{ variant.price | money_with_currency }}
+									                    </option>
+									                  {% else %}
+									                    <option disabled="disabled">
+									                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+									                    </option>
+									                  {% endif %}
+									                {% endfor %}
+									              </select>           
+									              <div class="product-add-to-cart">
+									                {% if product.variants.size == 1 %}
+									                <button type="submit" name="add" id="AddToCart--{{ block.id }}-1" class="btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+									                  <span class="btn__text">
+									                    {% if current_variant.available %}
+									                      {{ 'products.product.add_to_cart' | t }}
+									                    {% else %}
+									                      {{ 'products.product.sold_out' | t }}
+									                    {% endif %}
+									                  </span>
+									                </button>
+									                {% else %}
+									                <a class="btn btn-options" href="{{ product.url | within: collection }}">{{ 'products.product.choose_variant_button' | t }}</a>
+									                {% endif %}
+									                {% if section.settings.enable_payment_button %}
+									                  {{ form | payment_button }}
+									                {% endif %}
+
+
+									              </div>
+									            {% endform %}
+
+									        </div>
+									      </div>
+									  {% unless product.empty == empty %}
+									  <script type="application/json" id="ProductJson-{{ block.id }}-1">
+									    {{ product | json }}
+									  </script>
+									{% endunless %}
+									</div>
+								</div>	
+								</span>
+							{% endif %}	
+
+								
+							</div>
+						</div></div>
+						
+						<div class="banner_item banner_right one-half grid__item"><div class="box-hidden">
+							<div class="bammer_item_2">
+								{%- assign product = all_products[block.settings.item2_product] -%}
+								{%- assign current_variant = product.selected_or_first_available_variant -%}
+								{%- assign vendor = product.vendor -%}
+								{%- assign title = product.title -%}
+								{%- assign compare_at_price = current_variant.compare_at_price -%}
+								{%- assign price = current_variant.price -%}
+								{% if block.settings.item2_img.size > 0 and block.settings.item2_product.size > 0  %}	
+								<span class="2 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item2_img | img_url: '375x290', crop: block.settings.img2_alignment }} );"></span>
+								{% else %}
+									{% if block.settings.item2_product.size > 0  %}	
+										<span class="1 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ product.images[0] | img_url: '375x290', crop: block.settings.img2_alignment }} );"></span>
+									{% else %}
+										<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+											{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+										</span>
+									{% endif %}
+								{% endif %}
+									
+								{%- if product.id.size > 0 -%}
+								<span class="caption_text">
+									<div class="collage_item">
+									
+
+									<div id="CollageProductSection-{{ block.id }}-2" data-section-id="{{ block.id }}-2" data-section-type="product-template">
+									      <div class="block-info">
+        
+									        {% if block.settings.show2_vendor %}
+									          <h6 class="product-vendor" itemprop="brand">{{ vendor }}</h6>
+									        {% endif %}
+
+									        <div class="product-title" itemprop="name"><a href="{{ product.url | within: collection }}">{{ product.title | strip_html | truncate: block.settings.worts_limit2_prod }}</a></div>
+
+
+									        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+									        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="price-container">
+									          <div data-price-container>
+									            {% comment %}
+									              Optionally show the 'compare at' or original price of the product.
+									            {% endcomment %}
+									            {% if compare_at_price > price %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper" aria-hidden="false">
+									                <span id="ComparePrice" class="product-price--compare-at">
+									                  {{ compare_at_price | money }}
+									                </span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+									            {% else %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper hide" aria-hidden="true">
+									                <span id="ComparePrice" class="product-price--compare-at"></span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+									            {% endif %}
+
+									            <span id="ProductPrice"
+									              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+									              itemprop="price"
+									              content="{{ price | divided_by: 100.00 }}"
+									              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+									              {{ price | money }}
+									            </span>
+									          </div>
+
+									          {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+									            <div class="product-policies rte">
+									              {%- if shop.taxes_included -%}
+									                {{ 'products.general.include_taxes' | t }}
+									              {%- endif -%}
+									              {%- if shop.shipping_policy.body != blank -%}
+									                {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+									              {%- endif -%}
+									            </div>
+									          {%- endif -%}
+
+									          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+									          <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+									            {% capture "form_classes" %}
+									              product-form{% if product.has_only_default_variant %} product-form--no-variants{% endif %}
+									            {%- endcapture %}
+
+									            {% capture "form_id" %}AddToCartForm--{{ block.id }}-2{%- endcapture %}
+
+									            {% form 'product', product, class:form_classes, id:form_id %}
+									              <select name="id" id="ProductSelect" class="product-single__variants no-js">
+									                {% for variant in product.variants %}
+									                  {% if variant.available %}
+									                    <option {% if variant == product.selected_or_first_available_variant %}
+									                      selected="selected" {% endif %}
+									                      data-sku="{{ variant.sku }}"
+									                      value="{{ variant.id }}">
+									                      {{ variant.title }} - {{ variant.price | money_with_currency }}
+									                    </option>
+									                  {% else %}
+									                    <option disabled="disabled">
+									                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+									                    </option>
+									                  {% endif %}
+									                {% endfor %}
+									              </select>           
+									              <div class="product-add-to-cart">
+									                {% if product.variants.size == 1 %}
+									                <button type="submit" name="add" id="AddToCart--{{ block.id }}-2" class="btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+									                  <span class="btn__text">
+									                    {% if current_variant.available %}
+									                      {{ 'products.product.add_to_cart' | t }}
+									                    {% else %}
+									                      {{ 'products.product.sold_out' | t }}
+									                    {% endif %}
+									                  </span>
+									                </button>
+									                {% else %}
+									                <a class="btn btn-options" href="{{ product.url | within: collection }}">{{ 'products.product.choose_variant_button' | t }}</a>
+									                {% endif %}
+									                {% if section.settings.enable_payment_button %}
+									                  {{ form | payment_button }}
+									                {% endif %}
+
+
+									              </div>
+									            {% endform %}
+
+									        </div>
+									      </div>
+									  {% unless product.empty == empty %}
+									  <script type="application/json" id="ProductJson-{{ block.id }}-2">
+									    {{ product | json }}
+									  </script>
+									{% endunless %}
+									</div>
+								</div>	
+								</span>
+							{% endif %}	
+
+								
+							</div>
+						</div></div>
+						</div>
+						<div class="banner_item banner_bottom">
+							<div class="bammer_item_3">
+								{%- assign product = all_products[block.settings.item3_product] -%}
+								{%- assign current_variant = product.selected_or_first_available_variant -%}
+								{%- assign vendor = product.vendor -%}
+								{%- assign title = product.title -%}
+								{%- assign compare_at_price = current_variant.compare_at_price -%}
+								{%- assign price = current_variant.price -%}
+								{% if block.settings.item3_img.size > 0 and block.settings.item3_product.size > 0  %}	
+								<span class="2 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item3_img | img_url: '750x290', crop: block.settings.img3_alignment }} );"></span>
+								{% else %}
+									{% if block.settings.item3_product.size > 0  %}	
+										<span class="1 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ product.images[0] | img_url: '750x290', crop: block.settings.img3_alignment }} );"></span>
+									{% else %}
+										<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+											{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+										</span>
+									{% endif %}
+								{% endif %}
+									
+								{%- if product.id.size > 0 -%}
+								<span class="caption_text">
+									<div class="collage_item">
+									
+
+									<div id="CollageProductSection-{{ block.id }}-3" data-section-id="{{ block.id }}-3" data-section-type="product-template">
+									      <div class="block-info">
+        
+									        {% if block.settings.show3_vendor %}
+									          <h6 class="product-vendor" itemprop="brand">{{ vendor }}</h6>
+									        {% endif %}
+
+									        <div class="product-title" itemprop="name"><a href="{{ product.url | within: collection }}">{{ product.title | strip_html | truncate: block.settings.worts_limit3_prod }}</a></div>
+
+
+									        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+									        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="price-container">
+									          <div data-price-container>
+									            {% comment %}
+									              Optionally show the 'compare at' or original price of the product.
+									            {% endcomment %}
+									            {% if compare_at_price > price %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper" aria-hidden="false">
+									                <span id="ComparePrice" class="product-price--compare-at">
+									                  {{ compare_at_price | money }}
+									                </span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+									            {% else %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper hide" aria-hidden="true">
+									                <span id="ComparePrice" class="product-price--compare-at"></span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+									            {% endif %}
+
+									            <span id="ProductPrice"
+									              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+									              itemprop="price"
+									              content="{{ price | divided_by: 100.00 }}"
+									              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+									              {{ price | money }}
+									            </span>
+									          </div>
+
+									          {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+									            <div class="product-policies rte">
+									              {%- if shop.taxes_included -%}
+									                {{ 'products.general.include_taxes' | t }}
+									              {%- endif -%}
+									              {%- if shop.shipping_policy.body != blank -%}
+									                {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+									              {%- endif -%}
+									            </div>
+									          {%- endif -%}
+
+									          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+									          <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+									            {% capture "form_classes" %}
+									              product-form{% if product.has_only_default_variant %} product-form--no-variants{% endif %}
+									            {%- endcapture %}
+
+									            {% capture "form_id" %}AddToCartForm--{{ block.id }}-3{%- endcapture %}
+
+									            {% form 'product', product, class:form_classes, id:form_id %}
+									              <select name="id" id="ProductSelect" class="product-single__variants no-js">
+									                {% for variant in product.variants %}
+									                  {% if variant.available %}
+									                    <option {% if variant == product.selected_or_first_available_variant %}
+									                      selected="selected" {% endif %}
+									                      data-sku="{{ variant.sku }}"
+									                      value="{{ variant.id }}">
+									                      {{ variant.title }} - {{ variant.price | money_with_currency }}
+									                    </option>
+									                  {% else %}
+									                    <option disabled="disabled">
+									                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+									                    </option>
+									                  {% endif %}
+									                {% endfor %}
+									              </select>           
+									              <div class="product-add-to-cart">
+									                {% if product.variants.size == 1 %}
+									                <button type="submit" name="add" id="AddToCart--{{ block.id }}-3" class="btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+									                  <span class="btn__text">
+									                    {% if current_variant.available %}
+									                      {{ 'products.product.add_to_cart' | t }}
+									                    {% else %}
+									                      {{ 'products.product.sold_out' | t }}
+									                    {% endif %}
+									                  </span>
+									                </button>
+									                {% else %}
+									                <a class="btn btn-options" href="{{ product.url | within: collection }}">{{ 'products.product.choose_variant_button' | t }}</a>
+									                {% endif %}
+									                {% if section.settings.enable_payment_button %}
+									                  {{ form | payment_button }}
+									                {% endif %}
+
+
+									              </div>
+									            {% endform %}
+
+									        </div>
+									      </div>
+									  {% unless product.empty == empty %}
+									  <script type="application/json" id="ProductJson-{{ block.id }}-3">
+									    {{ product | json }}
+									  </script>
+									{% endunless %}
+									</div>
+								</div>	
+								</span>
+							{% endif %}	
+
+								
+							</div>
+						</div>
+					</div>
+
+
+				{% when 'two_big_50' %}
+					{% case section.settings.section_height %}
+						{% when 'small'  %}{%- assign img_size = '570x232' -%}
+						{% when 'medium' %}{%- assign img_size = '570x255' -%}
+						{% when 'large'  %}{%- assign img_size = '570x273' -%}
+					{% endcase %}
+
+					<div class="col-sm-6 grid__item one-half banner_{{ block.type }}">
+						<div class="banner_item">
+							<div class="bammer_item_1">
+								{%- assign product = all_products[block.settings.item_product] -%}
+								{%- assign current_variant = product.selected_or_first_available_variant -%}
+								{%- assign vendor = product.vendor -%}
+								{%- assign title = product.title -%}
+								{%- assign compare_at_price = current_variant.compare_at_price -%}
+								{%- assign price = current_variant.price -%}
+								{% if block.settings.item_img.size > 0 and block.settings.item_product.size > 0  %}	
+								<span class="2 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+								{% else %}
+									{% if block.settings.item_product.size > 0  %}	
+										<span class="1 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ product.images[0] | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+									{% else %}
+										<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+											{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+										</span>
+									{% endif %}
+								{% endif %}
+									
+								{%- if product.id.size > 0 -%}
+								<span class="caption_text">
+									<div class="collage_item">
+									
+
+									<div id="CollageProductSection-{{ block.id }}-1" data-section-id="{{ block.id }}-1" data-section-type="product-template">
+									      <div class="block-info">
+        
+									        {% if block.settings.show_vendor %}
+									          <h6 class="product-vendor" itemprop="brand">{{ vendor }}</h6>
+									        {% endif %}
+
+									        <div class="product-title" itemprop="name"><a href="{{ product.url | within: collection }}">{{ product.title | strip_html | truncate: block.settings.worts_limit_prod }}</a></div>
+
+
+									        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+									        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="price-container">
+									          <div data-price-container>
+									            {% comment %}
+									              Optionally show the 'compare at' or original price of the product.
+									            {% endcomment %}
+									            {% if compare_at_price > price %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper" aria-hidden="false">
+									                <span id="ComparePrice" class="product-price--compare-at">
+									                  {{ compare_at_price | money }}
+									                </span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+									            {% else %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper hide" aria-hidden="true">
+									                <span id="ComparePrice" class="product-price--compare-at"></span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+									            {% endif %}
+
+									            <span id="ProductPrice"
+									              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+									              itemprop="price"
+									              content="{{ price | divided_by: 100.00 }}"
+									              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+									              {{ price | money }}
+									            </span>
+									          </div>
+
+									          {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+									            <div class="product-policies rte">
+									              {%- if shop.taxes_included -%}
+									                {{ 'products.general.include_taxes' | t }}
+									              {%- endif -%}
+									              {%- if shop.shipping_policy.body != blank -%}
+									                {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+									              {%- endif -%}
+									            </div>
+									          {%- endif -%}
+
+									          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+									          <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+									            {% capture "form_classes" %}
+									              product-form{% if product.has_only_default_variant %} product-form--no-variants{% endif %}
+									            {%- endcapture %}
+
+									            {% capture "form_id" %}AddToCartForm--{{ block.id }}-1{%- endcapture %}
+
+									            {% form 'product', product, class:form_classes, id:form_id %}
+									              <select name="id" id="ProductSelect" class="product-single__variants no-js">
+									                {% for variant in product.variants %}
+									                  {% if variant.available %}
+									                    <option {% if variant == product.selected_or_first_available_variant %}
+									                      selected="selected" {% endif %}
+									                      data-sku="{{ variant.sku }}"
+									                      value="{{ variant.id }}">
+									                      {{ variant.title }} - {{ variant.price | money_with_currency }}
+									                    </option>
+									                  {% else %}
+									                    <option disabled="disabled">
+									                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+									                    </option>
+									                  {% endif %}
+									                {% endfor %}
+									              </select>           
+									              <div class="product-add-to-cart">
+									                {% if product.variants.size == 1 %}
+									                <button type="submit" name="add" id="AddToCart--{{ block.id }}-1" class="btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+									                  <span class="btn__text">
+									                    {% if current_variant.available %}
+									                      {{ 'products.product.add_to_cart' | t }}
+									                    {% else %}
+									                      {{ 'products.product.sold_out' | t }}
+									                    {% endif %}
+									                  </span>
+									                </button>
+									                {% else %}
+									                <a class="btn btn-options" href="{{ product.url | within: collection }}">{{ 'products.product.choose_variant_button' | t }}</a>
+									                {% endif %}
+									                {% if section.settings.enable_payment_button %}
+									                  {{ form | payment_button }}
+									                {% endif %}
+
+
+									              </div>
+									            {% endform %}
+
+									        </div>
+									      </div>
+									  {% unless product.empty == empty %}
+									  <script type="application/json" id="ProductJson-{{ block.id }}-1">
+									    {{ product | json }}
+									  </script>
+									{% endunless %}
+									</div>
+								</div>	
+								</span>
+							{% endif %}	
+
+								
+							</div>
+
+							<div class="bammer_item_2">
+								{%- assign product = all_products[block.settings.item2_product] -%}
+								{%- assign current_variant = product.selected_or_first_available_variant -%}
+								{%- assign vendor = product.vendor -%}
+								{%- assign title = product.title -%}
+								{%- assign compare_at_price = current_variant.compare_at_price -%}
+								{%- assign price = current_variant.price -%}
+								{% if block.settings.item2_img.size > 0 and block.settings.item2_product.size > 0  %}	
+								<span class="2 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item2_img | img_url: img_size, crop: block.settings.img2_alignment }} );"></span>
+								{% else %}
+									{% if block.settings.item2_product.size > 0  %}	
+										<span class="1 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ product.images[0] | img_url: img_size, crop: block.settings.img2_alignment }} );"></span>
+									{% else %}
+										<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+											{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+										</span>
+									{% endif %}
+								{% endif %}
+									
+								{%- if product.id.size > 0 -%}
+								<span class="caption_text">
+									<div class="collage_item">
+									
+
+									<div id="CollageProductSection-{{ block.id }}-2" data-section-id="{{ block.id }}-2" data-section-type="product-template">
+									      <div class="block-info">
+        
+									        {% if block.settings.show2_vendor %}
+									          <h6 class="product-vendor" itemprop="brand">{{ vendor }}</h6>
+									        {% endif %}
+
+									        <div class="product-title" itemprop="name"><a href="{{ product.url | within: collection }}">{{ product.title | strip_html | truncate: block.settings.worts_limit2_prod }}</a></div>
+
+
+									        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+									        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="price-container">
+									          <div data-price-container>
+									            {% comment %}
+									              Optionally show the 'compare at' or original price of the product.
+									            {% endcomment %}
+									            {% if compare_at_price > price %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper" aria-hidden="false">
+									                <span id="ComparePrice" class="product-price--compare-at">
+									                  {{ compare_at_price | money }}
+									                </span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+									            {% else %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper hide" aria-hidden="true">
+									                <span id="ComparePrice" class="product-price--compare-at"></span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+									            {% endif %}
+
+									            <span id="ProductPrice"
+									              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+									              itemprop="price"
+									              content="{{ price | divided_by: 100.00 }}"
+									              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+									              {{ price | money }}
+									            </span>
+									          </div>
+
+									          {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+									            <div class="product-policies rte">
+									              {%- if shop.taxes_included -%}
+									                {{ 'products.general.include_taxes' | t }}
+									              {%- endif -%}
+									              {%- if shop.shipping_policy.body != blank -%}
+									                {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+									              {%- endif -%}
+									            </div>
+									          {%- endif -%}
+
+									          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+									          <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+									            {% capture "form_classes" %}
+									              product-form{% if product.has_only_default_variant %} product-form--no-variants{% endif %}
+									            {%- endcapture %}
+
+									            {% capture "form_id" %}AddToCartForm--{{ block.id }}-2{%- endcapture %}
+
+									            {% form 'product', product, class:form_classes, id:form_id %}
+									              <select name="id" id="ProductSelect" class="product-single__variants no-js">
+									                {% for variant in product.variants %}
+									                  {% if variant.available %}
+									                    <option {% if variant == product.selected_or_first_available_variant %}
+									                      selected="selected" {% endif %}
+									                      data-sku="{{ variant.sku }}"
+									                      value="{{ variant.id }}">
+									                      {{ variant.title }} - {{ variant.price | money_with_currency }}
+									                    </option>
+									                  {% else %}
+									                    <option disabled="disabled">
+									                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+									                    </option>
+									                  {% endif %}
+									                {% endfor %}
+									              </select>           
+									              <div class="product-add-to-cart">
+									                {% if product.variants.size == 1 %}
+									                <button type="submit" name="add" id="AddToCart--{{ block.id }}-2" class="btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+									                  <span class="btn__text">
+									                    {% if current_variant.available %}
+									                      {{ 'products.product.add_to_cart' | t }}
+									                    {% else %}
+									                      {{ 'products.product.sold_out' | t }}
+									                    {% endif %}
+									                  </span>
+									                </button>
+									                {% else %}
+									                <a class="btn btn-options" href="{{ product.url | within: collection }}">{{ 'products.product.choose_variant_button' | t }}</a>
+									                {% endif %}
+									                {% if section.settings.enable_payment_button %}
+									                  {{ form | payment_button }}
+									                {% endif %}
+
+
+									              </div>
+									            {% endform %}
+
+									        </div>
+									      </div>
+									  {% unless product.empty == empty %}
+									  <script type="application/json" id="ProductJson-{{ block.id }}-2">
+									    {{ product | json }}
+									  </script>
+									{% endunless %}
+									</div>
+								</div>	
+								</span>
+							{% endif %}	
+								
+							</div>
+						</div>
+					</div>
+					
+
+				{% when 'two_small_25' %}
+					{% case section.settings.section_height %}
+						{% when 'small'  %}{%- assign img_size = '270x232' -%}
+						{% when 'medium' %}{%- assign img_size = '270x255' -%}
+						{% when 'large'  %}{%- assign img_size = '270x273' -%}
+					{% endcase %}
+
+					<div class="col-sm-3 grid__item one-quarter banner_{{ block.type }}">
+						<div class="banner_item">
+							<div class="bammer_item_1">
+								{%- assign product = all_products[block.settings.item_product] -%}
+								{%- assign current_variant = product.selected_or_first_available_variant -%}
+								{%- assign vendor = product.vendor -%}
+								{%- assign title = product.title -%}
+								{%- assign compare_at_price = current_variant.compare_at_price -%}
+								{%- assign price = current_variant.price -%}
+								{% if block.settings.item_img.size > 0 and block.settings.item_product.size > 0  %}	
+								<span class="2 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+								{% else %}
+									{% if block.settings.item_product.size > 0  %}	
+										<span class="1 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ product.images[0] | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+									{% else %}
+										<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+											{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+										</span>
+									{% endif %}
+								{% endif %}
+									
+								{%- if product.id.size > 0 -%}
+								<span class="caption_text">
+									<div class="collage_item">
+									
+
+									<div id="CollageProductSection-{{ block.id }}-1" data-section-id="{{ block.id }}-1" data-section-type="product-template">
+									      <div class="block-info">
+        
+									        {% if block.settings.show_vendor %}
+									          <h6 class="product-vendor" itemprop="brand">{{ vendor }}</h6>
+									        {% endif %}
+
+									        <div class="product-title" itemprop="name"><a href="{{ product.url | within: collection }}">{{ product.title | strip_html | truncate: block.settings.worts_limit_prod }}</a></div>
+
+
+									        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+									        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="price-container">
+									          <div data-price-container>
+									            {% comment %}
+									              Optionally show the 'compare at' or original price of the product.
+									            {% endcomment %}
+									            {% if compare_at_price > price %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper" aria-hidden="false">
+									                <span id="ComparePrice" class="product-price--compare-at">
+									                  {{ compare_at_price | money }}
+									                </span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+									            {% else %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper hide" aria-hidden="true">
+									                <span id="ComparePrice" class="product-price--compare-at"></span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+									            {% endif %}
+
+									            <span id="ProductPrice"
+									              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+									              itemprop="price"
+									              content="{{ price | divided_by: 100.00 }}"
+									              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+									              {{ price | money }}
+									            </span>
+									          </div>
+
+									          {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+									            <div class="product-policies rte">
+									              {%- if shop.taxes_included -%}
+									                {{ 'products.general.include_taxes' | t }}
+									              {%- endif -%}
+									              {%- if shop.shipping_policy.body != blank -%}
+									                {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+									              {%- endif -%}
+									            </div>
+									          {%- endif -%}
+
+									          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+									          <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+									            {% capture "form_classes" %}
+									              product-form{% if product.has_only_default_variant %} product-form--no-variants{% endif %}
+									            {%- endcapture %}
+
+									            {% capture "form_id" %}AddToCartForm--{{ block.id }}-1{%- endcapture %}
+
+									            {% form 'product', product, class:form_classes, id:form_id %}
+									              <select name="id" id="ProductSelect" class="product-single__variants no-js">
+									                {% for variant in product.variants %}
+									                  {% if variant.available %}
+									                    <option {% if variant == product.selected_or_first_available_variant %}
+									                      selected="selected" {% endif %}
+									                      data-sku="{{ variant.sku }}"
+									                      value="{{ variant.id }}">
+									                      {{ variant.title }} - {{ variant.price | money_with_currency }}
+									                    </option>
+									                  {% else %}
+									                    <option disabled="disabled">
+									                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+									                    </option>
+									                  {% endif %}
+									                {% endfor %}
+									              </select>           
+									              <div class="product-add-to-cart">
+									                {% if product.variants.size == 1 %}
+									                <button type="submit" name="add" id="AddToCart--{{ block.id }}-1" class="btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+									                  <span class="btn__text">
+									                    {% if current_variant.available %}
+									                      {{ 'products.product.add_to_cart' | t }}
+									                    {% else %}
+									                      {{ 'products.product.sold_out' | t }}
+									                    {% endif %}
+									                  </span>
+									                </button>
+									                {% else %}
+									                <a class="btn btn-options" href="{{ product.url | within: collection }}">{{ 'products.product.choose_variant_button' | t }}</a>
+									                {% endif %}
+									                {% if section.settings.enable_payment_button %}
+									                  {{ form | payment_button }}
+									                {% endif %}
+
+
+									              </div>
+									            {% endform %}
+
+									        </div>
+									      </div>
+									  {% unless product.empty == empty %}
+									  <script type="application/json" id="ProductJson-{{ block.id }}-1">
+									    {{ product | json }}
+									  </script>
+									{% endunless %}
+									</div>
+								</div>	
+								</span>
+							{% endif %}	
+
+								
+							</div>
+							<div class="bammer_item_2">
+								{%- assign product = all_products[block.settings.item2_product] -%}
+								{%- assign current_variant = product.selected_or_first_available_variant -%}
+								{%- assign vendor = product.vendor -%}
+								{%- assign title = product.title -%}
+								{%- assign compare_at_price = current_variant.compare_at_price -%}
+								{%- assign price = current_variant.price -%}
+								{% if block.settings.item2_img.size > 0 and block.settings.item2_product.size > 0  %}	
+								<span class="2 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item2_img | img_url: img_size, crop: block.settings.img2_alignment }} );"></span>
+								{% else %}
+									{% if block.settings.item2_product.size > 0  %}	
+										<span class="1 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ product.images[0] | img_url: img_size, crop: block.settings.img2_alignment }} );"></span>
+									{% else %}
+										<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+											{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+										</span>
+									{% endif %}
+								{% endif %}
+									
+								{%- if product.id.size > 0 -%}
+								<span class="caption_text">
+									<div class="collage_item">
+									
+
+									<div id="CollageProductSection-{{ block.id }}-2" data-section-id="{{ block.id }}-2" data-section-type="product-template">
+									      <div class="block-info">
+        
+									        {% if block.settings.show2_vendor %}
+									          <h6 class="product-vendor" itemprop="brand">{{ vendor }}</h6>
+									        {% endif %}
+
+									        <div class="product-title" itemprop="name"><a href="{{ product.url | within: collection }}">{{ product.title | strip_html | truncate: block.settings.worts_limit2_prod }}</a></div>
+
+
+									        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+									        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="price-container">
+									          <div data-price-container>
+									            {% comment %}
+									              Optionally show the 'compare at' or original price of the product.
+									            {% endcomment %}
+									            {% if compare_at_price > price %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper" aria-hidden="false">
+									                <span id="ComparePrice" class="product-price--compare-at">
+									                  {{ compare_at_price | money }}
+									                </span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+									            {% else %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper hide" aria-hidden="true">
+									                <span id="ComparePrice" class="product-price--compare-at"></span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+									            {% endif %}
+
+									            <span id="ProductPrice"
+									              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+									              itemprop="price"
+									              content="{{ price | divided_by: 100.00 }}"
+									              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+									              {{ price | money }}
+									            </span>
+									          </div>
+
+									          {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+									            <div class="product-policies rte">
+									              {%- if shop.taxes_included -%}
+									                {{ 'products.general.include_taxes' | t }}
+									              {%- endif -%}
+									              {%- if shop.shipping_policy.body != blank -%}
+									                {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+									              {%- endif -%}
+									            </div>
+									          {%- endif -%}
+
+									          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+									          <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+									            {% capture "form_classes" %}
+									              product-form{% if product.has_only_default_variant %} product-form--no-variants{% endif %}
+									            {%- endcapture %}
+
+									            {% capture "form_id" %}AddToCartForm--{{ block.id }}-2{%- endcapture %}
+
+									            {% form 'product', product, class:form_classes, id:form_id %}
+									              <select name="id" id="ProductSelect" class="product-single__variants no-js">
+									                {% for variant in product.variants %}
+									                  {% if variant.available %}
+									                    <option {% if variant == product.selected_or_first_available_variant %}
+									                      selected="selected" {% endif %}
+									                      data-sku="{{ variant.sku }}"
+									                      value="{{ variant.id }}">
+									                      {{ variant.title }} - {{ variant.price | money_with_currency }}
+									                    </option>
+									                  {% else %}
+									                    <option disabled="disabled">
+									                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+									                    </option>
+									                  {% endif %}
+									                {% endfor %}
+									              </select>           
+									              <div class="product-add-to-cart">
+									                {% if product.variants.size == 1 %}
+									                <button type="submit" name="add" id="AddToCart--{{ block.id }}-2" class="btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+									                  <span class="btn__text">
+									                    {% if current_variant.available %}
+									                      {{ 'products.product.add_to_cart' | t }}
+									                    {% else %}
+									                      {{ 'products.product.sold_out' | t }}
+									                    {% endif %}
+									                  </span>
+									                </button>
+									                {% else %}
+									                <a class="btn btn-options" href="{{ product.url | within: collection }}">{{ 'products.product.choose_variant_button' | t }}</a>
+									                {% endif %}
+									                {% if section.settings.enable_payment_button %}
+									                  {{ form | payment_button }}
+									                {% endif %}
+
+
+									              </div>
+									            {% endform %}
+
+									        </div>
+									      </div>
+									  {% unless product.empty == empty %}
+									  <script type="application/json" id="ProductJson-{{ block.id }}-2">
+									    {{ product | json }}
+									  </script>
+									{% endunless %}
+									</div>
+								</div>	
+								</span>
+							{% endif %}	
+								
+							</div>
+						</div>
+					</div>
+
+				{% when 'one_small_33' %}
+					{% case section.settings.section_height %}
+						{% when 'small'  %}{%- assign img_size = '540x494' -%}
+						{% when 'medium' %}{%- assign img_size = '540x540' -%}
+						{% when 'large'  %}{%- assign img_size = '540x577' -%}
+					{% endcase %}
+
+					<div class="col-sm-3 grid__item one-third banner_{{ block.type }}">
+						<div class="banner_item">
+							{%- assign product = all_products[block.settings.item_product] -%}
+							{%- assign current_variant = product.selected_or_first_available_variant -%}
+							{%- assign vendor = product.vendor -%}
+							{%- assign title = product.title -%}
+							{%- assign compare_at_price = current_variant.compare_at_price -%}
+							{%- assign price = current_variant.price -%}
+							{% if block.settings.item_img.size > 0 and block.settings.item_product.size > 0  %}	
+								<span class="2 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ block.settings.item_img | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+							{% else %}
+								{% if block.settings.item_product.size > 0  %}	
+									<span class="1 img_placeholder__wrap img_placeholder__{{ section.settings.section_height }}" style="background-image: url( {{ product.images[0] | img_url: img_size, crop: block.settings.img_alignment }} );"></span>
+								{% else %}
+									<span class="img_placeholder__wrap img_placeholder__{{ section.settings.section_height }} svg_tag">
+										{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+									</span>
+								{% endif %}
+							{% endif %}
+							
+							{%- if product.id.size > 0 -%}
+								<span class="caption_text">
+									<div class="collage_item">
+									
+
+									<div id="CollageProductSection-{{ block.id }}" data-section-id="{{ block.id }}" data-section-type="product-template">
+									      <div class="block-info">
+        
+									        {% if block.settings.show_vendor %}
+									          <h6 class="product-vendor" itemprop="brand">{{ vendor }}</h6>
+									        {% endif %}
+
+									        <div class="product-title" itemprop="name"><a href="{{ product.url | within: collection }}">{{ product.title | strip_html | truncate: block.settings.worts_limit_prod }}</a></div>
+
+
+									        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+									        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="price-container">
+									          <div data-price-container>
+									            {% comment %}
+									              Optionally show the 'compare at' or original price of the product.
+									            {% endcomment %}
+									            {% if compare_at_price > price %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper" aria-hidden="false">
+									                <span id="ComparePrice" class="product-price--compare-at">
+									                  {{ compare_at_price | money }}
+									                </span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+									            {% else %}
+									              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+									              <span class="product-price--wrapper hide" aria-hidden="true">
+									                <span id="ComparePrice" class="product-price--compare-at"></span>
+									              </span>
+									              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+									            {% endif %}
+
+									            <span id="ProductPrice"
+									              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+									              itemprop="price"
+									              content="{{ price | divided_by: 100.00 }}"
+									              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+									              {{ price | money }}
+									            </span>
+									          </div>
+
+									          {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+									            <div class="product-policies rte">
+									              {%- if shop.taxes_included -%}
+									                {{ 'products.general.include_taxes' | t }}
+									              {%- endif -%}
+									              {%- if shop.shipping_policy.body != blank -%}
+									                {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+									              {%- endif -%}
+									            </div>
+									          {%- endif -%}
+
+									          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+									          <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+									            {% capture "form_classes" %}
+									              product-form{% if product.has_only_default_variant %} product-form--no-variants{% endif %}
+									            {%- endcapture %}
+
+									            {% capture "form_id" %}AddToCartForm--{{ block.id }}{%- endcapture %}
+
+									            {% form 'product', product, class:form_classes, id:form_id %}
+									              <select name="id" id="ProductSelect" class="product-single__variants no-js">
+									                {% for variant in product.variants %}
+									                  {% if variant.available %}
+									                    <option {% if variant == product.selected_or_first_available_variant %}
+									                      selected="selected" {% endif %}
+									                      data-sku="{{ variant.sku }}"
+									                      value="{{ variant.id }}">
+									                      {{ variant.title }} - {{ variant.price | money_with_currency }}
+									                    </option>
+									                  {% else %}
+									                    <option disabled="disabled">
+									                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+									                    </option>
+									                  {% endif %}
+									                {% endfor %}
+									              </select>           
+									              <div class="product-add-to-cart">
+									                {% if product.variants.size == 1 %}
+									                <button type="submit" name="add" id="AddToCart--{{ block.id }}" class="btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+									                  <span class="btn__text">
+									                    {% if current_variant.available %}
+									                      {{ 'products.product.add_to_cart' | t }}
+									                    {% else %}
+									                      {{ 'products.product.sold_out' | t }}
+									                    {% endif %}
+									                  </span>
+									                </button>
+									                {% else %}
+									                <a class="btn btn-options" href="{{ product.url | within: collection }}">{{ 'products.product.choose_variant_button' | t }}</a>
+									                {% endif %}
+									                {% if section.settings.enable_payment_button %}
+									                  {{ form | payment_button }}
+									                {% endif %}
+
+
+									              </div>
+									            {% endform %}
+
+									        </div>
+									      </div>
+									  {% unless product.empty == empty %}
+									  <script type="application/json" id="ProductJson-{{ block.id }}">
+									    {{ product | json }}
+									  </script>
+									{% endunless %}
+									</div>
+								</div>	
+								</span>
+							{% endif %}		
+						</div>
+					</div>
+			{% endcase %}
+		{% endfor %}
+	</div>
+</div>
+</div>
+{% schema %}
+{
+	"name": "Collage Product",
+	"class": "section section_homepage section_collage",
+	"max_blocks": 4,
+	"settings": [
+		{
+	      "type": "text",
+	      "id": "title",
+	      "label": {
+	        "de": "Überschrift",
+	        "en": "Heading",
+	        "es": "Título",
+	        "fr": "Titre",
+	        "it": "Heading",
+	        "ja": "見出し",
+	        "pt-BR": "Título"
+	      },
+	      "default": {
+	        "de": "Featured Kategorie",
+	        "en": "Featured collection",
+	        "es": "colección destacada",
+	        "fr": "Collection en vedette",
+	        "it": "Collezione in evidenza",
+	        "ja": "特集コレクション",
+	        "pt-BR": "Coleção em destaque"
+	      }
+	    },
+	    {
+	      "type": "checkbox",
+	      "id": "background_toggle",
+	      "label": "Show background color",
+	      "default": true
+	    },
+	    {
+	      "type": "color",
+	      "id": "bg_color",
+	      "label": "Background color",
+	      "default": "#fafbfb"
+	    },
+	    {
+	      "type": "range",
+	      "id": "padding_box",
+	      "min": 0,
+	      "max": 100,
+	      "step": 1,
+	      "label": "Padding Top",
+	      "default": 30
+	    },
+	    {
+	      "type": "range",
+	      "id": "padding_box_bot",
+	      "min": 0,
+	      "max": 100,
+	      "step": 1,
+	      "label": "Padding Bottom",
+	      "default": 0
+	    },
+		{
+			"type": "select",
+			"id": "section_height",
+			"label": "Section height",
+			"options": [
+				{
+					"label": "Small (494px)",
+					"value": "small"
+				},
+				{
+					"label": "Medium (540px)",
+					"value": "medium"
+				},
+				{
+					"label": "Large (577px)",
+					"value": "large"
+				}
+			]
+		}
+		
+	],
+	"blocks": [
+
+		// BIG BANNER 50%  //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "big_50",
+			"name": "Big banner(50%)",
+			"limit": 2,
+			"settings": [
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item_img",
+					"label": "Banner image"
+				},
+				{
+					"type": "product",
+					"id": "item_product",
+					"label": "Product"
+				},
+				{
+			      "type": "checkbox",
+			      "id": "show_vendor",
+			      "label": {
+			        "de": "Anbieter anzeigen",
+			        "en": "Show vendor",
+			        "es": "Mostrar proveedor",
+			        "fr": "Afficher le distributeur",
+			        "it": "Mostra fornitore",
+			        "ja": "販売元を表示する",
+			        "pt-BR": "Exibir fornecedor"
+			      },
+			      "default": false
+			    },
+				{
+			      "type": "range",
+			      "id": "worts_limit_prod",
+			      "label": {
+			        "de": "Count of words in Title",
+			        "en": "Count of words in Title",
+			        "es": "Count of words in Title",
+			        "fr": "Count of words in Title",
+			        "it": "Count of words in Title",
+			        "ja": "Count of words in Title",
+			        "pt-BR": "Count of words in Title"
+			      },
+			      "min": 3,
+			      "max": 100,
+			      "step": 1,
+			      "default": 30
+			    }
+			]
+		},
+
+
+		// BIG BANNER 66% //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "big_66",
+			"name": "Big banner(66%)",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item_img",
+					"label": "Banner image"
+				},
+
+				{
+					"type": "product",
+					"id": "item_product",
+					"label": "Product"
+				},
+				{
+			      "type": "checkbox",
+			      "id": "show_vendor",
+			      "label": {
+			        "de": "Anbieter anzeigen",
+			        "en": "Show vendor",
+			        "es": "Mostrar proveedor",
+			        "fr": "Afficher le distributeur",
+			        "it": "Mostra fornitore",
+			        "ja": "販売元を表示する",
+			        "pt-BR": "Exibir fornecedor"
+			      },
+			      "default": false
+			    },
+				{
+			      "type": "range",
+			      "id": "worts_limit_prod",
+			      "label": {
+			        "de": "Count of words in Title",
+			        "en": "Count of words in Title",
+			        "es": "Count of words in Title",
+			        "fr": "Count of words in Title",
+			        "it": "Count of words in Title",
+			        "ja": "Count of words in Title",
+			        "pt-BR": "Count of words in Title"
+			      },
+			      "min": 3,
+			      "max": 100,
+			      "step": 1,
+			      "default": 30
+			    }
+			]
+		},
+
+
+		// BIG BANNER 66% WITH 3 ITEMS //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "big_66_3item",
+			"name": "Three banners (66%)",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "header",
+					"content": "Left banner"
+				},
+				{
+					"type": "select",
+					"id": "img1_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item1_img",
+					"label": "Banner image (870x381)"
+				},
+				{
+					"type": "product",
+					"id": "item1_product",
+					"label": "Product"
+				},
+				{
+			      "type": "checkbox",
+			      "id": "show1_vendor",
+			      "label": {
+			        "de": "Anbieter anzeigen",
+			        "en": "Show vendor",
+			        "es": "Mostrar proveedor",
+			        "fr": "Afficher le distributeur",
+			        "it": "Mostra fornitore",
+			        "ja": "販売元を表示する",
+			        "pt-BR": "Exibir fornecedor"
+			      },
+			      "default": false
+			    },
+				{
+			      "type": "range",
+			      "id": "worts_limit1_prod",
+			      "label": {
+			        "de": "Count of words in Title",
+			        "en": "Count of words in Title",
+			        "es": "Count of words in Title",
+			        "fr": "Count of words in Title",
+			        "it": "Count of words in Title",
+			        "ja": "Count of words in Title",
+			        "pt-BR": "Count of words in Title"
+			      },
+			      "min": 3,
+			      "max": 100,
+			      "step": 1,
+			      "default": 30
+			    },
+				
+				
+				
+				{
+					"type": "header",
+					"content": "Right banner"
+				},
+				{
+					"type": "select",
+					"id": "img2_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item2_img",
+					"label": "Banner image (870x381)"
+				},
+				{
+					"type": "product",
+					"id": "item2_product",
+					"label": "Product"
+				},
+				{
+			      "type": "checkbox",
+			      "id": "show2_vendor",
+			      "label": {
+			        "de": "Anbieter anzeigen",
+			        "en": "Show vendor",
+			        "es": "Mostrar proveedor",
+			        "fr": "Afficher le distributeur",
+			        "it": "Mostra fornitore",
+			        "ja": "販売元を表示する",
+			        "pt-BR": "Exibir fornecedor"
+			      },
+			      "default": false
+			    },
+				{
+			      "type": "range",
+			      "id": "worts_limit2_prod",
+			      "label": {
+			        "de": "Count of words in Title",
+			        "en": "Count of words in Title",
+			        "es": "Count of words in Title",
+			        "fr": "Count of words in Title",
+			        "it": "Count of words in Title",
+			        "ja": "Count of words in Title",
+			        "pt-BR": "Count of words in Title"
+			      },
+			      "min": 3,
+			      "max": 100,
+			      "step": 1,
+			      "default": 30
+			    },
+				
+
+				{
+					"type": "header",
+					"content": "Bottom banner"
+				},
+				{
+					"type": "select",
+					"id": "img3_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item3_img",
+					"label": "Banner image (870x381)"
+				},
+				{
+					"type": "product",
+					"id": "item3_product",
+					"label": "Product"
+				},
+				{
+			      "type": "checkbox",
+			      "id": "show3_vendor",
+			      "label": {
+			        "de": "Anbieter anzeigen",
+			        "en": "Show vendor",
+			        "es": "Mostrar proveedor",
+			        "fr": "Afficher le distributeur",
+			        "it": "Mostra fornitore",
+			        "ja": "販売元を表示する",
+			        "pt-BR": "Exibir fornecedor"
+			      },
+			      "default": false
+			    },
+				{
+			      "type": "range",
+			      "id": "worts_limit3_prod",
+			      "label": {
+			        "de": "Count of words in Title",
+			        "en": "Count of words in Title",
+			        "es": "Count of words in Title",
+			        "fr": "Count of words in Title",
+			        "it": "Count of words in Title",
+			        "ja": "Count of words in Title",
+			        "pt-BR": "Count of words in Title"
+			      },
+			      "min": 3,
+			      "max": 100,
+			      "step": 1,
+			      "default": 30
+			    }
+				
+			]
+		},
+
+
+		// TWO BIG BANNERS 50%  //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "two_big_50",
+			"name": "Two big banners(50%)",
+			"limit": 2,
+			"settings": [
+				{
+					"type": "paragraph",
+					"content": "Banner 1"
+				},
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item_img",
+					"label": "Banner 1 image"
+				},
+				{
+					"type": "product",
+					"id": "item_product",
+					"label": "Product"
+				},
+				{
+			      "type": "checkbox",
+			      "id": "show_vendor",
+			      "label": {
+			        "de": "Anbieter anzeigen",
+			        "en": "Show vendor",
+			        "es": "Mostrar proveedor",
+			        "fr": "Afficher le distributeur",
+			        "it": "Mostra fornitore",
+			        "ja": "販売元を表示する",
+			        "pt-BR": "Exibir fornecedor"
+			      },
+			      "default": false
+			    },
+				{
+			      "type": "range",
+			      "id": "worts_limit_prod",
+			      "label": {
+			        "de": "Count of words in Title",
+			        "en": "Count of words in Title",
+			        "es": "Count of words in Title",
+			        "fr": "Count of words in Title",
+			        "it": "Count of words in Title",
+			        "ja": "Count of words in Title",
+			        "pt-BR": "Count of words in Title"
+			      },
+			      "min": 3,
+			      "max": 100,
+			      "step": 1,
+			      "default": 30
+			    },
+				
+				{
+					"type": "paragraph",
+					"content": "Banner 2"
+				},
+
+				{
+					"type": "select",
+					"id": "img2_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item2_img",
+					"label": "Banner 2 image"
+				},
+				{
+					"type": "product",
+					"id": "item2_product",
+					"label": "Product"
+				},
+				{
+			      "type": "checkbox",
+			      "id": "show2_vendor",
+			      "label": {
+			        "de": "Anbieter anzeigen",
+			        "en": "Show vendor",
+			        "es": "Mostrar proveedor",
+			        "fr": "Afficher le distributeur",
+			        "it": "Mostra fornitore",
+			        "ja": "販売元を表示する",
+			        "pt-BR": "Exibir fornecedor"
+			      },
+			      "default": false
+			    },
+				{
+			      "type": "range",
+			      "id": "worts_limit2_prod",
+			      "label": {
+			        "de": "Count of words in Title",
+			        "en": "Count of words in Title",
+			        "es": "Count of words in Title",
+			        "fr": "Count of words in Title",
+			        "it": "Count of words in Title",
+			        "ja": "Count of words in Title",
+			        "pt-BR": "Count of words in Title"
+			      },
+			      "min": 3,
+			      "max": 100,
+			      "step": 1,
+			      "default": 30
+			    }
+				
+			]
+		},
+
+		// TWO SMALL BANNERS 25%  //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "two_small_25",
+			"name": "Two small banners(25%)",
+			"settings": [
+				{
+					"type": "paragraph",
+					"content": "Banner 1"
+				},
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item_img",
+					"label": "Banner 1 image"
+				},
+				{
+					"type": "product",
+					"id": "item_product",
+					"label": "Product"
+				},
+				{
+			      "type": "checkbox",
+			      "id": "show_vendor",
+			      "label": {
+			        "de": "Anbieter anzeigen",
+			        "en": "Show vendor",
+			        "es": "Mostrar proveedor",
+			        "fr": "Afficher le distributeur",
+			        "it": "Mostra fornitore",
+			        "ja": "販売元を表示する",
+			        "pt-BR": "Exibir fornecedor"
+			      },
+			      "default": false
+			    },
+				{
+			      "type": "range",
+			      "id": "worts_limit_prod",
+			      "label": {
+			        "de": "Count of words in Title",
+			        "en": "Count of words in Title",
+			        "es": "Count of words in Title",
+			        "fr": "Count of words in Title",
+			        "it": "Count of words in Title",
+			        "ja": "Count of words in Title",
+			        "pt-BR": "Count of words in Title"
+			      },
+			      "min": 3,
+			      "max": 100,
+			      "step": 1,
+			      "default": 30
+			    },
+			    {
+					"type": "paragraph",
+					"content": "Banner 2"
+				},
+			    {
+					"type": "select",
+					"id": "img2_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item2_img",
+					"label": "Banner 2 image"
+				},
+				{
+					"type": "product",
+					"id": "item2_product",
+					"label": "Product"
+				},
+				{
+			      "type": "checkbox",
+			      "id": "show2_vendor",
+			      "label": {
+			        "de": "Anbieter anzeigen",
+			        "en": "Show vendor",
+			        "es": "Mostrar proveedor",
+			        "fr": "Afficher le distributeur",
+			        "it": "Mostra fornitore",
+			        "ja": "販売元を表示する",
+			        "pt-BR": "Exibir fornecedor"
+			      },
+			      "default": false
+			    },
+				{
+			      "type": "range",
+			      "id": "worts_limit2_prod",
+			      "label": {
+			        "de": "Count of words in Title",
+			        "en": "Count of words in Title",
+			        "es": "Count of words in Title",
+			        "fr": "Count of words in Title",
+			        "it": "Count of words in Title",
+			        "ja": "Count of words in Title",
+			        "pt-BR": "Count of words in Title"
+			      },
+			      "min": 3,
+			      "max": 100,
+			      "step": 1,
+			      "default": 30
+			    }
+			]
+		},
+
+		// ONE SMALL BANNER 33%  //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "one_small_33",
+			"name": "One small banner(33%)",
+			"settings": [
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "image_picker",
+					"id": "item_img",
+					"label": "Banner image"
+				},
+
+				{
+					"type": "product",
+					"id": "item_product",
+					"label": "Product"
+				},
+				{
+			      "type": "checkbox",
+			      "id": "show_vendor",
+			      "label": {
+			        "de": "Anbieter anzeigen",
+			        "en": "Show vendor",
+			        "es": "Mostrar proveedor",
+			        "fr": "Afficher le distributeur",
+			        "it": "Mostra fornitore",
+			        "ja": "販売元を表示する",
+			        "pt-BR": "Exibir fornecedor"
+			      },
+			      "default": false
+			    },
+				{
+			      "type": "range",
+			      "id": "worts_limit_prod",
+			      "label": {
+			        "de": "Count of words in Title",
+			        "en": "Count of words in Title",
+			        "es": "Count of words in Title",
+			        "fr": "Count of words in Title",
+			        "it": "Count of words in Title",
+			        "ja": "Count of words in Title",
+			        "pt-BR": "Count of words in Title"
+			      },
+			      "min": 3,
+			      "max": 100,
+			      "step": 1,
+			      "default": 30
+			    }
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Collage Products",
+			"category": "Image",
+			"blocks": [
+				{
+					"type": "big_50"
+				},
+				{
+					"type": "big_50"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

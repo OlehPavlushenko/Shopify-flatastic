@@ -1,0 +1,95 @@
+{{ 'api.jquery.js' | shopify_asset_url | script_tag }}
+<div id="fl-recent-products" class="grids">
+
+    {%- if section.settings.heading_recent != blank -%}
+      <h2>{{ section.settings.heading_recent | escape }}</h2>
+    {%- endif -%}
+  <div class="grid-uniform"></div>
+</div>
+{% comment %}
+Recently Viewed Labs Snippet, included on the products page.
+{% endcomment %}
+<script type="text/javascript">
+var pHandle  
+var pLimit   = 4; 
+pLimit       = 9;
+var pPointer = 0;
+jQuery(function($){
+  
+  if (jQuery('#fl-recent-products .grid-uniform .product_box').length ) {
+    jQuery('#fl-recent-products').addClass('hidden');
+  }
+    // Gives the assets enough time to load.
+    setTimeout(function(){
+        if(jQuery.cookie('fl-recent-products') == undefined){
+            if(pHandle){
+                jQuery.cookie('fl-recent-products', "{{product.handle}}", {expires: 365, path: "/"});
+            }
+        }
+    var currentProducts = [];
+    if(jQuery.cookie('fl-recent-products') != undefined){
+        currentProducts = jQuery.cookie('fl-recent-products').split(",");    
+    }
+   
+    if(currentProducts.length > 0){$('#_rvp').show()}
+    // set the current product
+    // If its not already listed
+    if(pHandle){
+      if(currentProducts.indexOf(pHandle) == -1){
+          // If we are at the limit move it to the front
+          if(currentProducts.length >= pLimit){
+              currentProducts.unshift; // remove very last item
+          }
+          currentProducts.push(pHandle); // add this one
+      }
+    }
+    // prevent cookie override.
+    if(currentProducts.length > 0){
+        jQuery.cookie('fl-recent-products', currentProducts.join(","), {expires: 365, path: "/"});    
+    }
+    console.log(currentProducts);
+        $.each(currentProducts.reverse(), function(i,e){
+        if(pPointer >= pLimit || e == ''){
+            return false;
+        }else{
+            pPointer += 1;
+            Shopify.getProduct(e, function(product){
+              
+              //console.log(product);
+              
+                // we now have the product
+                var productContainer = $("<div />",{class: "grid__item grid-product large--one-third"});
+                var productBox       = $("<div />",{class: "product_box"});
+                var productImg       = $("<div />",{class: "product_img"});
+                var productIndent       = $("<div />",{class: "product_indent"});
+                var pPrice      = $("<div />",{class: "product_price"});
+                var plink            = $("<a />",{alt: product.title, title: product.title, href: product.url});
+                var plink2            = $("<a />",{alt: product.title, title: product.title, href: product.url,html: product.title});
+                var pTitle           = $("<div/>",{class: "product-title"});
+                var pImage           = $("<img />",{class: "responsive", src: product.featured_image});
+                var pImageWrap       = $("<div />",{class: "img_wrap"});
+                if(product.compare_at_price > product.price){
+                  var pPriceN           = $("<div />",{class: "price_n", html: Shopify.formatMoney(product.compare_at_price, theme.settings.moneyFormat)});
+                }
+                var pPriceH           = $("<div />",{class: "price_h", html: Shopify.formatMoney(product.price, theme.settings.moneyFormat)});
+                productImg.append(plink);
+                pImageWrap.append(pImage);
+                plink.append(pImageWrap);
+                pTitle.append(plink2);
+                productBox.append(productImg);
+                productBox.append(productIndent);
+                productIndent.append(pTitle);
+                productIndent.append(pPrice);
+                pPrice.append(pPriceN);
+                pPrice.append(pPriceH);
+                productContainer.append(productBox);
+                $("#fl-recent-products.grids>.grid-uniform:last").append(productContainer);
+                $("#fl-recent-products.grids").append("<div class='clearfix'></div>");
+               Currency.convertAll(window.shop_currency, $('select[name=currencies] option:selected').val(), '#fl-recent-products span.money', 'money_format');
+            });
+        } 
+
+    });
+    }, 850);
+});
+</script>

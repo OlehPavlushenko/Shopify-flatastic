@@ -1,0 +1,898 @@
+{{ 'option_selection.js' | shopify_asset_url | script_tag }}
+{%- assign product = all_products[section.settings.featured_product] -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+{%- if product == empty -%}
+  {%- assign section_onboarding = true -%}
+  {%- assign vendor = 'home_page.onboarding.product_vendor' | t -%}
+  {%- assign title = 'home_page.onboarding.product_title' | t -%}
+  {%- assign compare_at_price = 2999 -%}
+  {%- assign price = 1999 -%}
+{%- else -%}
+  {%- assign section_onboarding = false -%}
+  {%- assign vendor = product.vendor -%}
+  {%- assign title = product.title -%}
+  {%- assign compare_at_price = current_variant.compare_at_price -%}
+  {%- assign price = current_variant.price -%}
+{%- endif -%}
+
+<div itemscope itemtype="http://schema.org/Product" id="FeaturedProductSection--{{ section.id }}" class="FeaturedProduct" data-section-id="{{ section.id }}" data-section-type="product-template" data-image-zoom-type="true" data-enable-history-state="false" {% if section.settings.background_toggle %} style="background-color: {{ section.settings.bg_color }}; padding: {{ section.settings.padding_box }}px 0 {{ section.settings.padding_box }}px 0"{% endif %}>
+  <div class="wrapper">
+    {% if section.settings.title != blank %}
+      <div class="section-header">
+        <h2 class="section-header__title">{{ section.settings.title | escape }}</h2>
+      </div>
+    {% endif %}
+    <meta itemprop="url" content="{{ shop.url }}{{ product.url }}">
+    <meta itemprop="image" content="{{ product.featured_image.src | img_url: 'grande' }}">
+
+    <div class="grid product-single product-single-info">
+      <div class="grid__item large--seven-twelfths medium--seven-twelfths text-center">
+        <div class="product-single__photos">
+          {% unless section_onboarding %}
+            {% assign featured_image = product.selected_or_first_available_variant.featured_image | default: product.featured_image %}
+
+            {% for image in product.images %}
+              {% capture img_id_class %}ProductImage-{{ image.id }}{% endcapture %}
+              {% capture img_wrapper_id %}ProductImageWrapper-{{ image.id }}{% endcapture %}
+              {% assign img_url = image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+              {% include 'image-style' with image: image, small_style: false, width: 700, height: 800, wrapper_id: img_wrapper_id, img_id_class: img_id_class %}
+
+              <div id="{{ img_wrapper_id }}" class="product-single__photo-wrapper product-single__photo-wrapper--featured-product supports-js{% unless featured_image == image %} hide{% endunless%}" data-image-id="{{ image.id }}">
+              {% if settings.sale_lbl %}
+                {% if compare_at_price > price %}
+              <div class="ribbon ribbon-top-left"><span>{{ 'products.product.sale' | t }}</span></div>
+              {% endif %}
+              {% endif %}
+              {% if sold_out %} 
+                {% if settings.sold_lbl %}
+                  <div class="ribbon ribbon-top-right"><span>{{ 'products.product.sold' | t }}</span></div>
+                {% endif %}
+              {% endif %}
+                <div style="padding-top:{{ 1 | divided_by: image.aspect_ratio | times: 100}}%;">
+                  <img class="lazyload lazypreload {{ img_id_class }}"
+                      src="{{ image | img_url: '300x300' }}"
+                      data-src="{{ img_url }}"
+                      data-widths="[180, 370, 540, 740, 900, 1080, 1296, 1512, 1728, 2048]"
+                      data-aspectratio="{{ image.aspect_ratio }}"
+                      data-sizes="auto"
+                      alt="{{ image.alt | escape }}">
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+          {% endunless %}
+           
+        </div>
+      </div>
+
+      <div class="grid__item product-single__meta--wrapper medium--five-twelfths large--five-twelfths">
+        {% if section.settings.show_vendor %}
+          <div class="product-single__vendor" itemprop="brand">{{ vendor }}</div>
+        {% endif %}
+
+        <h1 class="product-single__title" itemprop="name">{{ title }}</h1>
+        <div class="product-desc" itemprop="name">{{ product.description | strip_html | truncate: 120 }}</div>
+        
+        {% for var in product.variants limit:1 %}
+          {% assign varQ = var.inventory_quantity %}
+       
+        <div class="paddingtop8 eins-prod">
+          <span class="vmicon vm2-{% if varQ == 0 %}nostock{% elsif varQ < 10 %}lowstock{% else %}normalstock{% endif %}"></span>
+          <span class="stock-level">{{ 'products.product.stock_level' | t }} : <span>{{ varQ }}</span> {{ 'products.product.stock_items' | t }}</span>
+        </div>
+         {% endfor %}
+
+        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class='price-container'>
+          <div data-price-container>
+            {% comment %}
+              Optionally show the 'compare at' or original price of the product.
+            {% endcomment %}
+            {% if compare_at_price > price %}
+              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+              <span class="product-single__price--wrapper" aria-hidden="false">
+                <span id="ComparePrice" class="product-single__price--compare-at" content="{{ current_variant.compare_at_price | divided_by: 100.00 }}">
+                  {{ compare_at_price | money }}
+                </span>
+              </span>
+              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+            {% else %}
+              <span id="PriceA11y" class="visually-hidden" {% unless current_variant.available %}aria-hidden="true"{% endunless %}>{{ 'products.general.regular_price' | t }}</span>
+              <span class="product-single__price--wrapper hide" aria-hidden="true">
+                <span id="ComparePrice" content="{{ current_variant.compare_at_price | divided_by: 100.00 }}" class="product-single__price--compare-at"></span>
+              </span>
+              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+            {% endif %}
+
+            <span id="ProductPrice"
+              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+              itemprop="price"
+              content="{{ price | divided_by: 100.00 }}"
+              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+              {{ price | money }}
+            </span>
+            
+              <div class="sale-1 hidden">
+                <a href="#" class="announcement-bar--link">
+                <i class="fa fa-certificate"></i>
+                <span></span>
+                </a>
+              {% if current_variant.compare_at_price > current_variant.price %}
+              <script>
+              (function($) {
+                $(document).ready(function() {
+                  var stockId = $('.index-section.featured-product > div').attr('data-section-id');
+                  var productsPrice = $('#FeaturedProductSection--'+stockId+' .product-single-info .price-container .sale-1');
+                  var variant_price = $('#FeaturedProductSection--'+stockId+' .product-single-info .price-container').find('#ProductPrice').attr('content');
+                  var variant_compare_at_price = $('#FeaturedProductSection--'+stockId+' .product-single-info .price-container').find('#ComparePrice').attr('content');
+                  productsPrice.removeClass('hidden');
+                    productsPrice.find('span').html( '<span class="money hidden">' + variant_price + '</span>' + '<span class="money hidden">' + variant_compare_at_price + '</span><span class="money-percent">' + parseInt( 100 - ( variant_price*100 )/variant_compare_at_price ) + '%</span>');
+                   });
+              })(jQuery);
+              </script>
+              {% endif %}
+              </div>
+          </div>
+
+          {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product-single__policies rte">
+              {%- if shop.taxes_included -%}
+                {{ 'products.general.include_taxes' | t }}
+              {%- endif -%}
+              {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+          
+            {% if section.settings.salecount_toggle %}
+                <div class="timer">      
+                 <div class="timer_expires"> Expires in : </div>
+                  <div class="countdown_timer countsale_timer" id="timer_{{ forloop.index }}_{{ section.id }}" data-date="{{ section.settings.count_date_year }}/{{ section.settings.count_date_month }}/{{ section.settings.count_date_day }}">
+                  </div>
+                </div>
+                <div class="clearfix"></div>
+                 <div class="timer_left">
+                  <div class="eins-prod-text">Hurry! Only </div> 
+                  {% for var in product.variants limit:1 %}
+                  {% assign varQ = var.inventory_quantity %}
+                    <div class="eins-prod">
+                       <p class="single_product__availability stock-level">
+                          <span><span>{{ varQ }}</span> {{ 'products.product.stock_items' | t }}</span> Left!
+                       </p>
+                    </div>
+                  {% endfor %} 
+                </div>
+                 <script>
+                $(document ).ready(function() {
+                  $('#timer_{{ forloop.index }}_{{ section.id }}').each(function() {
+                    var $this = $(this), finalDate = $(this).data('date');
+                    $this.countdown(finalDate, function(event) {
+                      $this.html(event.strftime('<div class="deals-time day"><div class="num-time">%D</div><div class="title-time">{{ 'general.countdown.days' | t }}</div></div> <div class="deals-time hour"><div class="num-time">%H</div> <div class="title-time">{{ 'general.countdown.hours' | t }}</div></div><div class="deals-time minute"><div class="num-time">%M</div><div class="title-time">{{ 'general.countdown.minutes' | t }}</div></div><div class="deals-time second"><div class="num-time">%S</div><div class="title-time">{{ 'general.countdown.seconds' | t }}</div></div>'));
+                    });
+                  });  
+                });
+              </script>
+              {% endif %}
+           
+          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+          <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+          {% if section_onboarding %}
+            <div class="product-single__add-to-cart default-product">
+              <button type="submit" name="add" id="AddToCart--{{ section.id }}" class="btn btn--add-to-cart" disabled="disabled">
+                <span class="btn__text">
+                  {{ 'products.product.sold_out' | t }}
+                </span>
+              </button>
+            </div>
+          {% else %}
+            {% capture "form_classes" %}
+              product-single__form{% if product.has_only_default_variant %} product-single__form--no-variants{% endif %}
+            {%- endcapture %}
+
+            {% capture "form_id" %}AddToCartForm--{{ section.id }}{%- endcapture %}
+
+            {% form 'product', product, class:form_classes, id:form_id %}
+            
+             {% if section.settings.product_selector == 'radio' %}
+              <div id="product-variants">
+              
+                {% for option in product.options %}
+                {% include 'swatch' with option %}
+                {% endfor %}
+                </div>
+              {% endif %}  
+
+              {% unless product.has_only_default_variant %}
+                {% for option in product.options_with_values %}
+                    <div {% if section.settings.product_selector == 'radio' %} style="display: none!important;" {% endif %} class="radio-wrapper js product-form__item">
+                    <label class="single-option-radio__label{% if option.name == 'Default' or option.name == 'Title' or section.settings.show_variant_labels == false %} hidden-label{% endif %}"
+                      for="ProductSelect--{{ section.id }}-option-{{ forloop.index0 }}">
+                      {{ option.name | escape }} : 
+                    </label>
+                     
+                    <select class="{% if section.settings.product_selector == 'select' %}single-option-selector {% endif %}single-option-selector__radio single-option-selector-{{ section.id }} product-form__input" id="ProductSelect--{{ section.id }}-option-{{ forloop.index0 }}" data-index="option{{ forloop.index }}">
+                        {% for value in option.values %}
+                          <option value="{{ value | escape }}"{% if option.selected_value == value %} selected="selected"{% endif %}>{{ value | escape }}</option>
+                        {% endfor %}
+                      </select>
+
+                    </div>
+                {% endfor %}
+              {% endunless %}
+              
+              <div style="display: none!important;">
+                <select name="id" id="ProductSelectors" class="product-single__variants no-js">
+                  {% for variant in product.variants %}
+                    {% if variant.available %}
+                      <option {% if variant == product.selected_or_first_available_variant %}
+                        selected="selected" {% endif %}
+                        data-sku="{{ variant.sku }}"
+                        value="{{ variant.id }}">
+                        {{ variant.title }}
+                      </option>
+                    {% else %}
+                      <option disabled="disabled">
+                        {{ variant.title }}
+                      </option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="product-single__add-to-cart">
+                <button type="submit" name="add" id="AddToCart--{{ section.id }}" class="btn btn--add-to-cart"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+                  <span class="btn__text">
+                    {% if current_variant.available %}
+                      {{ 'products.product.add_to_cart' | t }}
+                    {% else %}
+                      {{ 'products.product.sold_out' | t }}
+                    {% endif %}
+                  </span>
+                </button>
+                {% if section.settings.enable_payment_button %}
+                  {{ form | payment_button }}
+                {% endif %}
+              </div>
+            {% endform %}
+          {% endif %}
+        </div>
+
+        <a class="product-single__full-details text-link"{% unless section_onboarding %} href="{{ product.url }}?variant={{ current_variant.id }}"{% endunless %}>
+          {{ 'products.product.full_details' | t }}
+        </a>
+
+        {% if section.settings.show_share_buttons %}
+          {% include 'social-sharing', share_title: product.title, share_permalink: product.url, share_image: product %}
+        {% endif %}
+      </div>
+    </div>
+
+    {% if collection %}
+      <hr class="hr--clear">
+      <div class="text-center">
+        <a href="{{ collection.url }}" class="return-link">{{ 'products.general.collection_return' | t: collection: collection.title }}</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+<script>
+  {% if section.settings.product_selector == 'radio' %}
+  jQuery('.swatch :radio').change(function() {
+    var optionIndex = jQuery(this).closest('.swatch').attr('data-option-index');
+    var optionValue = jQuery(this).val();
+    jQuery(this)
+    .closest('#AddToCartForm--{{ section.id }}')
+    .find('.single-option-selector')
+    .eq(optionIndex)
+    .val(optionValue)
+    .trigger('change');
+    jQuery(this)
+    .closest('#AddToCartForm--{{ section.id }}')
+    .find('.single-option-selector__radio')
+    .eq(optionIndex)
+    .val(optionValue)
+    .trigger('change');
+  });  
+  var selectCallback = function(variant, selector) {
+    if (variant) {
+      var form = jQuery('#' + selector.domIdPrefix).closest('form');
+      for (var i=0,length=variant.options.length; i<length; i++) {
+        var radioButton = form.find('.swatch[data-option-index="' + i + '"] :radio[value="' + variant.options[i] +'"]');
+        if (radioButton.size()) {
+          radioButton.get(0).checked = true;
+        }
+      }
+    }
+  };  
+  jQuery(function($) {
+    {% if product.available and product.variants.size > 1 %}
+    new Shopify.OptionSelectors('ProductSelectors', {
+      product: {{ product | json }},
+      onVariantSelected: selectCallback
+     // enableHistoryState: true
+      });  
+     {% endif %} 
+  }); 
+  {% endif %} 
+window.addEventListener('DOMContentLoaded', function() {
+  var Shopify = Shopify || {};
+    
+  // Required functionality from depricated options_selection.js
+  Shopify.arrayIncludes = function(e, t) {
+    for (var n = 0; n < e.length; n++)
+        if (e[n] == t) return !0;
+    return !1
+  }, Shopify.uniq = function(e) {
+      for (var t = [], n = 0; n < e.length; n++) Shopify.arrayIncludes(t, e[n]) || t.push(e[n]);
+      return t
+  }
+  Shopify.optionsMap = {};
+  Shopify.updateOptionsInSelector = function(selectorIndex) {
+    switch (selectorIndex) {
+      case 0:
+        var key = 'root';
+        var selector = jQuery('.single-option-selector:eq(0) , .single-option-selector__radio:eq(0)');
+        break;
+      case 1:
+        var key = jQuery('.single-option-selector:eq(0), .single-option-selector__radio:eq(0)').val();
+        var selector = jQuery('.single-option-selector:eq(1), .single-option-selector__radio:eq(1)');
+        break;
+      case 2:
+        var key = jQuery('.single-option-selector:eq(0), .single-option-selector__radio:eq(0)').val();  
+        key += ' / ' + jQuery('.single-option-selector:eq(1), .single-option-selector__radio:eq(1)').val();
+        var selector = jQuery('.single-option-selector:eq(2), .single-option-selector__radio:eq(2)');
+    }
+    
+    var initialValue = selector.val();
+    selector.empty();    
+    var availableOptions = Shopify.optionsMap[key];
+    for (var i=0; i<availableOptions.length; i++) {
+      var option = availableOptions[i];
+      var newOption = jQuery('<option></option>').val(option).html(option);
+      selector.append(newOption);
+    }
+    jQuery('.swatch[data-option-index="' + selectorIndex + '"] .swatch-element').each(function() {
+      if (jQuery.inArray(jQuery(this).attr('data-value'), availableOptions) !== -1) {
+        jQuery(this).removeClass('soldout').show().find(':radio').removeAttr('disabled','disabled').removeAttr('checked');
+      }
+      else {
+        jQuery(this).addClass('soldout').hide().find(':radio').removeAttr('checked').attr('disabled','disabled');
+      }
+    });
+    if (jQuery.inArray(initialValue, availableOptions) !== -1) {
+      selector.val(initialValue);
+    }
+    selector.trigger('change');
+
+  };
+
+  Shopify.linkOptionSelectors = function(product) {
+    // Building our mapping object.
+    for (var i=0; i<product.variants.length; i++) {
+      var variant = product.variants[i];
+      if (variant.available) {
+        // Gathering values for the 1st drop-down.
+        Shopify.optionsMap['root'] = Shopify.optionsMap['root'] || [];
+        Shopify.optionsMap['root'].push(variant.option1);
+        Shopify.optionsMap['root'] = Shopify.uniq(Shopify.optionsMap['root']);
+        // Gathering values for the 2nd drop-down.
+        if (product.options.length > 1) {
+          var key = variant.option1;
+          Shopify.optionsMap[key] = Shopify.optionsMap[key] || [];
+          Shopify.optionsMap[key].push(variant.option2);
+          Shopify.optionsMap[key] = Shopify.uniq(Shopify.optionsMap[key]);
+        }
+        // Gathering values for the 3rd drop-down.
+        if (product.options.length === 3) {
+          var key = variant.option1 + ' / ' + variant.option2;
+          Shopify.optionsMap[key] = Shopify.optionsMap[key] || [];
+          Shopify.optionsMap[key].push(variant.option3);
+          Shopify.optionsMap[key] = Shopify.uniq(Shopify.optionsMap[key]);
+        }
+      }
+    }
+    // Update options right away.
+    Shopify.updateOptionsInSelector(0);
+    if (product.options.length > 1) Shopify.updateOptionsInSelector(1);
+    if (product.options.length === 3) Shopify.updateOptionsInSelector(2);
+    // When there is an update in the first dropdown.
+    jQuery(".single-option-selector:eq(0) , .single-option-selector__radio:eq(0)").change(function() {
+      Shopify.updateOptionsInSelector(1);
+      if (product.options.length === 3) Shopify.updateOptionsInSelector(2);
+      return true;
+    });
+    // When there is an update in the second dropdown.
+    jQuery(".single-option-selector:eq(1), .single-option-selector__radio:eq(1)").change(function() {
+      if (product.options.length === 3) Shopify.updateOptionsInSelector(2);
+      return true;
+    });  
+  };
+   
+  {% if product.available and product.options.size > 1 %}
+    var $addToCartForm = jQuery('#AddToCartForm--{{ section.id }}');
+    if (window.MutationObserver && $addToCartForm.length) {
+      if (typeof observer === 'object' && typeof observer.disconnect === 'function') {
+        observer.disconnect();
+      }
+      var config = { childList: true, subtree: true };
+      var observer = new MutationObserver(function() {      
+        Shopify.linkOptionSelectors({{ product | json }});
+        observer.disconnect();
+      });  
+      observer.observe($addToCartForm[0], config);
+    }
+  {% endif %}
+   
+  var selector = jQuery('.single-option-selector:eq(0), .single-option-selector__radio:eq(1)');
+  selector.trigger('change'); 
+  {% if product.options.size == 1 %}
+    {% for variant in product.variants %}
+      {% unless variant.available %}
+        jQuery('.single-option-selector option, .single-option-selector__radio option').filter(function() { return jQuery(this).text().trim() === {{ variant.title | json }}; }).remove();
+      {% endunless %}
+    {% endfor %}
+    jQuery('.single-option-selector, .single-option-selector__radio').trigger('change');
+  {% endif %}
+});
+  
+</script>
+
+{% unless product.empty == empty %}
+  <script type="application/json" id="ProductJson-{{ section.id }}">
+    {{ product | json }}
+  </script>
+{% endunless %}
+
+
+
+{% schema %}
+{
+  "name": {
+    "de": "Vorgestelltes Produkt",
+    "en": "Featured product",
+    "es": "Producto destacado",
+    "fr": "Produit en vedette",
+    "it": "Prodotto in primo piano",
+    "ja": "おすすめ商品",
+    "pt-BR": "Produto em destaque"
+  },
+  "class":"index-section featured-product",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": {
+        "de": "Überschrift",
+        "en": "Heading",
+        "es": "Título",
+        "fr": "Titre",
+        "it": "Heading",
+        "ja": "見出し",
+        "pt-BR": "Título"
+      },
+      "default": {
+        "de": "Featured Kategorie",
+        "en": "Featured collection",
+        "es": "colección destacada",
+        "fr": "Collection en vedette",
+        "it": "Collezione in evidenza",
+        "ja": "特集コレクション",
+        "pt-BR": "Coleção em destaque"
+      }
+    },
+    {
+      "type": "checkbox",
+      "id": "background_toggle",
+      "label": "Show background color",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#fafbfb"
+    },
+    {
+      "type": "range",
+      "id": "padding_box",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Padding Top and Bottom",
+      "default": 0
+    },
+    {
+      "type": "product",
+      "id": "featured_product",
+      "label": {
+        "de": "Produkt",
+        "en": "Product",
+        "es": "Producto",
+        "fr": "Produit",
+        "it": "Prodotto",
+        "ja": "商品",
+        "pt-BR": "Produto"
+      }
+    },
+    {
+      "type": "select",
+      "id": "product_selector",
+      "label": {
+        "de": "Auswahlart",
+        "en": "Picker type",
+        "es": "Tipo de selector",
+        "fr": "Type de sélecteur",
+        "it": "Tipo di selettore",
+        "ja": "ピッカーの種類",
+        "pt-BR": "Tipo de seletor"
+      },
+      "options": [
+        {
+          "value": "radio",
+          "label": {
+            "de": "Schaltfläche",
+            "en": "Button",
+            "es": "Botón",
+            "fr": "Bouton",
+            "it": "Pulsante",
+            "ja": "ボタン",
+            "pt-BR": "Botão"
+          }
+        },
+        {
+          "value": "select",
+          "label": {
+            "de": "Dropdown",
+            "en": "Dropdown",
+            "es": "Desplegable",
+            "fr": "Menu déroulant",
+            "it": "Menu a tendina",
+            "ja": "ドロップダウン",
+            "pt-BR": "Menu suspenso"
+          }
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_variant_labels",
+      "label": {
+        "de": "Variantenbezeichnungen anzeigen",
+        "en": "Show variant labels",
+        "es": "Mostrar etiquetas variantes",
+        "fr": "Afficher les étiquettes de variantes",
+        "it": "Mostra etichette varianti",
+        "ja": "バリエーションのラベルを表示する",
+        "pt-BR": "Exibir etiquetas variantes"
+      },
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": {
+        "de": "Anbieter anzeigen",
+        "en": "Show vendor",
+        "es": "Mostrar proveedor",
+        "fr": "Afficher le distributeur",
+        "it": "Mostra fornitore",
+        "ja": "販売元を表示する",
+        "pt-BR": "Exibir fornecedor"
+      },
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_payment_button",
+      "label": {
+        "de": "Dynamischen Checkout-Button anzeigen",
+        "en": "Show dynamic checkout button",
+        "es": "Mostrar botón de pago dinámico",
+        "fr": "Afficher le bouton de passage à la caisse dynamique",
+        "it": "Mostra pulsante di check-out dinamico",
+        "ja": "ダイナミックチェックアウトボタンを表示する",
+        "pt-BR": "Exibir botão dinâmico de finalização da compra"
+      },
+      "info": {
+        "de": "Jeder Kunde sieht seine bevorzugte Zahlungsmethode aus den in Ihrem Shop verfügbaren Zahlungsmethoden wie PayPal oder Apple Pay. [Mehr Infos](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+        "en": "Each customer will see their preferred payment method from those available on your store, such as PayPal or Apple Pay. [Learn more](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+        "es": "Cada cliente verá su forma de pago preferida entre las disponibles en tu tienda, como PayPal o Apple Pay. [Más información](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+        "fr": "Chaque client verra son moyen de paiement préféré parmi ceux qui sont proposés sur votre boutique, tels que PayPal ou Apple Pay. [En savoir plus](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+        "it": "Ogni cliente vedrà il suo metodo di pagamento preferito tra quelli disponibili nel tuo negozio, come PayPal o Apple Pay. [Maggiori informazioni](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+        "ja": "PayPalやApple Payなど、ストアで利用可能な希望の決済方法がお客様に表示されます。[もっと詳しく](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+        "pt-BR": "Cada cliente verá seu método de pagamento preferido dentre os disponíveis na loja, como PayPal ou Apple Pay. [Saiba mais](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)"
+      },
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share_buttons",
+      "label": {
+        "de": "Social-Sharing-Schaltflächen anzeigen",
+        "en": "Show social sharing buttons",
+        "es": "Mostrar botones para compartir en redes sociales",
+        "fr": "Afficher les boutons de partage social",
+        "it": "Mostra i pulsanti per la condivisione sui social",
+        "ja": "ソーシャル共有ボタンを表示する",
+        "pt-BR": "Exibir botões de compartilhamento em redes sociais"
+      },
+      "default": true,
+      "info": {
+        "de": "Bearbeiten Sie Social-Media-Konten in den allgemeinen Einstellungen",
+        "en": "Edit social accounts in General settings",
+        "es": "Editar cuentas sociales en la configuración general",
+        "fr": "Modifier les comptes sociaux dans les paramètres généraux",
+        "it": "Modifica gli account social nelle Impostazioni generali",
+        "ja": "一般設定でソーシャルアカウントを編集する",
+        "pt-BR": "Edite as contas de redes sociais nas configurações gerais"
+      }
+    },
+    {
+      "type": "header",
+      "content": "Sale Countdown date"
+    }, 
+    {
+      "type": "checkbox",
+      "id": "salecount_toggle",
+      "label": "Show Countdown date",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "count_date_day",
+      "label": "Day",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        },
+        {
+          "value": "3",
+          "label": "3"
+        },
+        {
+          "value": "4",
+          "label": "4"
+        },
+        {
+          "value": "5",
+          "label": "5"
+        },
+        {
+          "value": "6",
+          "label": "6"
+        },
+        {
+          "value": "7",
+          "label": "7"
+        },
+        {
+          "value": "8",
+          "label": "8"
+        },
+        {
+          "value": "9",
+          "label": "9"
+        },
+        {
+          "value": "10",
+          "label": "10"
+        },
+        {
+          "value": "11",
+          "label": "11"
+        },
+        {
+          "value": "12",
+          "label": "12"
+        },
+        {
+          "value": "13",
+          "label": "13"
+        },
+        {
+          "value": "14",
+          "label": "14"
+        },
+        {
+          "value": "15",
+          "label": "15"
+        },
+        {
+          "value": "16",
+          "label": "16"
+        },
+        {
+          "value": "17",
+          "label": "17"
+        },
+        {
+          "value": "18",
+          "label": "18"
+        },
+        {
+          "value": "19",
+          "label": "19"
+        },
+        {
+          "value": "20",
+          "label": "20"
+        },
+        {
+          "value": "21",
+          "label": "21"
+        },
+        {
+          "value": "22",
+          "label": "22"
+        },
+        {
+          "value": "23",
+          "label": "23"
+        },
+        {
+          "value": "24",
+          "label": "24"
+        },
+        {
+          "value": "25",
+          "label": "25"
+        },
+        {
+          "value": "26",
+          "label": "26"
+        },
+        {
+          "value": "27",
+          "label": "27"
+        },
+        {
+          "value": "28",
+          "label": "28"
+        },
+        {
+           "value": "29",
+           "label": "29"
+        },
+        {
+          "value": "30",
+          "label": "30"
+        },
+        {
+          "value": "31",
+          "label": "31"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "count_date_month",
+      "label": "Month",
+      "options": [
+        {
+          "value": "01",
+          "label": "January"
+        },
+        {
+          "value": "02",
+          "label": "February"
+        },
+        {
+          "value": "03",
+          "label": "March"
+        },
+        {
+          "value": "04",
+          "label": "April"
+        },
+        {
+          "value": "05",
+          "label": "May"
+        },
+        {
+          "value": "06",
+          "label": "June"
+        },
+        {
+          "value": "07",
+          "label": "July"
+        },
+        {
+          "value": "08",
+          "label": "August"
+        },
+        {
+          "value": "09",
+          "label": "September"
+        },
+        {
+          "value": "10",
+          "label": "October"
+        },
+        {
+          "value": "11",
+          "label": "November"
+        },
+        {
+          "value": "12",
+          "label": "December"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "count_date_year",
+      "label": "Year",
+      "options": [
+        {
+          "value": "2018",
+          "label": "2018"
+        },
+        {
+          "value": "2019",
+          "label": "2019"
+        },
+        {
+          "value": "2020",
+          "label": "2020"
+        },
+        {
+          "value": "2021",
+          "label": "2021"
+        },
+        {
+          "value": "2022",
+          "label": "2022"
+        },
+        {
+          "value": "2023",
+          "label": "2023"
+        },
+        {
+          "value": "2024",
+          "label": "2024"
+        },
+        {
+          "value": "2025",
+          "label": "2025"
+        },
+        {
+          "value": "2026",
+          "label": "2026"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": {
+        "de": "Vorgestelltes Produkt",
+        "en": "Featured product",
+        "es": "Producto destacado",
+        "fr": "Produit en vedette",
+        "it": "Prodotto in primo piano",
+        "ja": "おすすめ商品",
+        "pt-BR": "Produto em destaque"
+      },
+      "category": {
+        "de": "Produkt",
+        "en": "Product",
+        "es": "Producto",
+        "fr": "Produit",
+        "it": "Prodotto",
+        "ja": "商品",
+        "pt-BR": "Produto"
+      }
+    }
+  ]
+}
+{% endschema %}
+

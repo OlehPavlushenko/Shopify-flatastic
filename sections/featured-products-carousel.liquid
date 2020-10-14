@@ -1,0 +1,581 @@
+{%- capture img_alignment -%}{{ section.settings.img_alignment }}{%- endcapture -%}
+
+{%- assign productsNum = collections[section.settings.section_collection].products_count | plus: 0 -%}
+{%- assign productsNumHalf = collections[section.settings.section_collection].products_count | divided_by: 2 -%}
+{%- assign productsCount = section.settings.products_count | plus: 0 -%}
+{%- assign productsCountHalf = productsCount | divided_by: 2 -%}
+{%- assign productsRows = section.settings.carousel_rows | plus: 0 -%}
+{%- assign productsDir = section.settings.carousel_direction | plus: 0 -%}
+{%- assign collection = collections[section.settings.section_collection] -%}
+
+<div class="carousel-box" id="{{ section.id }}" style="{% if section.settings.background_toggle %}background-color: {{ section.settings.bg_color }};{% endif %} padding-top: {{ section.settings.padding_box }}px;padding-bottom: {{ section.settings.padding_box_bot }}px;">
+
+<div class="carousel_wrap wrapper CollectionSection">
+	{% if section.settings.section_title.size > 0 %}
+		<div class="section-header">
+			<h2 class="section-header__title">{{ section.settings.section_title | escape }}</h2>
+		</div>
+	{% endif %}
+
+
+	{% if productsNum <= 4 %}
+		<div class="product_listing__main grid">
+			{% for product in collections[section.settings.section_collection].products limit:productsCount %}
+				<div class="col-sm-3">
+					{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %} 
+				</div>
+			{% endfor %}
+		</div>
+
+	{% elsif productsNum > 4 and productsNum <= 8 %}
+		{% case productsCount %}
+			{% when 4 %}
+				<div class="product_listing__main grid">
+					{% for product in collections[section.settings.section_collection].products limit:productsCount %}
+						<div class="grid__item large--one-quarter">
+							{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %} 
+						</div>
+					{% endfor %}
+				</div>
+
+			{% else %}
+				{% case productsRows %}
+					{% when 1 %}
+						<div class="products_carousel swiper-container" id="products_carousel_{{ section.id }}" data-products="{{ productsNum }}" data-rows="{{ section.settings.carousel_rows }}" data-dir="{{ productsDir }}">
+							<div class="swiper-wrapper product_listing__main">
+								{% for product in collections[section.settings.section_collection].products limit:productsCount %}
+									<div class="swiper-slide">
+										{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %} 
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+
+						<div id="carousel_swiper__prev_{{ section.id }}" class="swiper_btn swiper_btn__prev"></div>
+						<div id="carousel_swiper__next_{{ section.id }}" class="swiper_btn swiper_btn__next"></div>
+					
+					{% else %}
+						<div class="product_listing__main grid">
+							{% for product in collections[section.settings.section_collection].products limit:4 %}
+								<div class="grid__item large--one-quarter">
+									{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %} 
+								</div>
+							{% endfor %}
+						</div>
+
+						<div class="product_listing__main grid">
+							{% for product in collections[section.settings.section_collection].products offset:4 %}
+								<div class="grid__item large--one-quarter">
+									{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %} 
+								</div>
+							{% endfor %}
+						</div>
+
+				{% endcase %}
+
+		{% endcase %}
+
+	{% else %}
+		{% case productsCount %}
+			{% when 4 %}
+				<div class="product_listing__main grid">
+					{% for product in collections[section.settings.section_collection].products limit:productsCount %}
+						<div class="grid__item large--one-quarter">
+							{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %} 
+						</div>
+					{% endfor %}
+				</div>
+
+			{% when 8 %}
+				{% case productsRows %}
+					{% when 1 %}
+						<div class="products_carousel swiper-container" id="products_carousel_{{ section.id }}" data-products="{{ productsNum }}" data-rows="{{ section.settings.carousel_rows }}" data-dir="{{ productsDir }}">
+							<div class="swiper-wrapper product_listing__main">
+								{% for product in collections[section.settings.section_collection].products limit:productsCount %}
+									<div class="swiper-slide">
+										{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %} 
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+
+						<div id="carousel_swiper__prev_{{ section.id }}" class="swiper_btn swiper_btn__prev"></div>
+						<div id="carousel_swiper__next_{{ section.id }}" class="swiper_btn swiper_btn__next"></div>
+
+					{% else %}
+						<div class="product_listing__main grid">
+							{% for product in collections[section.settings.section_collection].products limit:4 %}
+								<div class="grid__item large--one-quarter">
+									{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %} 
+								</div>
+							{% endfor %}
+						</div>
+
+						<div class="product_listing__main grid">
+							{% for product in collections[section.settings.section_collection].products offset:4 limit:4 %}
+								<div class="grid__item large--one-quarter">
+									{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %} 
+								</div>
+							{% endfor %}
+						</div>
+
+				{% endcase %}
+
+			{% else %}
+				{% case productsRows %}
+					{% when 1 %}
+						<div class="products_carousel swiper-container" id="products_carousel_{{ section.id }}" data-products="{{ productsNum }}" data-rows="{{ section.settings.carousel_rows }}" data-dir="{{ productsDir }}">
+							<div class="swiper-wrapper product_listing__main">
+								{% for product in collections[section.settings.section_collection].products limit:productsCount %}
+									<div class="swiper-slide">
+										{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %} 
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+
+						<div id="carousel_swiper__prev_{{ section.id }}" class="swiper_btn swiper_btn__prev"></div>
+						<div id="carousel_swiper__next_{{ section.id }}" class="swiper_btn swiper_btn__next"></div>
+
+					{% else %}
+						<div class="products_carousel " id="products_carousel_{{ section.id }}" data-products="{{ productsNum }}" data-rows="{{ section.settings.carousel_rows }}" data-dir="{{ productsDir }}">
+							<div class="swiper-container swiper_1">
+								<div class="swiper-wrapper product_listing__main">
+									{% if productsNum < productsCount %}
+										{% for product in collections[section.settings.section_collection].products limit:productsNumHalf %}
+											<div class="swiper-slide">
+												{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %}
+											</div>
+										{% endfor %}
+									{% else %}
+										{% for product in collections[section.settings.section_collection].products limit:productsCountHalf %}
+											<div class="swiper-slide">
+												{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %}
+											</div>
+										{% endfor %}
+									{% endif %}
+								</div>
+
+								<div class="carousel_1_prev"></div>
+								<div class="carousel_1_next"></div>
+							</div>
+
+							<div class="swiper-container swiper_2">
+								<div class="swiper-wrapper product_listing__main">
+									{% if productsNum < productsCount %}
+										{% for product in collections[section.settings.section_collection].products offset:productsNumHalf %}
+											<div class="swiper-slide">
+												{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %}
+											</div>
+										{% endfor %}
+									{% else %}
+										{% for product in collections[section.settings.section_collection].products offset:productsCountHalf %}
+											<div class="swiper-slide">
+												{% include 'product-grid-item' img_size: img_size, img_alignment: img_alignment %}
+											</div>
+										{% endfor %}
+									{% endif %}
+								</div>
+
+								<div class="carousel_2_prev"></div>
+								<div class="carousel_2_next"></div>
+
+							</div>
+
+							<div id="carousel_swiper__prev_{{ section.id }}" class="swiper_btn swiper_btn__prev swiper_2row"></div>
+							<div id="carousel_swiper__next_{{ section.id }}" class="swiper_btn swiper_btn__next swiper_2row"></div>
+							
+						</div>
+
+
+				{% endcase %}
+
+			{% endcase %}
+
+	{% endif %}
+</div>	
+
+</div>
+
+
+{% schema %}
+{
+	"name": "Products carousel",
+	"class": "section section_homepage section_products-carousel",
+	"settings": [
+		{
+			"id": "section_title",
+			"type": "text",
+			"label": "Heading",
+			"default": "Popular products"
+		},
+		{
+	      "type": "checkbox",
+	      "id": "background_toggle",
+	      "label": "Show background color",
+	      "default": true
+	    },
+	    {
+	      "type": "color",
+	      "id": "bg_color",
+	      "label": "Background color",
+	      "default": "#fafbfb"
+	    },
+	    {
+	      "type": "range",
+	      "id": "padding_box",
+	      "min": 0,
+	      "max": 100,
+	      "step": 1,
+	      "label": "Padding Top",
+	      "default": 30
+	    },
+	    {
+	      "type": "range",
+	      "id": "padding_box_bot",
+	      "min": 0,
+	      "max": 100,
+	      "step": 1,
+	      "label": "Padding Bottom",
+	      "default": 0
+	    },
+		{
+			"type": "collection",
+			"id": "section_collection",
+			"label": "Collection"
+		},
+		{
+			"type": "select",
+			"id": "products_count",
+			"label": "Carousel products count",
+			"options": [
+				{
+					"value": "4",
+					"label": "4"
+				},
+				{
+					"value": "8",
+					"label": "8"
+				},
+				{
+					"value": "12",
+					"label": "12"
+				},
+				{
+					"value": "16",
+					"label": "16"
+				},
+				{
+					"value": "20",
+					"label": "20"
+				}
+			]
+		},
+		{
+			"type": "radio",
+			"id": "carousel_rows",
+			"label": "Carousel rows",
+			"options": [
+				{
+					"value": "1",
+					"label": "One row"
+				},
+				{
+					"value": "2",
+					"label": "Two rows"
+				}
+			]
+		},
+		{
+			"type": "radio",
+			"id": "carousel_direction",
+			"label": "Carousel direction",
+			"options": [
+				{
+					"value": "1",
+					"label": "One-way"
+				},
+				{
+					"value": "2",
+					"label": "Two-way (for two rows only)"
+				}
+			]
+		},
+		 {
+	      "type": "select",
+	      "id": "img_prod_size",
+	      "label": "Image size",
+	      "options": [
+	        {
+	          "value": "small",
+	          "label": "Small"
+	        },
+	        {
+	          "value": "medium",
+	          "label": "Medium"
+	        },
+	        {
+	          "value": "large",
+	          "label": "Large"
+	        }
+	      ]
+	    },
+		{
+			"type": "select",
+			"id": "img_alignment",
+			"label": "Image alignment",
+			"options": [
+				{
+					"value": "top",
+					"label": "Top"
+				},
+				{
+					"value": "center",
+					"label": "Middle"
+				},
+				{
+					"value": "bottom",
+					"label": "Bottom"
+				}
+			]
+		},
+		{
+	      "type": "range",
+	      "id": "worts_limit_prod",
+	      "label": {
+	        "de": "Count of words in Title",
+	        "en": "Count of words in Title",
+	        "es": "Count of words in Title",
+	        "fr": "Count of words in Title",
+	        "it": "Count of words in Title",
+	        "ja": "Count of words in Title",
+	        "pt-BR": "Count of words in Title"
+	      },
+	      "min": 3,
+	      "max": 100,
+	      "step": 1,
+	      "default": 5
+	    },
+	    {
+	      "type": "checkbox",
+	      "id": "show_animation_img",
+	      "label": {
+	        "de": "Animation Images",
+	        "en": "Animation Images",
+	        "es": "Animation Images",
+	        "fr": "Animation Images",
+	        "it": "Animation Images",
+	        "ja": "Animation Images",
+	        "pt-BR": "Animation Images"
+	      },
+	      "default": true
+	    },
+	    {
+	      "type": "checkbox",
+	      "id": "show_vendor",
+	      "label": {
+	        "de": "Anbieter anzeigen",
+	        "en": "Show vendor",
+	        "es": "Mostrar proveedor",
+	        "fr": "Afficher le distributeur",
+	        "it": "Mostra fornitore",
+	        "ja": "販売元を表示する",
+	        "pt-BR": "Exibir fornecedor"
+	      },
+	      "default": false
+	    }
+	],
+	"presets": [
+		{
+			"name": "Products carousel",
+			"category": "Products"
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+(function($) {
+sliderProduct = function() {
+var sectionId = $(".section_products-carousel .carousel-box").attr('id');
+
+	$('.products_carousel').each(function(i) {
+
+		var sliderId = '#' + $(this).attr('id');
+		var sliderVar = $(this).attr('id');
+		var sliderPrev = '#carousel_swiper__prev_' + sliderVar.replace('products_carousel_', '');
+		var sliderNext = '#carousel_swiper__next_' + sliderVar.replace('products_carousel_', '');
+		var productsQ = $(this).data('products');
+		var sliderRows = $(this).data('rows');
+		var sliderDir = $(this).data('dir');
+
+		if ( productsQ > 4 && sliderRows == 1 ) {
+			var carouselVar = new Swiper( sliderId, {
+				effect: 'slide',
+				slidesPerView: 4,
+				spaceBetween: 30,
+				loop: true,
+				speed: 500,
+				autoplayDisableOnInteraction: false,
+
+				breakpoints: {
+					992: {
+						slidesPerView: 3
+					},
+					768: {
+						slidesPerView: 2
+					},
+					479: {
+						slidesPerView: 1
+					}
+				},
+
+				prevButton: sliderPrev,
+				nextButton: sliderNext,
+
+			});
+			
+			$(window).on('load', function() {
+				carouselVar.onResize(); // updating swiper after loading
+			});
+		};
+		
+
+
+		if ( productsQ > 8 && sliderRows == 2 ) {
+
+			var slider1 = sliderId + ' .swiper_1';
+			var slider2 = sliderId + ' .swiper_2';
+			var slider1_prev = sliderId + ' .swiper_1 .carousel_1_prev';
+			var slider1_next = sliderId + ' .swiper_2 .carousel_1_next';
+			var slider2_prev = sliderId + ' .swiper_1 .carousel_2_prev';
+			var slider2_next = sliderId + ' .swiper_2 .carousel_2_next';
+
+			var carousel_1 = new Swiper( slider1, {
+				effect: 'slide',
+				slidesPerView: 4,
+				spaceBetween: 30,
+				loop: true,
+				speed: 500,
+				autoplayDisableOnInteraction: false,
+
+				breakpoints: {
+					992: {
+						slidesPerView: 3
+					},
+					768: {
+						slidesPerView: 2
+					},
+					479: {
+						slidesPerView: 1
+					}
+				},
+
+				prevButton: slider1_prev,
+				nextButton: slider1_next,
+
+			});
+
+
+			var carousel_2 = new Swiper( slider2, {
+				effect: 'slide',
+				slidesPerView: 4,
+				spaceBetween: 30,
+				loop: true,
+				speed: 500,
+				autoplayDisableOnInteraction: false,
+
+				breakpoints: {
+					992: {
+						slidesPerView: 3
+					},
+					768: {
+						slidesPerView: 2
+					},
+					479: {
+						slidesPerView: 1
+					}
+				},
+
+				prevButton: slider2_prev,
+				nextButton: slider2_next,
+
+			});
+
+			if (sliderDir == 1) {
+				$(sliderPrev).on('click', function() {
+					carousel_1.slidePrev();
+					carousel_2.slidePrev();
+				});
+				$(sliderNext).on('click', function() {
+					carousel_1.slideNext();
+					carousel_2.slideNext();
+				});
+			} else {
+				$(sliderPrev).on('click', function() {
+					carousel_1.slidePrev();
+					carousel_2.slideNext();
+				});
+				$(sliderNext).on('click', function() {
+					carousel_1.slideNext();
+					carousel_2.slidePrev();
+				});
+			};
+			
+			$(window).on('load', function() {
+				carousel_1.onResize(); // updating swiper after loading
+				carousel_2.onResize(); 
+			});
+
+		};
+
+	});
+
+}
+ $(document).on('shopify:section:load', '.section_products-carousel', function() {
+    sliderProduct();
+  });
+  $(document).ready(function() {
+    sliderProduct();
+  });
+})(jQuery);   
+$(function() { 
+  $('.CollectionSection div.grid-product').each(function() {        
+    var tip = $(this).find('div.count_holder_small'); 
+
+    $(this).hover(
+        function() { tip.appendTo('body'); },
+        function() { tip.appendTo(this); }
+    ).mousemove(function(e) {
+        var x = e.pageX + 60,
+            y = e.pageY - 50,
+            w = tip.width(),
+            h = tip.height(),
+            dx = $(window).width() - (x + w),
+            dy = $(window).height() - (y + h);
+
+        if ( dx < 50 ) x = e.pageX - w - 60;
+        if ( dy < 50 ) y = e.pageY - h + 130;
+
+        tip.css({ left: x, top: y });
+      });         
+  });
+});
+(function($) {
+  $('.section_products-carousel .product_item').each(function(){
+    var self = $(this)
+    if ( device.desktop() && self.find(".prod-img2").length > 0 ) {
+      self.on({
+        mouseenter: function(){
+          self.find(".prod-img1").stop().animate({"opacity": 0}, 200);
+          self.find(".prod-img2").stop().animate({"opacity": 1}, 200);
+        },
+        mouseleave: function(){
+          self.find(".prod-img1").stop().animate({"opacity": 1}, 200);
+          self.find(".prod-img2").stop().animate({"opacity": 0}, 200);
+        }
+      });
+    }     
+  });
+})(jQuery);
+{% endjavascript %}

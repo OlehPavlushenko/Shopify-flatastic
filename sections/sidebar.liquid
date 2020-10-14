@@ -1,0 +1,436 @@
+<div class="sidebar-left{% if section.settings.sidebar_enable %} enabel{% endif %}">
+	{% for block in section.blocks %}
+		{% case block.type %}
+			{% when 'widget_linklist' %}
+			<div class="sidebar_widget sidebar_widget__linklist">
+				<h3 class="widget_header">{{ block.settings.title | escape }}<i class="side_trigger" data-subside="side_{{ block.id }}"></i></h3>
+
+				<div class="widget_content" id="side_{{ block.id }}">
+					{%- assign links_small = block.settings.links -%}
+
+					<ul class="list_links">
+						{% assign tmp_col_size = collection.id | size | plus:0 %}
+						{% for link in linklists[links_small].links %}
+							{%- assign child_list_handle = link.title | handleize -%}
+
+							{%- assign link_count = 0 -%}
+							{% for childlink in linklists[child_list_handle].links %}
+								{%- assign link_count = link_count | plus: 1 -%}
+							{% endfor %}
+
+							{% if link.title contains ';' %}
+	                            {%- assign titlemitbadge = link.title | split: ',' | split: ';' -%}
+	                            {%- assign titlemitbadgetext = titlemitbadge[0] | split: '["' -%}
+	                            {%- assign titlemitbadgename = titlemitbadge[1] -%}
+	                            {%- assign titlemitbadgecolor = titlemitbadge[2] | split: '"]' -%}
+	                            {% assign idhandles = titlemitbadgetext | camelcase %}
+                            {% else %}
+                              {%- assign titlemitbadgetext = link.title -%}
+                              {%- assign titlemitbadgename = false -%}
+                              {%- assign titlemitbadgecolor = false -%}  
+                              {% assign idhandles = titlemitbadgetext | camelcase %}
+                            {% endif %}
+						
+							<li class="level_1__item {% if link_count > 0 %}with_ul{% endif %}">
+								<a class="level_1__link{% if link.active == true %} curent{% endif %}" href="{{ link.url }}">{{ titlemitbadgetext }}{% if titlemitbadgename %}<span style="background:{{ titlemitbadgecolor }};" class="badge">{{ titlemitbadgename }}</span>{% endif %}</a>
+
+								{% if link_count > 0 %}
+									<i class="level_1__trigger menu_trigger fa fa-angle-down" data-submenu="submenu_{{ block.id }}-{{ forloop.index }}"></i>
+									<ul class="level_1_2 droped_linklist" id="submenu_{{ block.id }}-{{ forloop.index }}">
+										{% for childlink in linklists[child_list_handle].links %}
+										{%- assign child_list_2_handle = childlink.title | handleize -%}
+		                                      {% if tmp_col_size > 0 %}
+		                                        {% assign tmp_col = canonical_url | replace: shop.url %}
+		                                        {% assign handles = childlink.url %}
+		                                      {% endif %}
+											{%- assign link_count = 0 -%}
+											{% for childlink in linklists[child_list_2_handle].links %}
+												{%- assign link_count = link_count | plus: 1 -%}
+											{% endfor %}
+											{% if childlink.title contains ';' %}
+		                                    {%- assign titlemitbadge = childlink.title | split: ',' | split: ';' -%}
+		                                    {%- assign titlemitbadgetext = titlemitbadge[0] | split: '["' -%}
+		                                    {%- assign titlemitbadgename = titlemitbadge[1] -%}
+		                                    {%- assign titlemitbadgecolor = titlemitbadge[2] | split: '"]' -%}
+		                                    {% else %}
+		                                      {%- assign titlemitbadgetext = childlink.title -%}
+		                                      {%- assign titlemitbadgename = false -%}
+		                                      {%- assign titlemitbadgecolor = false -%}  
+		                                    {% endif %} 	
+											<li class="level_1_2_item {% if link_count > 0 %}with_ul{% endif %}">
+												<a class="level_1_2_link{% if tmp_col_size > 0 and tmp_col == handles %} curent{% endif %}" href="{{ childlink.url }}">{{ titlemitbadgetext }}{% if titlemitbadgename %}<span style="background:{{ titlemitbadgecolor }}" class="badge">{{ titlemitbadgename }}</span>{% endif %}</a>
+
+												{% if link_count > 0 %}
+													<i class="level_1__trigger menu_trigger fa fa-angle-down" data-submenu="subsubmenu_{{ block.id }}-{{ forloop.index }}"></i>
+													<ul class="level_1_3 droped_linklist" id="subsubmenu_{{ block.id }}-{{ forloop.index }}">
+														{% for childlink in linklists[child_list_2_handle].links %}
+														{% if tmp_col_size > 0 %}
+				                                            {% assign tmp_col = canonical_url | replace: shop.url %}
+				                                            {% assign handles = childlink.url %}
+				                                          {% endif %}
+														{% if childlink.title contains ';' %}
+			                                            {%- assign titlemitbadge = childlink.title | split: ',' | split: ';' -%}
+			                                            {%- assign titlemitbadgetext = titlemitbadge[0] | split: '["' -%}
+			                                            {%- assign titlemitbadgename = titlemitbadge[1] -%}
+			                                            {%- assign titlemitbadgecolor = titlemitbadge[2] | split: '"]' -%}
+			                                            {% else %}
+			                                              {%- assign titlemitbadgetext = childlink.title -%}
+			                                              {%- assign titlemitbadgename = false -%}
+			                                              {%- assign titlemitbadgecolor = false -%}  
+			                                            {% endif %}
+															<li class="level_1_3_item">
+																<a class="level_1_3_link{% if tmp_col_size > 0 and tmp_col == handles %} curent{% endif %}" href="{{ childlink.url }}">{{ titlemitbadgetext }}{% if titlemitbadgename %}<span style="background:{{ titlemitbadgecolor }}" class="badge">{{ titlemitbadgename }}</span>{% endif %}</a>
+															</li>
+														{% endfor %}
+													</ul>
+												{% endif %}
+											</li>
+										{% endfor %}
+									</ul>
+								{% endif %}
+							</li>
+
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+			{% when 'widget_types' %}
+				<div class="sidebar_widget sidebar_widget__types">
+					<h3 class="widget_header">{{ block.settings.title | escape }} <i class="side_trigger" data-subside="side_{{ block.id }}"></i></h3>
+
+					<div class="widget_content" id="side_{{ block.id }}">
+						<ul class="list_links">
+							{% for product_type in shop.types %}
+								{% if product_type.size > 0 %}
+
+									{% if canonical_url contains 'types' %}
+										{% assign tmp_title = page_title | escape | handleize  %}
+										{% assign tmp_type = product_type | escape | handleize  %}
+									{% endif %}
+
+									<li><a {% if tmp_title and tmp_title == tmp_type  %}class="active"{% endif %} href="{{ product_type | url_for_type }}">{{ product_type }}</a></li>
+
+								{% endif %}
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+
+			{% when 'widget_vendors' %}
+				<div class="sidebar_widget sidebar_widget__vendors">
+					<h3 class="widget_header">{{ block.settings.title | escape }}<i class="side_trigger" data-subside="side_{{ block.id }}"></i></h3>
+
+					<div class="widget_content" id="side_{{ block.id }}">
+						<ul class="list_links">
+							{% for vendor in shop.vendors %}
+
+								{% if canonical_url contains 'vendors' %}
+									{% assign tmp_title = page_title | escape | handleize %}
+									{% assign tmp_vendor = vendor | escape | handleize %}
+								{% endif %}
+
+								<li><a {% if tmp_title and tmp_title == tmp_vendor %}class="active"{% endif %} href="{{ vendor | url_for_vendor }}">{{ vendor }}</a></li>
+
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+
+			{% when 'widget_products' %}
+				<div class="sidebar_widget sidebar_widget__products">
+					<h3 class="widget_header">{{ block.settings.title | escape }}<i class="side_trigger" data-subside="side_{{ block.id }}"></i></h3>
+					<div class="widget_content" id="side_{{ block.id }}">
+						<ul class="list_products">
+						{% for product in collections[block.settings.products_collection].products limit:3 %}
+						{%- assign current_variant = product.selected_or_first_available_variant -%}
+						{%- assign compare_at_price = current_variant.compare_at_price -%}
+						{%- assign price = current_variant.price -%}
+							<li class="product">
+								<div class="product_img">  
+									<a href="{{ product.url | within: collection }}">
+										<img class="img-responsive lazyload" data-sizes="auto" src="{{ "icon-loadings.svg" | asset_url }}" data-src="{{ product.featured_image.src | product_img_url: '200x', crop:'center' }}" alt="{{ product.featured_image.alt | escape }}" />
+									</a>
+								</div>
+
+								<div class="product_info">
+									<div class="product_name">
+										<a href="{{ product.url | within: collection }}">{{ product.title | truncate: 30 }}</a>
+									</div>
+
+									<div class="data-price"  data-price-container>
+						            {% if compare_at_price > price %}
+						              <span class="product-single__price--wrapper" aria-hidden="false">
+						                <span id="ComparePrice" class="product-single__price--compare-at">
+						                  {{ compare_at_price | money }}
+						                </span>
+						              </span>
+						              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+						            {% else %}
+						              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+						            {% endif %}
+
+						            <span id="ProductPrice"
+						              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+						              itemprop="price"
+						              content="{{ price | divided_by: 100.00 }}"
+						              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+						              {{ price | money }}
+						            </span>
+						          </div>
+
+									<div class="product_links">
+										<a class="btn--line" href="{{ product.url | within: collection }}">{{ 'layout.product.view_button' | t }}</a>
+									</div>
+								</div>
+							</li>
+						{% endfor %}
+						</ul>
+					</div>
+				</div>
+
+			{% when 'custom_html' %}
+				<div class="sidebar_widget sidebar_widget__html">{{ block.settings.html_code }}</div>
+
+			{% when 'widget_banner' %}
+			{% case block.settings.banner_height %}
+				{% when 'small'  %}{%- assign img_size = '370x251' -%}
+				{% when 'medium' %}{%- assign img_size = '370x370' -%}
+				{% when 'large'  %}{%- assign img_size = '370x460' -%}
+			{% endcase %}
+			
+			<div class="sidebar_widget sidebar_widget__banner">
+					{% if block.settings.image.size > 0 %}
+					<div class="sidebar-list-wrap">										
+			      	<img class="sidebar-list-image img-responsive lazyload" data-sizes="auto" src="{{ "icon-loadings.svg" | asset_url }}" data-src="{{ block.settings.image | img_url: img_size , crop: 'center' }}" alt="{{ block.settings.title | escape }}">
+			     	</div>
+					{% else %}
+						<div class="sidebar-list-wrap">
+							{{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+						</div>
+					{% endif %}
+
+					<div class="sidebar_banner_caption">
+						{% if block.settings.link.size > 0 %}
+							<a href="{{ block.settings.link }}">
+						{% endif %}
+
+							{% if block.settings.title.size > 0 %}
+								{{ block.settings.title | escape }}
+							{% endif %}
+
+						{% if block.settings.link.size > 0 %}
+							</a>
+						{% endif %}
+					</div>
+				</div>
+
+		{% endcase %}
+	{% endfor %}
+</div>
+
+
+
+{% schema %}
+{
+	"name": "Sidebar",
+	"class": "page_sidebar_left",
+	"max_blocks": 10,
+	"settings": [
+		{
+			"type": "header",
+			"content": "Sidebar widgets"
+		}
+
+	],
+	"blocks": [
+
+		// PRODUCT TYPES ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "widget_types",
+			"name": "Product types",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Widget title",
+					"default": "Product types"
+				}
+			]
+		},
+
+		// PRODUCT VENDORS ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "widget_vendors",
+			"name": "Product vendors",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Widget title",
+					"default": "Product vendors"
+				}
+			]
+		},
+
+		// PRODUCTS ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "widget_products",
+			"name": "Products",
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Widget title",
+					"default": "Products"
+				},
+				{
+					"type": "collection",
+					"id": "products_collection",
+					"label": "Collection"
+				}
+			]
+		},
+
+
+		// LINKLIST ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "widget_linklist",
+			"name": "Linklist",
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Widget title",
+					"default": "Linklist"
+				},
+				{
+					"type": "link_list",
+					"id": "links",
+					"label": "Choose linklist"
+				}
+			]
+		},
+
+
+		// CUSTOM HTML ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "custom_html",
+			"name": "HTML code",
+			"settings": [
+				{
+					"type": "html",
+					"id": "html_code",
+					"label": "Custom HTML",
+					"default": "<div><p>You HTML content</p></div>"
+				}
+			]
+		},
+
+
+		// BANNER ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "widget_banner",
+			"name": "Banner",
+			"settings": [
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "Image"
+				},
+				{
+					"type": "select",
+					"id": "banner_height",
+					"label": "Banner height",
+					"default": "medium",
+					"options": [
+						{
+							"label": "Small (270x151)",
+							"value": "small"
+						},
+						{
+							"label": "Medium (270x270)",
+							"value": "medium"
+						},
+						{
+							"label": "Large (270x360)",
+							"value": "large"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Heading",
+					"default": "Title"
+				},
+				{
+					"type": "url",
+					"id": "link",
+					"label": "Link"
+				}
+
+			]
+		}
+	]
+}
+{% endschema %}
+
+
+{% javascript %}
+(function($) {
+	// LINKLIST ITEM SHOW/HIDE ELEMENT
+	$(window).on('load', function() {
+		$('.sidebar_widget__linklist .menu_trigger').each(function(i) {
+			var targetMenu = '#' + $(this).data('submenu');
+
+			$(this).on('click', function(e){
+				if ($(this).hasClass('active')){
+					$(targetMenu).hide(300);
+					$(this).removeClass('active');
+				} else {
+					$(targetMenu).show(300);
+					$(this).addClass('active');
+				};
+			});
+		});
+	
+	});
+// trigger sidebar
+   var sideFlag = 0;
+   sideToggle = function() {
+    if ( $(window).width() > 767 ) {
+      $('.sidebar_small .side_trigger').removeClass('active');
+      sideFlag = 0;
+    }
+    else {
+      if ( sideFlag == 0 ) {
+       sideMobile();
+        sideFlag = 1;
+      };
+    };
+  };
+  sideMobile = function() {
+    $('.sidebar_small .side_trigger').on('click', function() {
+
+      var targetSide = '#' + $(this).data('subside');
+
+      $(targetSide).slideToggle(300);
+
+      $(this).toggleClass('active');
+
+      return false;
+    });
+
+  };
+  $(window).on('load resize', function() {
+    sideToggle();
+  });
+
+  $(document).ready(function() {
+    sideToggle();
+  });
+
+})(jQuery);
+{% endjavascript %}

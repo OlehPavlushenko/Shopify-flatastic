@@ -1,0 +1,96 @@
+{% capture popupCode %}
+<div class="success" {% if settings.newsletter_popup_bg %}style="background-image: url( {{ settings.newsletter_popup_bg | img_url: '580x450', crop: 'center' }} );"{% endif %}>
+	<div class="system_view_close">×</div>
+	<div class="newsletter_popup_text">
+		
+		{% if settings.item_subtitle.size > 0 %}
+			<h3 class="newsletter_title">{{ settings.item_subtitle }}</h3>
+		{% endif %}
+		{% if settings.item_title.size > 0 %}
+			<div class="newsletter_subtitle">{{ settings.item_title }}</div>
+		{% endif %}
+		<div class="box-indent">
+			{% if settings.item_img.size > 0 %}
+				<img class="img_caption" src="{{ settings.item_img | img_url: '250x' , crop: 'center' }}" alt="{{ settings.item_subtitle }}">
+			{% endif %}
+			{% if settings.item_text.size > 0 %}
+				<p class="newsletter_text">{{ settings.item_text }}</p>
+			{% endif %}
+		</div>
+		<div class="newsletter_form newsletter_form__shopify">
+			{% form 'customer', id:'newsletter_form', class: 'footer_form' %}
+				{% if form.posted_successfully? %}
+				<div class="newsletter-form">
+				    <div class="note form-success">{{ 'general.newsletter_form.newsletter_confirmation' | t }}</div>
+				</div>
+				{% else %}
+				{% if form.errors %}
+				  <div class="errors form-success">{{ 'general.newsletter_form.newsletter_notification' | t }}</div>
+				{% endif %}
+				{% endif %}
+				<label for="Email" class="newsletter__label hidden-label">{{ 'general.newsletter_form.newsletter_email' | t }}</label>
+				<input id="contact_tags" name="contact[tags]" type="hidden" value="prospect,newsletter" />
+				<div class="newsletter-form">
+				  <div class="input-group">
+				    <input type="email" value="{% if customer %}{{ customer.email }}{% endif %}" placeholder="{{ 'general.newsletter_form.newsletter_placeholder' | t }}" name="contact[email]" id="Email" class="newsletter-input"  autocapitalize="off">
+				    <span class="input-btn">
+				      <button id="Subscribe" type="submit"
+				        class="btn newsletter-submit"
+				        aria-label="{{ 'general.newsletter_form.submit' | t }}">
+				        <span class="newsletter-submit-text-large">{{ 'general.newsletter_form.submit' | t }}</span>
+				      </button>
+				    </span>
+				  </div>
+				</div>
+				{% endform %}
+				<div class="newsletter_off__wrap">
+					<span id="newsletter_off">{{ 'layout.footer.newsletter_off' | t }}</span>
+				</div>
+			<p class="newsletter_success">{{ 'layout.footer.newsletter_success' | t }}</p>
+		</div>
+	</div>
+</div>	
+{% endcapture %}
+{% assign popupCode = popupCode | replace: "'", "&lsquo;" | strip_newlines %}
+<div id="newsletter_view_overlay" style=""></div>
+<div id="newsletter_popup"></div>
+	
+<script>
+
+	$(window).load(function(){
+		$('#newsletter_popup').append('{{ popupCode }}');
+		$("#newsletter_popup,#newsletter_view_overlay,.newsletter_error,.newsletter_success").hide();
+		$('#newsletter_popup form').formValidation();
+
+		var cc = $.cookie('newsletter_popup_status');
+		if ( (cc !== 'disabled') && $(window).width() > 768 ) {
+
+			setTimeout(function(){
+				$('#newsletter_view_overlay').delay(1500).fadeIn(1400);
+				$('#newsletter_popup').delay(1500).fadeIn(1400);
+
+				$('#newsletter_view_overlay').on('click', function() {
+					$('#newsletter_view_overlay').delay(500).fadeOut(400);
+					$('#newsletter_popup').delay(500).fadeOut(400);
+					 $.cookie('newsletter_popup_status', 'delayed', { path: '/' });
+				});
+
+				$('#newsletter_popup .system_view_close').on('click', function() {
+					$('#newsletter_view_overlay').delay(500).fadeOut(400);
+					$('#newsletter_popup').delay(500).fadeOut(400);
+					 $.cookie('newsletter_popup_status', 'delayed', { path: '/' });
+				});
+
+				$('#newsletter_off').on('click', function() {
+					$('#newsletter_view_overlay').delay(500).fadeOut(400);
+					$('#newsletter_popup').delay(500).fadeOut(400);
+					$.cookie("newsletter_popup_status", "disabled", { path: '/', expires : {{ settings.newsletter_popup_period | plus:0 }} });
+					return false;
+				});
+
+			}, {{ settings.newsletter_popup_time | plus:0 }}000);
+		};
+	});
+
+</script>
+

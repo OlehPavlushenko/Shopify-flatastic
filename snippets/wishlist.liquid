@@ -1,0 +1,50 @@
+{%- if template contains 'collection.' -%}
+    {%- assign items_length = current_tags | size -%}
+{%- else -%}
+    {%- assign namespace = template | remove: 'cart.' | remove: 'page.' -%}
+    {%- assign items = customer.metafields[namespace] -%}
+    {%- assign items_length = items | size -%}
+{%- endif -%}
+
+<div class="wishlist">
+    <h2 class="h3 {% if items_length < 1 %} d-none-important{% endif %}" data-js-store-lists-has-items-wishlist>Wish list</h2>
+
+    <div class="page-widths">
+        <ul class="cm-grid {% if items_length < 1 %} d-none-important{% endif %}" data-js-store-lists-has-items-wishlist>
+
+            {%- if template contains 'collection.' -%}
+                {%- for tag in current_tags -%}
+                    {%- assign item = tag | split: '=' -%}
+                    {%- assign current_handle = item[0] -%}
+                    {%- assign current_variant_id = item[1] | abs -%}
+                    {%- assign product = all_products[current_handle] -%}
+                    <li class="cm-grid__item {{ grid_item_width }}" data-js-product data-js-store-lists-product-wishlist data-product-handle="{{ product.handle }}" data-product-variant-id="{{ current_variant_id }}">
+                        {% include 'cm-product-grid-item' %}
+                        <span class="product-store-lists__remove btn-link js-store-lists-remove-wishlist">{{ 'general.cmproduct.cm_removewish' | t }}</span>
+                    </li>
+                {%- endfor -%}
+            {%- else -%}
+                {%- for item in items -%}
+                    {%- assign current_handle = item[1] -%}
+                    {%- assign current_variant_id = item[0] | abs -%}
+                    {%- assign product = all_products[current_handle] -%}
+                    <li class="cm-grid__item {{ grid_item_width }}" data-js-product data-js-store-lists-product-wishlist data-product-handle="{{ product.handle }}" data-product-variant-id="{{ current_variant_id }}">
+                        {% include 'cm-product-grid-item' %}
+                        <span class="product-store-lists__remove btn-link js-store-lists-remove-wishlist">{{ 'general.cmproduct.cm_removewish' | t }}</span>
+                    </li>
+                {%- endfor -%}
+            {%- endif -%}
+        </ul>
+        <div class="d-flex flex-column py-100 my-100{% if items_length > 0 %} d-none-important{% endif %}" data-js-store-lists-dhas-items-wishlist>
+            <h3>{{ 'general.cmproduct.cm_wtitle' | t }}</h3>
+            <p>{{ 'general.cmproduct.cm_wtext' | t }}</p>
+        </div>
+        <div class="d-flex">
+            <div
+                    class="btn w-100 w-sm-auto ml-sm-auto js-store-lists-clear-wishlist{% if items_length < 1 %} d-none-important{% endif %} mt-20 cm-link"
+                    data-js-store-lists-has-items-wishlist>{{ 'general.cmproduct.cm_remove' | t }}</div>
+        </div>
+    </div>
+
+
+</div>

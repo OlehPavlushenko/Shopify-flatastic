@@ -1,0 +1,6 @@
+<a class="cm-link btn--status js-store-lists-add-wishlist"
+    {% unless product.selected_or_first_available_variant.available %}data-disabled="disabled"{% endunless %} >
+    <i class="fa fa-heart-o"></i>
+    <span>Add to wish list</span>
+    <span data-button-content="added">Remove from wish list</span>
+</a>

@@ -1,0 +1,292 @@
+
+{% capture img_alignment %}{{ section.settings.img_alignment }}{% endcapture %}
+<div class="column-box" id="{{ section.id }}" style="{% if section.settings.background_toggle %}background-color: {{ section.settings.bg_color }};{% endif %} padding-top: {{ section.settings.padding_box }}px;padding-bottom: {{ section.settings.padding_box_bot }}px;">
+<div class="wrapper">
+	{% if section.settings.section_title.size > 0 %}
+		<div class="section-header">
+			<h2 class="section-header__title">{{ section.settings.section_title | escape }}</h2>
+		</div>
+	{% endif %}
+
+	<div class="grid">
+		{% for block in section.blocks %}
+		{%- assign collection = collections[block.settings.collection_item] -%}
+
+			<div class="column_item grid__item item_collection large--{{ section.settings.column_width }}">
+				{% if block.settings.title.size > 0 %}
+					<h3>{{ block.settings.title }} <span class="column_trigger"><i class="fa fa-caret-down"></i></span></h3>
+				{% else %}
+					<h3>{{ collections[block.settings.collection_item].title | truncate: 30 }} <span class="column_trigger"><i class="fa fa-caret-down"></i></span></h3>
+				{% endif %}
+
+				<ul class="products_list">
+					{% for product in collections[block.settings.collection_item].products limit: 3 %}
+					{%- assign current_variant = product.selected_or_first_available_variant -%}
+					{%- assign compare_at_price = current_variant.compare_at_price -%}
+					{%- assign price = current_variant.price -%}
+					{% case block.settings.section_height %}
+						{% when 'small'  %}{%- assign img_size = '150x130' -%}
+						{% when 'medium' %}{%- assign img_size = '150x150' -%}
+						{% when 'large'  %}{%- assign img_size = '150x170' -%}
+					{% endcase %}
+
+						<li class="product" id="CollumnProductSection-{{ block.id }}-{{ forloop.index }}" data-section-id="{{ block.id }}-{{ forloop.index }}" data-section-type="product-template">
+							<div class="product_img">  
+								<a href="{{ product.url | within: collection }}">
+									<img class="prod-list-image img-responsive lazyload" data-sizes="auto" src="{{ "icon-loadings.svg" | asset_url }}" data-src="{{ product.featured_image.src | product_img_url: img_size, crop: block.settings.img_alignment }}" alt="{{ product.featured_image.alt | escape }}" />
+								</a>
+								{% for var in product.variants limit:1 %}
+						          {% assign varQ = var.inventory_quantity %}
+						       
+						        <div class="paddingtop8 eins-prod">
+						          <span class="vmicon vm2-{% if varQ == 0 %}nostock{% elsif varQ < 10 %}lowstock{% else %}normalstock{% endif %}"></span>
+						          <span class="stock-level">{{ 'products.product.stock_level' | t }} : <span>{{ varQ }}</span> {{ 'products.product.stock_items' | t }}</span>
+						        </div>
+						         {% endfor %}
+							</div>
+
+							<div class="product_info">
+								<span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+								<div class="product_name">
+									<a href="{{ product.url | within: collection }}">{{ product.title | truncate: 35 }}</a>
+								</div>
+								
+								<div class="data-price"  data-price-container>
+					            {% if compare_at_price > price %}
+					              <span class="product-single__price--wrapper" aria-hidden="false">
+					                <span id="ComparePrice" class="product-single__price--compare-at">
+					                  {{ compare_at_price | money }}
+					                </span>
+					              </span>
+					              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="false">{{ 'products.general.sale_price' | t }}</span>
+					            {% else %}
+					              <span id="ComparePriceA11y" class="visually-hidden" aria-hidden="true">{{ 'products.general.sale_price' | t }}</span>
+					            {% endif %}
+
+					            <span id="ProductPrice"
+					              class="product-single__price{% if compare_at_price > price %} on-sale{% endif %}"
+					              itemprop="price"
+					              content="{{ price | divided_by: 100.00 }}"
+					              {% unless current_variant.available %}aria-hidden="true"{% endunless %}>
+					              {{ price | money }}
+					            </span>
+					          </div>
+					          {% capture "form_classes" %}
+				              product-form{% if product.has_only_default_variant %} product-form--no-variants{% endif %}
+				            {%- endcapture %}
+
+				            {% capture "form_id" %}AddToCartForm--{{ block.id }}-{{ forloop.index }}{%- endcapture %}
+
+				            {% form 'product', product, class:form_classes, id:form_id %}
+				              <select name="id" id="ProductSelect" class="product-single__variants no-js">
+				                {% for variant in product.variants %}
+				                  {% if variant.available %}
+				                    <option {% if variant == product.selected_or_first_available_variant %}
+				                      selected="selected" {% endif %}
+				                      data-sku="{{ variant.sku }}"
+				                      value="{{ variant.id }}">
+				                      {{ variant.title }} - {{ variant.price | money_with_currency }}
+				                    </option>
+				                  {% else %}
+				                    <option disabled="disabled">
+				                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+				                    </option>
+				                  {% endif %}
+				                {% endfor %}
+				              </select>           
+				              <div class="product-add-to-cart">
+				                {% if product.variants.size == 1 %}
+				                <button type="submit" name="add" id="AddToCart--{{ block.id }}-{{ forloop.index }}" class="btn-line btn--add-to-cart
+				                "{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+				                  <span class="btn__text">
+				                    {% if current_variant.available %}
+				                      {{ 'products.product.add_to_cart' | t }}
+				                    {% else %}
+				                      {{ 'products.product.sold_out' | t }}
+				                    {% endif %}
+				                  </span>
+				                </button>
+				                {% else %}
+				                <a class="btn-line btn-options" href="{{ product.url }}">{{ 'products.product.choose_variant_button' | t }}</a>
+				                {% endif %}
+				                {% if section.settings.enable_payment_button %}
+				                  {{ form | payment_button }}
+				                {% endif %}
+
+
+				              </div>
+				            {% endform %}
+								
+							</div>
+							{% unless product.empty == empty %}
+							  <script type="application/json" id="ProductJson-{{ block.id }}-{{ forloop.index }}">
+							    {{ product | json }}
+							  </script>
+							{% endunless %}
+						</li>
+					{% endfor %}
+				</ul>
+			</div> 
+		{% endfor %}
+	</div>
+</div>
+</div>
+
+{% schema %}
+{
+	"name": "Products column",
+	"class": "section section_homepage section_products-column",
+	"max_blocks": 4,
+	"settings": [
+		{
+			"id": "section_title",
+			"type": "text",
+			"label": "Heading",
+			"default": "Products column"
+		},
+		{
+			"type": "select",
+			"id": "column_width",
+			"label": "Column width",
+			"default": "one-quarter",
+			"options": [
+				{
+					"value": "one-quarter",
+					"label": "One of fier"
+				},
+				{
+					"value": "one-third",
+					"label": "One of three"
+				}
+			]
+		},
+		{
+	      "type": "checkbox",
+	      "id": "background_toggle",
+	      "label": "Show background color",
+	      "default": true
+	    },
+	    {
+	      "type": "color",
+	      "id": "bg_color",
+	      "label": "Background color",
+	      "default": "#fafbfb"
+	    },
+	    {
+	      "type": "range",
+	      "id": "padding_box",
+	      "min": 0,
+	      "max": 100,
+	      "step": 1,
+	      "label": "Padding Top",
+	      "default": 30
+	    },
+	    {
+	      "type": "range",
+	      "id": "padding_box_bot",
+	      "min": 0,
+	      "max": 100,
+	      "step": 1,
+	      "label": "Padding Bottom",
+	      "default": 0
+	    }
+	],
+	"blocks": [
+
+		// COLLECTION //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "collection",
+			"name": "Collection",
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Column heading"
+				},
+				{
+					"label": "Collection",
+					"id": "collection_item",
+					"type": "collection"
+				},
+				{
+					"type": "select",
+					"id": "section_height",
+					"label": "Section height",
+					"options": [
+						{
+							"label": "Small",
+							"value": "small"
+						},
+						{
+							"label": "Medium",
+							"value": "medium"
+						},
+						{
+							"label": "Large",
+							"value": "large"
+						}
+					]
+				},
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				}
+
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Products column",
+			"category": "Products"
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(document).ready(function($) {
+
+	// COLUMN TABS
+	$('.section_products-column').each(function(i) {
+		var firstEl = $(this).find('.item_collection').first();
+		var firstTrigger = firstEl.find('.column_trigger');
+		var prodLists = $(this).find('.products_list');
+		var tabItem = $(this);
+
+		if ( $(window).width() < 768 ) {
+			prodLists.hide();
+			firstEl.find('.products_list').show();
+			firstTrigger.addClass('active');
+
+			tabItem.find('.column_trigger').on('click', function(e){
+				if ( $(this).hasClass('active') ) {
+					$(this).removeClass('active');
+					$(this).parent().parent().parent().find('.products_list').hide(300);
+				} else {
+					$(this).parent().parent().parent().find('.column_trigger').removeClass('active');
+					$(this).addClass('active');
+					$(this).parent().parent().parent().find('.products_list').hide(300);
+					$(this).parent().siblings('.products_list').show(300);
+				}
+			});
+		};
+	});
+
+});
+{% endjavascript %}

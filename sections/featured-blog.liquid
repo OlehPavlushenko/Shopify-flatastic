@@ -1,0 +1,376 @@
+<div class="featured-blog featured-blog--{{ section.id }}" data-section-id="{{ section.id }}" style="{% if section.settings.background_toggle %}background-color: {{ section.settings.bg_color }};{% endif %} padding-top: {{ section.settings.padding_box }}px;padding-bottom: {{ section.settings.padding_box_bot }}px;">
+  <div class="wrapper{% if section.settings.post_grid == 'list' %} list{% endif %}">
+    {%- assign blog = blogs[section.settings.blog] -%}
+    {% case section.settings.width_limit %}
+      {% when 4 %}
+        {%- assign width = 'small--one-whole medium--one-half large--one-quarter' -%}
+      {% when 3 %}
+        {%- assign width = 'small--one-whole medium--one-whole large--one-third' -%}
+      {% when 2 %}
+        {%- assign width = 'small--one-whole medium--one-half large--one-half' -%}
+      {% when 1 %}
+        {% if section.settings.blog_show_image %}
+          {%- assign width = 'small--one-whole medium--one-half large--one-half' -%}
+        {% else %}
+          {%- assign width = 'text-center large--four-fifths push--large--one-tenth' -%}
+        {% endif %}
+      {% else %}
+        {%- assign width = 'small--one-whole medium--one-half large--one-third' -%}
+    {% endcase %}
+    {% if section.settings.title != blank %}
+      <div class="section-header">
+        <h2 class="section-header__title">{{ section.settings.title | escape }}</h2>
+      </div>
+    {% endif %}
+
+    {% unless blog.articles_count == 0 %}
+      <div class="grid-uniform">
+        {% for article in blog.articles limit: section.settings.posts_limit %}
+          <div class="grid__item {{ width }}">
+            <div class="featured-blog-post">
+
+              {% if section.settings.blog_show_image %}
+                {% unless article.image == blank %}
+                <div class="blok-images">
+                  <a class="article-featured-image-link" href="{{ article.url }}">
+                    {% case section.settings.img_blog_size %}
+                      {% when 'small'  %}{%- assign img_blog_size = '570x390' -%}
+                      {% when 'medium' %}{%- assign img_blog_size = '570x570' -%}
+                      {% when 'large'  %}{%- assign img_blog_size = '570x640' -%}
+                    {% endcase %}       
+                    <div class="article-featured-image-wrapper">
+                      {% assign img_url = article.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                      <img class="blog-list-image"
+                      src="{{ article.image | img_url: img_blog_size , crop: 'center' }}"
+                      alt="{{ article.title | escape }}">
+                    </div>
+                  </a>
+                </div>
+                {% endunless %}
+              {% endif %}
+
+              {% unless section.settings.posts_limit == 1 and section.settings.blog_show_image %}
+              <div class="block-info">
+                {% include 'featured-blog', article: article %}
+              </div>
+              {% endunless %}
+
+            </div>
+          </div>
+
+          {% if section.settings.posts_limit == 1 and section.settings.blog_show_image %}
+            <div class="grid__item {{ width }}">
+              <div class="featured-blog__post">
+                 {% include 'featured-blog', article: article %}
+              </div>
+            </div>
+          {% endif %}
+
+        {% endfor %}
+      </div>
+
+    {% else %}
+      {% include 'onboarding-featured-blog' %}
+    {% endunless %}
+
+    {% if blog == empty %}
+      {% include 'onboarding-featured-blog' %}
+    {% endif %}
+
+    {% if section.settings.show_view_all %}
+      <div class="section-btn text-center">
+        <a href="{{ blog.url }}" class="btn">
+          {{ 'blogs.article.view_all' | t }}
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+
+
+{% schema %}
+{
+  "name": {
+    "de": "Blog-Beiträge",
+    "en": "Blog posts",
+    "es": "Entradas del blog",
+    "fr": "Articles de blog",
+    "it": "Articoli del blog",
+    "ja": "ブログ記事",
+    "pt-BR": "Posts do blog"
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": {
+        "de": "Überschrift",
+        "en": "Heading",
+        "es": "Título",
+        "fr": "Titre",
+        "it": "Heading",
+        "ja": "見出し",
+        "pt-BR": "Título"
+      },
+      "default": {
+        "de": "Blog",
+        "en": "Blog",
+        "es": "Blog",
+        "fr": "Blog",
+        "it": "Blog",
+        "ja": "ブログ",
+        "pt-BR": "Blog"
+      }
+    },
+    {
+      "id": "blog",
+      "type": "blog",
+      "label": {
+        "de": "Blog",
+        "en": "Blog",
+        "es": "Blog",
+        "fr": "Blog",
+        "it": "Blog",
+        "ja": "ブログ",
+        "pt-BR": "Blog"
+      }
+    },
+    {
+      "type": "checkbox",
+      "id": "background_toggle",
+      "label": "Show background color",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#fafbfb"
+    },
+    {
+      "type": "range",
+      "id": "padding_box",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Padding Top",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_box_bot",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "label": "Padding Bottom",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "img_blog_size",
+      "label": "Image size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "post_grid",
+      "label": {
+        "de": "Rasterstil",
+        "en": "Grid style",
+        "es": "Estilo de cuadrícula",
+        "fr": "Style de grille",
+        "it": "Stile griglia",
+        "ja": "グリッドスタイル",
+        "pt-BR": "Estilo da grade"
+      },
+      "options": [
+        {
+          "value": "grid",
+          "label": {
+            "de": "Raster",
+            "en": "Grid",
+            "es": "Cuadrícula",
+            "fr": "Grille",
+            "it": "Griglia",
+            "ja": "グリッド",
+            "pt-BR": "Grade"
+          }
+        },
+        {
+          "value": "list",
+          "label": {
+            "de": "List",
+            "en": "List",
+            "es": "List",
+            "fr": "List",
+            "it": "List",
+            "ja": "List",
+            "pt-BR": "List"
+          }
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "posts_limit",
+      "label": {
+        "de": "Beiträge",
+        "en": "Posts",
+        "es": "publicaciones",
+        "fr": "Articles de blog",
+        "it": "articoli",
+        "ja": "投稿",
+        "pt-BR": "posts"
+      },
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "width_limit",
+      "label": {
+        "de": "Beiträge",
+        "en": "Posts",
+        "es": "publicaciones",
+        "fr": "Articles de blog",
+        "it": "articoli",
+        "ja": "投稿",
+        "pt-BR": "posts"
+      },
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_show_date",
+      "label": {
+        "de": "Datum anzeigen",
+        "en": "Show date",
+        "es": "Mostrar fecha",
+        "fr": "Afficher la date",
+        "it": "Mostra data",
+        "ja": "日付を表示する",
+        "pt-BR": "Exibir data"
+      },
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_show_author",
+      "label": {
+        "de": "Verfasser anzeigen",
+        "en": "Show author",
+        "es": "Mostrar autor",
+        "fr": "Afficher l'auteur",
+        "it": "Mostra autore",
+        "ja": "執筆者を表示する",
+        "pt-BR": "Exibir autor(a)"
+      },
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_show_image",
+      "label": {
+        "de": "Titelbild anzeigen",
+        "en": "Show cover image",
+        "es": "Mostrar imagen de portada",
+        "fr": "Afficher l'image de couverture",
+        "it": "Mostra immagine di copertina",
+        "ja": "表紙画像を表示する",
+        "pt-BR": "Exibir imagem da capa"
+      },
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_show_excerpt",
+      "label": {
+        "de": "Auszug anzeigen",
+        "en": "Show excerpt",
+        "es": "Mostrar extracto",
+        "fr": "Afficher l'extrait",
+        "it": "Mostra riassunto",
+        "ja": "抜粋を表示する",
+        "pt-BR": "Exibir resumo"
+      },
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "worts_limit",
+      "label": {
+        "de": "Count of words in description",
+        "en": "Count of words in description",
+        "es": "Count of words in description",
+        "fr": "Count of words in description",
+        "it": "Count of words in description",
+        "ja": "Count of words in description",
+        "pt-BR": "Count of words in description"
+      },
+      "min": 10,
+      "max": 120,
+      "step": 5,
+      "default": 110
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": {
+        "de": "Schaltfläche \"Alle anzeigen\" anzeigen",
+        "en": "Show 'View all' button",
+        "es": "Mostrar el botón 'Ver todo'",
+        "fr": "Afficher le bouton « Tout afficher »",
+        "it": "Mostra il pulsante \"Visualizza tutto\"",
+        "ja": "「すべて表示」ボタンを表示する",
+        "pt-BR": "Exibir botão 'Visualizar tudo'"
+      },
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": {
+        "de": "Blog-Beiträge",
+        "en": "Blog posts",
+        "es": "Entradas del blog",
+        "fr": "Articles de blog",
+        "it": "Articoli del blog",
+        "ja": "ブログ記事",
+        "pt-BR": "Posts do blog"
+      },
+      "category": {
+        "de": "Blog",
+        "en": "Blog",
+        "es": "Blog",
+        "fr": "Blog",
+        "it": "Blog",
+        "ja": "ブログ",
+        "pt-BR": "Blog"
+      },
+      "settings": {
+        "blog": "News"
+      }
+    }
+  ]
+}
+{% endschema %}

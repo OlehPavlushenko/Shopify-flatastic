@@ -1,0 +1,129 @@
+<!-- /templates/search.liquid -->
+{% comment %}
+
+  To return only products or pages in results:
+    - http://docs.shopify.com/manual/configuration/store-customization/return-only-product-in-storefront-search-results
+    - Or manually add type=product or type=page to the search URL as a parameter
+
+{% endcomment %}
+
+{% comment %}
+  Avoid accessing search.results before the opening paginate tag.
+  If you do, the pagination of results will be broken.
+{% endcomment %}
+{% paginate search.results by 12 %}
+
+  <div class="grid search-page" data-section-type="search">
+    <div class="grid__item">
+      <header class="section-header text-center">
+        {% if search.performed %}
+          {% if search.results_count == 0 %}
+            <h1 class="text-center">{{ 'general.search.no_results_html' | t: terms: search.terms }}</h1>
+          {% else %}
+            <h1 class="text-center">{{ 'general.search.results_for_html' | t: terms: search.terms }}</h1>
+          {% endif %}
+        {% else %}
+          <h1 class="text-center">{{ 'general.search.title' | t }}</h1>
+        {% endif %}
+      </header>
+
+      {% include 'search-bar', search_btn_style: 'btn', search_bar_location: 'search-bar--page' %}
+      <div class="button_filters">
+        <ul>
+          <li {% unless canonical_url contains 'type' %}class="active"{% endunless %}><a href="/search?q={{ search.terms }}">{{ 'general.search.results_all' | t }}</a></li>
+          <li {% if canonical_url contains 'type=product' %}class="active"{% endif %}><a href="/search?type=product&q={{ search.terms }}">{{ 'general.search.results_products' | t }}</a></li>
+          <li {% if canonical_url contains 'type=page' %}class="active"{% endif %}><a href="/search?type=page&q={{ search.terms }}">{{ 'general.search.results_pages' | t }}</a></li>
+          <li {% if canonical_url contains 'type=article' %}class="active"{% endif %}><a href="/search?type=article&q={{ search.terms }}">{{ 'general.search.results_blog' | t }}</a></li>
+
+        </ul>
+      </div>
+    {% if search.performed %}        
+       <div class="CollectionSection lists">
+        <div class="grid">
+          {% for item in search.results %}
+
+            {% if item.object_type == 'product' %}
+              {% assign product = item %}
+              {% include 'product-grid-item-search' %}
+            {% endif %}
+
+          {% endfor %}
+        </div>
+        <div class="grid blog">
+          {% for item in search.results %}
+
+            {% if item.object_type == 'article' or item.object_type == 'page' %}
+              <div class="grid__item grid-search  medium--one-half">
+                <div class="grid-search__page">
+                  <a href="{{ item.url }}" class="grid-search__page-link">
+                    <span class="grid-search__page-content">
+                      <h3 class="section-header__title">{{ item.title }}</h3>
+                      {% if item.object_type == 'article' %}
+                      <img class="search-list-image"
+                      src="{{ item.image | img_url: '570x' , crop: 'center' }}"
+                      alt="{{ item.title | escape }}">
+                      {% endif %}
+                       <p>
+                      {% if item.published_at %}{{ item.published_at | date: format: "date" }} &#8212; {% endif %}
+                      {{ item.content | strip_html | truncatewords: 60 }} 
+                       </p>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            {% endif %}
+
+          {% endfor %}
+        </div>
+        </div>
+        {% if paginate.pages > 1 %}
+          {% include 'pagination' %}
+        {% endif %}
+
+    {% endif %}
+
+    </div>
+  </div>
+
+{% endpaginate %}
+<script>
+$(function() {
+  $('.CollectionSection div.grid-product').each(function() {        
+    var tip = $(this).find('div.count_holder_small'); 
+
+    $(this).hover(
+        function() { tip.appendTo('body'); },
+        function() { tip.appendTo(this); }
+    ).mousemove(function(e) {
+        var x = e.pageX + 60,
+            y = e.pageY - 50,
+            w = tip.width(),
+            h = tip.height(),
+            dx = $(window).width() - (x + w),
+            dy = $(window).height() - (y + h);
+
+        if ( dx < 50 ) x = e.pageX - w - 60;
+        if ( dy < 50 ) y = e.pageY - h + 130;
+
+        tip.css({ left: x, top: y });
+      });         
+  });
+});
+(function($) {
+  $('.CollectionSection div.grid-product').each(function(){
+    var self = $(this)
+    if ( device.desktop() && self.find(".prod-img2").length > 0 ) {
+      self.on({
+        mouseenter: function(){
+          self.find(".prod-img1").stop().animate({"opacity": 0}, 200);
+          self.find(".prod-img2").stop().animate({"opacity": 1}, 200);
+        },
+        mouseleave: function(){
+          self.find(".prod-img1").stop().animate({"opacity": 1}, 200);
+          self.find(".prod-img2").stop().animate({"opacity": 0}, 200);
+        }
+      });
+    }     
+  });
+})(jQuery);
+</script> 

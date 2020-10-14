@@ -1,0 +1,273 @@
+{%- if template contains 'collection.' -%}
+    {%- assign items_length = current_tags | size -%}
+{%- else -%}
+    {%- assign namespace = template | remove: 'cart.' | remove: 'page.' -%}
+    {%- assign items = customer.metafields[namespace] -%}
+    {%- assign items_length = items | size -%}
+{%- endif -%}
+
+{%- assign max_height = 250 -%}
+{%- assign grid_item_width = '' -%}
+
+
+<div class="compare list-pop">
+    <h2 class="h3 mb-30 {% if items_length < 1 %} d-none-important{% endif %}" data-js-store-lists-has-items-compare>{{ 'general.cmproduct.cm_ctitle' | t }}<div class="d-flex">
+            <div class="btn w-100 w-sm-auto ml-sm-auto js-store-lists-clear-compare{% if items_length < 1 %} d-none-important{% endif %}" data-js-store-lists-has-items-compare>{{ 'general.cmproduct.cm_remove' | t }}</div>
+        </div></h2>
+    <div class="containers">
+        <table class="table d-block{% if items_length < 1 %} d-none-important{% endif %} pb-20" data-js-store-lists-has-items-compare>
+            <tr>
+                <td class="compare__title pt-0 pl-0 border-right border-top-0">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_products' | t }}</h4>
+                </td>
+                <td class="pt-0 border-top-0">
+                    <div class="compare__items d-flex">
+                        {%- if template contains 'collection.' -%}
+                            {%- for tag in current_tags -%}
+                                {%- assign item = tag | split: '=' -%}
+                                {%- assign current_handle = item[0] -%}
+                                {%- assign current_variant_id = item[1] | abs -%}
+
+                                {% include 'compare-get-product' %}
+                            {%- endfor -%}
+                        {%- else -%}
+                            {%- for item in items -%}
+                                {%- assign current_handle = item[1] -%}
+                                {%- assign current_variant_id = item[0] | abs -%}
+
+                                {% include 'compare-get-product' %}
+                            {%- endfor -%}
+                        {%- endif -%}
+                    </div>
+                </td>
+                <td class="compare__title d-lg-none w-100 pt-0 pr-0 border-left border-top-0">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_products' | t }}</h4>
+                </td>
+            </tr>
+
+
+
+            {%- assign handles = handles | split: '|||' -%}
+
+
+
+            {% comment %}
+                description
+            {% endcomment %}
+            {%- assign compare_descriptions = compare_descriptions | split: '|||' -%}
+            <tr>
+                <td class="compare__title pl-0 border-right">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_description' | t }}</h4>
+                </td>
+                <td>
+                    <div class="compare__items d-flex">
+                        {%- for description in compare_descriptions -%}
+                            <div class="compare__item col" data-js-store-lists-product-compare data-product-handle="{{ handles[forloop.index0] }}">
+                                <p class="fs-lg mb-0">{{ description }}</p>
+                            </div>
+                        {%- endfor -%}
+                    </div>
+                </td>
+                <td class="compare__title d-lg-none w-100 pr-0 border-left">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_description' | t }}</h4>
+                </td>
+                <td class="w-100 d-none d-lg-block"></td>
+            </tr>
+
+
+
+            {% comment %}
+                Collection
+            {% endcomment %}
+            {%- assign compare_collections = compare_collections | split: '|||' -%}
+            <tr>
+                <td class="compare__title pl-0 border-right">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_collection' | t }}</h4>
+                </td>
+                <td>
+                    <div class="compare__items d-flex">
+                        {%- for collection in compare_collections -%}
+                            <div class="compare__item col" data-js-store-lists-product-compare data-product-handle="{{ handles[forloop.index0] }}">
+                                <p class="compare__collections mb-0">{{ collection }}</p>
+                            </div>
+                        {%- endfor -%}
+                    </div>
+                </td>
+                <td class="compare__title d-lg-none w-100 pr-0 border-left">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_collection' | t }}</h4>
+                </td>
+                <td class="w-100 d-none d-lg-block"></td>
+            </tr>
+
+
+
+            {% comment %}
+                Availability
+            {% endcomment %}
+            {%- assign compare_availabilities = compare_availabilities | split: '|||' -%}
+            <tr>
+                <td class="compare__title pl-0 border-right">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_availability' | t }}</h4>
+                </td>
+                <td>
+                    <div class="compare__items d-flex">
+                        {%- for availability in compare_availabilities -%}
+                            <div class="compare__item col" data-js-store-lists-product-compare data-product-handle="{{ handles[forloop.index0] }}">
+                                <p class="mb-0">{{ availability }}</p>
+                            </div>
+                        {%- endfor -%}
+                    </div>
+                </td>
+                <td class="compare__title d-lg-none w-100 pr-0 border-left">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_availability' | t }}</h4>
+                </td>
+                <td class="w-100 d-none d-lg-block"></td>
+            </tr>
+
+
+
+            {% comment %}
+                Type
+            {% endcomment %}
+            {%- assign compare_product_types = compare_product_types | split: '|||' -%}
+            <tr>
+                <td class="compare__title pl-0 border-right">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_type' | t }}</h4>
+                </td>
+                <td>
+                    <div class="compare__items d-flex">
+                        {%- for product_type in compare_product_types -%}
+                            <div class="compare__item col" data-js-store-lists-product-compare data-product-handle="{{ handles[forloop.index0] }}">
+                                <p class="mb-0">{{ product_type }}</p>
+                            </div>
+                        {%- endfor -%}
+                    </div>
+                </td>
+                <td class="compare__title d-lg-none w-100 pr-0 border-left">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_type' | t }}</h4>
+                </td>
+                <td class="w-100 d-none d-lg-block"></td>
+            </tr>
+
+
+
+            {% comment %}
+                Vendor
+            {% endcomment %}
+            {%- assign compare_vendors = compare_vendors | split: '|||' -%}
+            <tr>
+                <td class="compare__title pl-0 border-right">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_vendor' | t }}</h4>
+                </td>
+                <td>
+                    <div class="compare__items d-flex">
+                        {%- for vendor in compare_vendors -%}
+                            <div class="compare__item col" data-js-store-lists-product-compare data-product-handle="{{ handles[forloop.index0] }}">
+                                <p class="mb-0">{{ vendor }}</p>
+                            </div>
+                        {%- endfor -%}
+                    </div>
+                </td>
+                <td class="compare__title d-lg-none w-100 pr-0 border-left">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_vendor' | t }}</h4>
+                </td>
+                <td class="w-100 d-none d-lg-block"></td>
+            </tr>
+
+
+
+            {% comment %}
+                SKU
+            {% endcomment %}
+            {%- assign compare_skus = compare_skus | split: '|||' -%}
+            <tr>
+                <td class="compare__title pl-0 border-right">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_sky' | t }}</h4>
+                </td>
+                <td>
+                    <div class="compare__items d-flex">
+                        {%- for sku in compare_skus -%}
+                            <div class="compare__item col" data-js-store-lists-product-compare data-product-handle="{{ handles[forloop.index0] }}">
+                                <p class="mb-0">{{ sku }}</p>
+                            </div>
+                        {%- endfor -%}
+                    </div>
+                </td>
+                <td class="compare__title d-lg-none w-100 pr-0 border-left">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_sky' | t }}</h4>
+                </td>
+                <td class="w-100 d-none d-lg-block"></td>
+            </tr>
+
+
+
+            {% comment %}
+                Barcode
+            {% endcomment %}
+            {%- assign compare_barcodes = compare_barcodes | split: '|||' -%}
+            <tr>
+                <td class="compare__title pl-0 border-right">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_barcode' | t }}</h4>
+                </td>
+                <td>
+                    <div class="compare__items d-flex">
+                        {%- for barcode in compare_barcodes -%}
+                            <div class="compare__item col" data-js-store-lists-product-compare data-product-handle="{{ handles[forloop.index0] }}">
+                                <p class="mb-0">{{ barcode }}</p>
+                            </div>
+                        {%- endfor -%}
+                    </div>
+                </td>
+                <td class="compare__title d-lg-none w-100 pr-0 border-left">
+                    <h4 class="h6 mb-0">{{ 'general.cmproduct.cm_barcode' | t }}</h4>
+                </td>
+                <td class="w-100 d-none d-lg-block"></td>
+            </tr>
+
+
+
+            {% comment %}
+                Options
+            {% endcomment %}
+            {%- assign compare_options = compare_options | split: '|||' -%}
+            {%- assign compare_variants = compare_variants | split: '|||' -%}
+            {%- for option in compare_options -%}
+                <tr>
+                    <td class="compare__title pl-0 border-right">
+                        <h4 class="h6 mb-0">{{ option | upcase }}</h4>
+                    </td>
+                    <td>
+                        <div class="compare__items d-flex">
+                            {%- for variant in compare_variants -%}
+                                <div class="compare__item col" data-js-store-lists-product-compare data-product-handle="{{ handles[forloop.index0] }}">
+                                    {%- assign vrts = variant | split: '+' -%}
+                                    {%- assign present = false -%}
+                                    {%- for vrt in vrts -%}
+                                        {%- assign key_value = vrt | split: '=' -%}
+                                        {%- if key_value[0] == option and key_value[1] -%}
+                                            <p class="mb-0">{{ key_value[1] }}</p>
+                                            {%- assign present = true -%}
+                                        {%- endif -%}
+                                    {%- endfor -%}
+                                    {%- if present == false -%}
+                                        <p class="mb-0">{{ 'general.cmproduct.cm_empty' | t }}</p>
+                                    {%- endif -%}
+                                </div>
+                            {%- endfor -%}
+                        </div>
+                    </td>
+                    <td class="compare__title d-lg-none w-100 pr-0 border-left">
+                        <h4 class="h6 mb-0">{{ option | upcase }}</h4>
+                    </td>
+                    <td class="w-100 d-none d-lg-block"></td>
+                </tr>
+            {%- endfor -%}
+
+        </table>
+
+        <div class="d-flex flex-column py-100 my-100{% if items_length > 0 %} d-none-important{% endif %}" data-js-store-lists-dhas-items-compare>
+            <h3>{{ 'general.cmproduct.cm_compare' | t }}</h3>
+            <p>{{ 'general.cmproduct.cm_ctext' | t }}</p>
+        </div>
+    </div>
+</div>

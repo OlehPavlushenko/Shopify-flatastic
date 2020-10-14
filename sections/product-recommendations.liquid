@@ -1,0 +1,426 @@
+{%- if section.settings.show_product_recommendations -%}
+{% assign limit = section.settings.products_limit | plus: 1 %}
+<div class="CollectionSection grids product-recommendations" data-product-id="{{ product.id }}" data-limit="{{ limit }}" data-section-id="{{ section.id }}" data-section-type="product-recommendations">
+  {% if recommendations.products_count > 0 %}
+    {%- if section.settings.heading != blank -%}
+      <h2>{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    <ul class="grid grid--uniform grid--view-items">
+      {% for product in recommendations.products limit: limit %}
+        <li class="grid__item small--one-half large--one-quarter">
+          {% include 'product-grid-item-search' %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+
+{% if collection and collection.products_count > 1 %}
+    {% if collection == null or collection.handle == 'frontpage' or collection.handle == 'all' %}
+
+    {% assign found_a_collection = false %}
+      {% for c in product.collections %}
+        {% if found_a_collection == false and c.handle != 'frontpage' and c.handle != 'all' and c.all_products_count > 1 %}
+          {% assign found_a_collection = true %}
+          {% assign collection = c %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    <div class="CollectionSection grids product-recommendations widget-related-roducts {{ section.settings.collection_products_grid }}s">
+      <h2>{{ section.settings.heading | escape }}</h2>
+      <div class="widget_content">
+         <div class="grid-uniform">
+
+          {% assign current_product_title = product.title %}
+          {% assign current_product_found = true %}
+
+          {% for prod in collection.products limit:limit %}
+            {% if prod.title == current_product_title %}
+              {% assign current_product_found = false %} 
+            {% endif %}
+
+            {% unless prod.title == current_product_title %}
+              {% unless forloop.last and current_product_found %}
+                {% assign product = prod %}
+                  {% if section.settings.collection_products_grid == 'grid' %}
+                    {% assign grid_item_width = 'medium--one-half large--one-third' %}
+                      {% include 'product-grid-item' %}
+                  {% endif %}
+                     {% if section.settings.collection_products_grid == 'list' %}
+
+                      {% assign grid_item_width = 'one-whole' %}
+                        {% include 'product-grid-itemllist' %}
+                    {% endif %}  
+              {% endunless %}
+            {% endunless %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{%- endif -%}
+{%- if section.settings.show_product_recent -%}
+{% include 'recently-viewed' %}
+{%- endif -%}
+{% schema %}
+{
+  "name": {
+    "da": "Produktanbefalinger",
+    "de": "Produktempfehlungen",
+    "en": "Product recommendations",
+    "es": "Recomendaciones de productos",
+    "fi": "Tuotesuositukset",
+    "fr": "Recommandations de produits",
+    "hi": "उत्पाद की अनुशंसाएं",
+    "it": "Raccomandazioni sui prodotti",
+    "ja": "商品の推奨",
+    "ko": "제품 권장 사항",
+    "ms": "Cadangan produk",
+    "nb": "Produktanbefalinger",
+    "nl": "Productaanbevelingen",
+    "pt-BR": "Recomendações de produtos",
+    "pt-PT": "Recomendações de produtos",
+    "sv": "Produktrekommendationer",
+    "th": "คำแนะนำสินค้า",
+    "zh-CN": "产品推荐",
+    "zh-TW": "商品推薦"
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_product_recommendations",
+      "label": {
+        "da": "Vis dynamiske anbefalinger",
+        "de": "Dynamische Empfehlungen anzeigen",
+        "en": "Show dynamic recommendations",
+        "es": "Mostrar recomendaciones dinámicas",
+        "fi": "Näytä dynaamiset suositukset",
+        "fr": "Afficher les recommandations dynamiques",
+        "hi": "डायनेमिक सुझाव दिखाएं",
+        "it": "Mostra raccomandazioni dinamiche",
+        "ja": "動的推奨を表示する",
+        "ko": "동적 권장 사항 표시",
+        "ms": "Tunjukkan cadangan dinamik",
+        "nb": "Vis dynamiske anbefalinger",
+        "nl": "Dynamische aanbevelingen weergeven",
+        "pt-BR": "Mostrar recomendações dinâmicas",
+        "pt-PT": "Mostrar recomendações dinâmicas",
+        "sv": "Visa dynamiska rekommendationer",
+        "th": "แสดงคำแนะนำแบบไดนามิก",
+        "zh-CN": "显示动态推荐",
+        "zh-TW": "顯示動態推薦"
+      },
+      "info": {
+        "da": "Dynamiske anbefalinger ændres og forbedres med tiden. [Få mere at vide](https://help.shopify.com/en/themes/development/recommended-products)",
+        "de": "Dynamische Empfehlungen werden im Laufe der Zeit angepasst und verbessert. [Mehr Informationen](https://help.shopify.com/en/themes/development/recommended-products)",
+        "en": "Dynamic recommendations change and improve with time. [Learn more](https://help.shopify.com/en/themes/development/recommended-products)",
+        "es": "Las recomendaciones dinámicas cambian y mejoran con el tiempo. [Más información](https://help.shopify.com/en/themes/development/recommended-products)",
+        "fi": "Dynaamiset suositukset muuttuvat ja paranevat ajan myötä. [Lisätietoja](https://help.shopify.com/en/themes/development/recommended-products)",
+        "fr": "Les recommandations dynamiques changent et s'améliorent avec le temps. [En savoir plus](https://help.shopify.com/en/themes/development/recommended-products)",
+        "hi": "समय के साथ डायनेमिक सुझाव परिवर्तन और सुधार. [अधिक जानें](https://help.shopify.com/en/themes/development/recommended-products)",
+        "it": "Le raccomandazioni dinamiche cambiano e migliorano nel tempo. [Maggiori informazioni](https://help.shopify.com/en/themes/development/recommended-products)",
+        "ja": "動的推奨は時間とともに変化し改善します。[詳細情報](https://help.shopify.com/en/themes/development/recommended-products)",
+        "ko": "동적 권장 사항은 시간이 지나면서 변하고 개선됩니다. [자세히 알아보기](https://help.shopify.com/en/themes/development/recommended-products)",
+        "ms": "Cadangan dinamik bertukar dan bertambah baik dari masa. [Ketahui lebih lanjut](https://help.shopify.com/en/themes/development/recommended-products)",
+        "nb": "Dynamiske anbefalinger endrer seg og forbedres med tiden. [Finn ut mer](https://help.shopify.com/en/themes/development/recommended-products)",
+        "nl": "Dynamische aanbevelingen veranderen en verbeteren mettertijd. [Meer informatie](https://help.shopify.com/en/themes/development/recommended-products)",
+        "pt-BR": "As recomendações dinâmicas mudam e melhoram com o tempo. [Saiba mais](https://help.shopify.com/en/themes/development/recommended-products)",
+        "pt-PT": "As recomendações dinâmicas mudam e melhoram com o tempo. [Saiba mais](https://help.shopify.com/en/themes/development/recommended-products)",
+        "sv": "Dynamiska rekommendationer ändras och förbättras med tiden. [Läs mer](https://help.shopify.com/en/themes/development/recommended-products)",
+        "th": "คำแนะนำแบบไดนามิกนั้นเปลี่ยนแปลงและถูกปรับปรุงให้ดีขึ้นตลอดเวลา [เรียนรู้เพิ่มเติม](https://help.shopify.com/en/themes/development/recommended-products)",
+        "zh-CN": "动态推荐会随着时间而变化和改进。[了解详情](https://help.shopify.com/en/themes/development/recommended-products)",
+        "zh-TW": "動態推薦會隨著時間改變與改進。[深入瞭解](https://help.shopify.com/en/themes/development/recommended-products)"
+      },
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": {
+        "da": "Overskrift",
+        "de": "Überschrift",
+        "en": "Heading",
+        "es": "Título",
+        "fi": "Otsake",
+        "fr": "En-tête",
+        "hi": "शीर्षक",
+        "it": "Heading",
+        "ja": "見出し",
+        "ko": "제목",
+        "ms": "Tajuk",
+        "nb": "Overskrift",
+        "nl": "Kop",
+        "pt-BR": "Título",
+        "pt-PT": "Título",
+        "sv": "Rubrik",
+        "th": "ส่วนหัว",
+        "zh-CN": "标题",
+        "zh-TW": "標題"
+      },
+      "default": {
+        "da": "Du vil muligvis også synes om",
+        "de": "Das könnte Ihnen auch gefallen",
+        "en": "You may also like",
+        "es": "También te puede interesar",
+        "fi": "Saatat pitää myös näistä",
+        "fr": "Vous pourriez aimer également",
+        "hi": "आप शायद इसे भी पसंद करें",
+        "it": "Potrebbero interessarti anche",
+        "ja": "あなたへのおすすめ",
+        "ko": "회원님도 좋아할 것입니다.",
+        "ms": "Anda juga mungkin sukakan",
+        "nb": "Kanskje du også liker",
+        "nl": "Wellicht vindt je  dit ook leuk",
+        "pt-BR": "Talvez você também goste de",
+        "pt-PT": "Também poderá gostar de",
+        "sv": "Du kanske också gillar",
+        "th": "คุณอาจจะชอบ",
+        "zh-CN": "您可能还喜欢",
+        "zh-TW": "您也可能喜歡"
+      }
+    },
+    {
+      "type": "select",
+      "id": "img_prod_size",
+      "label": "Image size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "img_alignment",
+      "label": "Image alignment",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        }
+      ]
+    },
+    {
+      "id": "products_limit",
+      "type": "select",
+      "label": "Show products",
+      "options": [
+        {
+          "value": "4",
+          "label": "4"
+        },
+        {
+          "value": "6",
+          "label": "6"
+        },
+        {
+          "value": "8",
+          "label": "8"
+        },
+        {
+          "value": "12",
+          "label": "12"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "width_limit",
+      "label": {
+        "de": "Anzahl der Produkte in einer Reihe",
+        "en": "Number of products in a row",
+        "es": "Número de productos en una fila",
+        "fr": "Nombre de produits dans une rangée",
+        "it": "Numero di prodotti in fila",
+        "ja": "1行の商品数",
+        "pt-BR": "Número de produtos em uma fileira"
+      },
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "worts_limit_prod",
+      "label": {
+        "de": "Count of words in Title",
+        "en": "Count of words in Title",
+        "es": "Count of words in Title",
+        "fr": "Count of words in Title",
+        "it": "Count of words in Title",
+        "ja": "Count of words in Title",
+        "pt-BR": "Count of words in Title"
+      },
+      "min": 3,
+      "max": 100,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_animation_img",
+      "label": {
+        "de": "Animation Images",
+        "en": "Animation Images",
+        "es": "Animation Images",
+        "fr": "Animation Images",
+        "it": "Animation Images",
+        "ja": "Animation Images",
+        "pt-BR": "Animation Images"
+      },
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": {
+        "de": "Anbieter anzeigen",
+        "en": "Show vendor",
+        "es": "Mostrar proveedor",
+        "fr": "Afficher le distributeur",
+        "it": "Mostra fornitore",
+        "ja": "販売元を表示する",
+        "pt-BR": "Exibir fornecedor"
+      },
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "collection_products_grid",
+      "label": {
+        "de": "Rasterstil",
+        "en": "Grid style",
+        "es": "Estilo de cuadrícula",
+        "fr": "Style de grille",
+        "it": "Stile griglia",
+        "ja": "グリッドスタイル",
+        "pt-BR": "Estilo da grade"
+      },
+      "options": [
+        {
+          "value": "grid",
+          "label": {
+            "de": "Raster",
+            "en": "Grid",
+            "es": "Cuadrícula",
+            "fr": "Grille",
+            "it": "Griglia",
+            "ja": "グリッド",
+            "pt-BR": "Grade"
+          }
+        },
+        {
+          "value": "list",
+          "label": {
+            "de": "List",
+            "en": "List",
+            "es": "List",
+            "fr": "List",
+            "it": "List",
+            "ja": "List",
+            "pt-BR": "List"
+          }
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_recent",
+      "label": {
+        "de": "Show dynamic recently products",
+        "en": "Show dynamic recently products",
+        "zh-TW": "Show dynamic recently products"
+      },
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "heading_recent",
+      "label": {
+        "da": "Overskrift",
+        "de": "Überschrift",
+        "en": "Heading Recently Viewed Products",
+        "es": "Título",
+        "fi": "Otsake",
+        "fr": "En-tête",
+        "hi": "शीर्षक",
+        "it": "Heading",
+        "ja": "見出し",
+        "ko": "제목",
+        "ms": "Tajuk",
+        "nb": "Overskrift",
+        "nl": "Kop",
+        "pt-BR": "Título",
+        "pt-PT": "Título",
+        "sv": "Rubrik",
+        "th": "ส่วนหัว",
+        "zh-CN": "标题",
+        "zh-TW": "標題"
+      },
+      "default": {
+        "en": "Recently Viewed Products"
+      }
+    }
+  ]
+}
+{% endschema %}
+{% javascript %}
+$(function() {
+  $('.CollectionSection.product-recommendations div.grid-product').each(function() {        
+    var tip = $(this).find('div.count_holder_small'); 
+
+    $(this).hover(
+        function() { tip.appendTo('body'); },
+        function() { tip.appendTo(this); }
+    ).mousemove(function(e) {
+        var x = e.pageX + 60,
+            y = e.pageY - 50,
+            w = tip.width(),
+            h = tip.height(),
+            dx = $(window).width() - (x + w),
+            dy = $(window).height() - (y + h);
+
+        if ( dx < 50 ) x = e.pageX - w - 60;
+        if ( dy < 50 ) y = e.pageY - h + 130;
+
+        tip.css({ left: x, top: y });
+      });         
+  });
+});
+(function($) {
+  $('.product_item').each(function(){
+    var self = $(this)
+    if ( device.desktop() && self.find(".prod-img2").length > 0 ) {
+      self.on({
+        mouseenter: function(){
+          self.find(".prod-img1").stop().animate({"opacity": 0}, 200);
+          self.find(".prod-img2").stop().animate({"opacity": 1}, 200);
+        },
+        mouseleave: function(){
+          self.find(".prod-img1").stop().animate({"opacity": 1}, 200);
+          self.find(".prod-img2").stop().animate({"opacity": 0}, 200);
+        }
+      });
+    }     
+  });
+})(jQuery);
+{% endjavascript %} 

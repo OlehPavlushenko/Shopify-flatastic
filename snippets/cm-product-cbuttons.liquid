@@ -1,0 +1,6 @@
+<a class="cm-link btn--status js-store-lists-add-compare"
+    {% unless product.selected_or_first_available_variant.available %}data-disabled="disabled"{% endunless %} >
+    <i class="fa fa-balance-scale"></i>
+    <span>Add to compare list</span>
+    <span data-button-content="added">Remove from compare list</span>
+</a>

@@ -1,0 +1,984 @@
+{% if section.settings.item_bg_color.size > 0 and section.settings.item_bg_color != 'rgba(0,0,0,0)' %}
+  {% capture item_style %}style="background: {{ section.settings.item_bg_color }};"{% endcapture %}
+  {%- assign item_class = 'with-bg' -%}
+{% endif %}
+<footer {% if section.settings.inverted %}class="inverted"{% endif %} {% if section.settings.section_bg_color.size > 0 %} style="background: {{ section.settings.section_bg_color }};"{% endif %}> 
+  <div class="footer-row-1"> 
+    <div class="wrapper">
+      <div class="grid footer-main">
+        {% for block in section.blocks %}
+            {% case block.type %}
+              {% when 'linklist' %}
+                {%- assign linklist = block.settings.links -%}
+                <div class="footer-item grid__item large--{{ block.settings.column-link }}">
+                <div class="footer-item-links {{ item_class }}" {{ item_style }}>
+                  <h3 class="h3 section-header-title">{{ linklists[linklist].title }}<i class="footer_trigger" data-subfoot="foot_{{ block.id }}"></i></h3>
+                  <ul class="footer-toogle" id="foot_{{ block.id }}">
+                    {% for link in linklists[linklist].links %}
+                      <li class="item {% if link.active == true %}active{% endif %}">
+                        <a href="{{ link.url }}">{{ link.title }}</a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+              {% when 'contacts' %}
+              <div class="footer-item grid__item large--{{ block.settings.column-contact }}">
+                <div class="footer-item-contacts {{ item_class }}" {{ item_style }}>
+                  <h3 class="h3 section-header-title">{{ block.settings.contacts_title }}<i class="footer_trigger" data-subfoot="foot_{{ block.id }}"></i></h3>
+                  <div class="footer-toogle" id="foot_{{ block.id }}">
+                  {% if block.settings.contacts_name.size > 0 %}
+                    <p class="contact-name"><i class="fa fa-home"></i>{{ block.settings.contacts_name }}</p>
+                  {% endif %}
+
+                  {% if block.settings.contacts_address.size > 0 %}
+                    <p class="contact-address"><i class="fa fa-map-pin"></i>{{ block.settings.contacts_address }}</p>
+                  {% endif %}
+
+                  {% if block.settings.contacts_phone.size > 0 %}
+                    <p class="contact-phone"><a href="tel:{{ block.settings.contacts_phone }}"><i class="fa fa-volume-control-phone"></i>{{ block.settings.contacts_phone }}</a></p>
+                  {% endif %}
+
+                  {% if block.settings.contacts_email.size > 0 %}
+                    <p class="contact-email"><a href="mailto:{{ block.settings.contacts_email }}"><i class="fa fa-envelope"></i>{{ block.settings.contacts_email }}</a></p>
+                  {% endif %}
+                  {% if block.settings.contacts_time.size > 0 %}
+                      <span class="contact-time"><i class="fa fa-calendar"></i>{{ block.settings.contacts_time }}</span>
+                  {% endif %}
+                </div>
+                </div>
+              </div>
+
+              {% when 'prod-list' %}
+                {% case block.settings.img_size %}
+                  {% when 'small'  %}{%- assign img_size = '270x190' -%}
+                  {% when 'medium' %}{%- assign img_size = '270x270' -%}
+                  {% when 'large'  %}{%- assign img_size = '270x341' -%}
+                {% endcase %}                   
+                <div class="footer-item grid__item large--{{ block.settings.column-prod }}">
+                  <div class="footer-item-prod {{ item_class }}" {{ item_style }}>
+                    <h3 class="h3 section-header-title">{{ block.settings.prod_title }}<i class="footer_trigger" data-subfoot="foot_{{ block.id }}"></i></h3>
+                    <div class="footer-toogle" id="foot_{{ block.id }}">
+                    {%- assign collection = collections[block.settings.prod_collection] -%}
+                    <div class="grid-uniform">
+                      {% for product in collection.products limit: block.settings.prod_limit %}
+                        <div class="grid__item {{ width }}">
+                          <div class="foot-list-item">
+                            {% include 'product-listing-footer' img_size: img_size %}
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                    {% if block.settings.show_view_all %}
+                    <div class="view-all">
+                      <a href="{{ collection.url }}" class="btn">
+                        {{ 'blogs.article.view_all' | t }}
+                      </a>
+                    </div>
+                    {% endif %}
+                  </div>
+                  </div>
+                </div>
+
+              {% when 'blog-list' %}
+               {% case block.settings.img_blog_size %}
+                  {% when 'small'  %}{%- assign img_blog_size = '270x190' -%}
+                  {% when 'medium' %}{%- assign img_blog_size = '270x270' -%}
+                  {% when 'large'  %}{%- assign img_blog_size = '270x341' -%}
+                {% endcase %}             
+              <div class="footer-item grid__item large--{{ block.settings.column-blog }}">
+                <div class="footer-item-blog {{ item_class }}" {{ item_style }}>
+
+                {%- assign blog = blogs[block.settings.blog] -%}
+
+                {% if block.settings.blog_title != blank %}
+                    <h3 class="h3 section-header-title">{{ block.settings.blog_title | escape }}<i class="footer_trigger" data-subfoot="foot_{{ block.id }}"></i></h3>
+                {% endif %}
+                <div class="footer-toogle" id="foot_{{ block.id }}">
+                {% unless blog.articles_count == 0 %}
+                  <div class="grid-uniform">
+                    {% for article in blog.articles limit: block.settings.post_limit %}
+                      <div class="grid__item {{ width }}">
+                        <div class="blog-list-item">
+                          <div class="blog-list-post">
+                            {% if block.settings.blog_show_image %}
+                              {% unless article.image == blank %}
+                                <a class="blog-list-image-link" href="{{ article.url }}">
+                                  <div class="blog-list-image-wrapper">
+                                    {% assign img_url = article.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                                    <img class="blog-list-image img-responsive lazyload" data-sizes="auto" src="{{ "icon-loadings.svg" | asset_url }}"
+                                      data-src="{{ article.image | img_url: img_blog_size , crop: 'center' }}"
+                                      alt="{{ article.title | escape }}">
+                                  </div>
+                                </a>
+                              {% endunless %}
+                            {% endif %}
+                          </div>
+                          <div class="featured-blog-post">
+                              {% include 'footer-blog', article: article %}
+                          </div>
+                        </div>  
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endunless %}
+                {% if block.settings.show_view_all %}
+                  <div class="view-all">
+                    <a href="{{ blog.url }}" class="btn">
+                      {{ 'blogs.article.view_all' | t }}
+                    </a>
+                  </div>
+                {% endif %}
+              </div>  
+              </div>
+            </div>
+
+              {% when 'newsletter' %}
+              <div class="footer-item grid__item large--{{ block.settings.column-news }}">
+                <div class="footer-item-newsletter {{ item_class }}"  {{ item_style }} data-section-id="{{ section.id }}" data-section-type="newsletter-section">
+                    {% unless block.settings.heading == blank %}
+                        <h3 class="h3 section-header-title">{{ block.settings.heading | escape }}<i class="footer_trigger" data-subfoot="foot_{{ block.id }}"></i></h3>
+                    {% endunless %}
+                    <div class="footer-toogle" id="foot_{{ block.id }}">
+
+                    {% unless block.settings.subheading == blank %}
+                      <div class="section-subheading">
+                        {{ block.settings.subheading }}
+                      </div>
+                    {% endunless %}
+                    {% form 'customer', id:'newsletter_form', class: 'footer_form' %}
+                      {% if form.posted_successfully? %}
+                        <div class="newsletter-form">
+                            <div class="note form-success">{{ 'general.newsletter_form.newsletter_confirmation' | t }}</div>
+                        </div>
+                      {% else %}
+                        {% if form.errors %}
+                          <div class="errors form-success">{{ 'general.newsletter_form.newsletter_notification' | t }}</div>
+                        {% endif %}
+                      {% endif %}
+                       <label for="Email" class="newsletter__label hidden-label">{{ 'general.newsletter_form.newsletter_email' | t }}</label>
+                        <input id="contact_tags" name="contact[tags]" type="hidden" value="prospect,newsletter" />
+                        <div class="newsletter-form">
+                          <div class="input-group">
+                            <input type="email" value="{% if customer %}{{ customer.email }}{% endif %}" placeholder="{{ 'general.newsletter_form.newsletter_placeholder' | t }}" name="contact[email]" id="Email" class="newsletter-input"  autocapitalize="off">
+                            <span class="input-btn">
+                              <button id="Subscribe" type="submit"
+                                class="btn newsletter-submit"
+                                aria-label="{{ 'general.newsletter_form.submit' | t }}">
+                                <span class="newsletter-submit-text-large">{{ 'general.newsletter_form.submit' | t }}</span>
+                              </button>
+                            </span>
+                          </div>
+                        </div>
+                    {% endform %}
+                 </div>   
+              </div>
+            </div>
+            <a id="result-link" href="#newsletter_form" class="active" aria-pressed="true" role="button"></a>
+            <script>
+              $(window).load(function() { 
+                if( $('.form-success').length) { 
+                  $('#result-link').trigger('click');
+                }
+              });
+              $('#result-link').on('click', function(event) {
+                  var target = $(this.getAttribute('href'));
+                  if( target.length ) {
+                      event.preventDefault();
+                      $('html, body').stop().animate({
+                          scrollTop: target.offset().top
+                      }, 10);
+                  }
+              });
+            </script>
+            {% when 'about' %}
+            <div class="footer-item grid__item large--{{ block.settings.column-about }}">
+              <div class="footer-item-about {{ item_class }}"  {{ item_style }}>
+               <h3 class="h3 section-header-title">{{ block.settings.about_title }}<i class="footer_trigger" data-subfoot="foot_{{ block.id }}"></i></h3>
+               <div class="footer-toogle" id="foot_{{ block.id }}">
+                {% if block.settings.footer_logo %}
+                  <img src="{{ block.settings.footer_logo | img_url: '1170x600', crop:'center' }}" alt="{{ shop.name }}">
+                {% endif %}
+
+                {% if block.settings.about_text.size > 0 %}
+                  <div class="about-text">{{ block.settings.about_text }}</div>
+                {% endif %}
+                {% if block.settings.social_fb.size > 0 or block.settings.social_tw.size > 0 or block.settings.social_inst.size > 0 or block.settings.social_pin.size > 0 or block.settings.social_gplus.size > 0 or block.settings.social_yt.size > 0  or block.settings.social_link.size > 0 or block.settings.social_vim.size > 0 or block.settings.social_flic.size > 0 %}
+                  <div class="foot-item-social">
+                    <ul class="default">
+                      {% if block.settings.social_fb.size > 0 %}
+                        <li class="fb"><a href="{{ block.settings.social_fb }}" title="Facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if block.settings.social_tw.size > 0 %}
+                        <li class="tw"><a href="{{ block.settings.social_tw }}" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if block.settings.social_inst.size > 0 %}
+                        <li class="inst"><a href="{{ block.settings.social_inst }}" title="Instagram"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if block.settings.social_pin.size > 0 %}
+                        <li class="pin"><a href="{{ block.settings.social_pin }}" title="Pinterest"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if block.settings.social_gplus.size > 0 %}
+                        <li class="gplus"><a href="{{ block.settings.social_gplus }}" title="Google-Plus"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if block.settings.social_link.size > 0 %}
+                        <li class="linkedin"><a href="{{ block.settings.social_link }}" title="Linkedin"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if block.settings.social_vim.size > 0 %}
+                        <li class="vimeo"><a href="{{ block.settings.social_vim }}" title="Vmeo"><i class="fa fa-vimeo-square" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if block.settings.social_flic.size > 0 %}
+                        <li class="flickr"><a href="{{ block.settings.social_flic }}" title="Flickr"><i class="fa fa-flickr" aria-hidden="true"></i></a></li>
+                      {% endif %}
+
+                      {% if block.settings.social_yt.size > 0 %}
+                        <li class="yt"><a href="{{ block.settings.social_yt }}" title="Youtube"><i class="fa fa-youtube" aria-hidden="true"></i></a></li> 
+                      {% endif %}
+                    </ul>
+                  </div>
+                {% endif %}
+               </div>
+              </div>
+            </div> 
+            {% when 'divider' %}
+            <div class="footer-item grid__item large--{{ block.settings.column-divider }}">
+              <div class="footer-item-diveder {{ item_class }}">
+              </div>
+            </div>   
+            {% endcase %} 
+        {% endfor %}
+
+      </div>
+
+    </div>
+
+  </div>
+
+  {% if section.settings.powered_toggle or section.settings.payment_icons_toggle %}
+    {% if section.settings.bottom_pannel_color.size > 0 and section.settings.bottom_pannel_color != 'rgba(0,0,0,0)' %}
+      {% capture bottom_pannel_style %}style="background: {{ section.settings.bottom_pannel_color }};"{% endcapture %}
+    {% endif %}
+
+    <div class="footer-row-2 {% if section.settings.bottom_inverted %} bottom_inverted{% endif %}" {{ bottom_pannel_style }}> 
+      <div class="wrapper">
+        <div class="grid footer-main">
+          {% if section.settings.powered_toggle %}
+            {% if section.settings.payment_icons_toggle %}
+              <div class="footer-wrap-2 footer-left grid__item large--one-half">
+                ©{{ shop.name }}. {{ powered_by_link }}
+              </div>
+            {% else %}  
+              <div class="footer-wrap-2 footer-center">
+                ©{{ shop.name }}. {{ powered_by_link }}
+              </div>
+            {% endif %}
+          {% endif %}
+
+          {% if section.settings.payment_icons_toggle %}
+            {% assign payment_icons = 'cc-amex|cc-diners-club|cc-discover|cc-jcb|cc-mastercard|cc-paypal|cc-stripe|cc-visa|google-wallet' | split: '|' %}
+
+            <div class="footer-wrap-2 footer-right grid__item large--one-half">
+              <ul class="footer-payments">
+                {% for i in payment_icons %}
+                  {% if section.settings[i] %}
+                    <li><i class="fa fa-{{ i }}" aria-hidden="true"></i></li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</footer>
+
+{% if section.settings.padding_top.size > 0 %}
+<style>
+  #shopify-section-footer footer .with-bg {padding: {{ section.settings.padding_top }}px;}
+</style>
+{% endif %}
+  
+{% schema %}
+{
+  "name": "Footer",
+  "max_blocks": 12,
+  "settings": [
+
+    // POWERED BY /////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "header",
+      "content": "'Powered by Shopify' link"
+    },
+    {
+      "type": "checkbox",
+      "id": "powered_toggle",
+      "label": "Show 'Powered by Shopify'",
+      "default": true
+    },
+
+    // PAYMENT ICONS //////////////////////////////////////////////////////////////////////////
+    {
+      "type": "header",
+      "content": "Payment icons"
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_icons_toggle",
+      "label": "Show payment icons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "cc-amex",
+      "label": "American Express"
+    },
+    {
+      "type": "checkbox",
+      "id": "cc-diners-club",
+      "label": "Diners Club"
+    },
+    {
+      "type": "checkbox",
+      "id": "cc-discover",
+      "label": "Discover"
+    },
+    {
+      "type": "checkbox",
+      "id": "cc-jcb",
+      "label": "JCB"
+    },
+    {
+      "type": "checkbox",
+      "id": "cc-mastercard",
+      "label": "Mastercard"
+    },
+    {
+      "type": "checkbox",
+      "id": "cc-paypal",
+      "label": "Paypal"
+    },
+    {
+      "type": "checkbox",
+      "id": "cc-stripe",
+      "label": "Stripe"
+    },
+    {
+      "type": "checkbox",
+      "id": "cc-visa",
+      "label": "Visa"
+    },
+    {
+      "type": "checkbox",
+      "id": "google-wallet",
+      "label": "Google Wallet"
+    }
+  ],
+  "blocks": [
+
+
+    // LINKLIST ///////////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "linklist",
+      "name": "Linklist",
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "links",
+          "label": "Choose linklist"
+        },
+        {
+           "type": "select",
+           "id": "column-link",
+           "options": [
+              { "value": "one-whole", "label": "one-whole"},
+              { "value": "one-half", "label": "one-half"},
+              { "value": "one-third", "label": "one-third"},
+              { "value": "one-quarter", "label": "one-quarter"}
+           ],
+            "label": {
+              "de": "Spaltenbreite",
+              "en": "Column Width",
+              "es": "Ancho de columna",
+              "fr": "Largeur de colonne",
+              "it": "Larghezza della colonna",
+              "ja": "列幅",
+              "pt-BR": "Largura da coluna"
+            }
+        }
+      ]
+    },
+        // prod-list ///////////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "prod-list",
+      "name": "Product List",
+      "settings": [
+        {
+          "type": "text",
+          "id": "prod_title",
+          "label": {
+            "de": "Überschrift",
+            "en": "Heading",
+            "es": "Título",
+            "fr": "Titre",
+            "it": "Heading",
+            "ja": "見出し",
+            "pt-BR": "Título"
+          },
+          "default": {
+            "de": "Beliebte Produkt",
+            "en": "Popular Product",
+            "es": "Producto popular",
+            "fr": "Produit populaire",
+            "it": "Prodotto popolare",
+            "ja": "人気商品",
+            "pt-BR": "Produto Popular"
+          }
+        },
+        {
+          "id": "prod_collection",
+          "type": "collection",
+            "label": {
+              "de": "Kategorie",
+              "en": "Collection",
+              "es": "colección",
+              "fr": "Collection",
+              "it": "collezione",
+              "ja": "コレクション",
+              "pt-BR": "Coleção"
+            }
+          },
+        {
+          "type": "range",
+          "id": "prod_limit",
+          "label": {
+            "de": "Unid",
+            "en": "Items",
+            "es": "Artículos",
+            "fr": "Articles",
+            "it": "Elementi",
+            "ja": "アイテム",
+            "pt-BR": "Unid"
+          },
+          "min": 1,
+          "max": 3,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "checkbox",
+          "id": "product_vendor_enable",
+          "label": {
+            "de": "Anbieter anzeigen",
+            "en": "Show vendor",
+            "es": "Mostrar vendedor",
+            "fr": "Afficher le vendeur",
+            "it": "Mostra venditore",
+            "ja": "ベンダーを表示",
+            "pt-BR": "Mostrar vendedor"
+          },
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "show_view_all",
+          "label": {
+            "de": "Schaltfläche \"Alle anzeigen\" anzeigen",
+            "en": "Show 'View all' button",
+            "es": "Mostrar el botón 'Ver todo'",
+            "fr": "Afficher le bouton « Tout afficher »",
+            "it": "Mostra il pulsante \"Visualizza tutto\"",
+            "ja": "「すべて表示」ボタンを表示する",
+            "pt-BR": "Exibir botão 'Visualizar tudo'"
+          },
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "img_size",
+          "label": "Image size",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "medium",
+              "label": "Medium"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            }
+          ]
+        },
+        {
+           "type": "select",
+           "id": "column-prod",
+           "options": [
+              { "value": "one-whole", "label": "one-whole"},
+              { "value": "one-half", "label": "one-half"},
+              { "value": "one-third", "label": "one-third"},
+              { "value": "one-quarter", "label": "one-quarter"}
+           ],
+            "label": {
+              "de": "Spaltenbreite",
+              "en": "Column Width",
+              "es": "Ancho de columna",
+              "fr": "Largeur de colonne",
+              "it": "Larghezza della colonna",
+              "ja": "列幅",
+              "pt-BR": "Largura da coluna"
+            }
+        }
+      ]
+    },
+    // blog-list ///////////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "blog-list",
+      "name": "Blog List",
+      "settings": [
+        {
+          "type": "text",
+          "id": "blog_title",
+          "label": {
+            "de": "Überschrift",
+            "en": "Heading",
+            "es": "Título",
+            "fr": "Titre",
+            "it": "Heading",
+            "ja": "見出し",
+            "pt-BR": "Título"
+          },
+          "default": {
+            "de": "Blog",
+            "en": "Blog",
+            "es": "Blog",
+            "fr": "Blog",
+            "it": "Blog",
+            "ja": "ブログ",
+            "pt-BR": "Blog"
+          }
+        },
+        {
+          "id": "blog",
+          "type": "blog",
+          "label": {
+            "de": "Blog",
+            "en": "Blog",
+            "es": "Blog",
+            "fr": "Blog",
+            "it": "Blog",
+            "ja": "ブログ",
+            "pt-BR": "Blog"
+          }
+        },
+        {
+          "type": "range",
+          "id": "post_limit",
+          "label": {
+            "de": "Beiträge",
+            "en": "Posts",
+            "es": "publicaciones",
+            "fr": "Articles de blog",
+            "it": "articoli",
+            "ja": "投稿",
+            "pt-BR": "posts"
+          },
+          "min": 1,
+          "max": 3,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "checkbox",
+          "id": "blog_show_date",
+          "label": {
+            "de": "Datum anzeigen",
+            "en": "Show date",
+            "es": "Mostrar fecha",
+            "fr": "Afficher la date",
+            "it": "Mostra data",
+            "ja": "日付を表示する",
+            "pt-BR": "Exibir data"
+          },
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "blog_show_image",
+          "label": {
+            "de": "Titelbild anzeigen",
+            "en": "Show cover image",
+            "es": "Mostrar imagen de portada",
+            "fr": "Afficher l'image de couverture",
+            "it": "Mostra immagine di copertina",
+            "ja": "表紙画像を表示する",
+            "pt-BR": "Exibir imagem da capa"
+          },
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "show_view_all",
+          "label": {
+            "de": "Schaltfläche \"Alle anzeigen\" anzeigen",
+            "en": "Show 'View all' button",
+            "es": "Mostrar el botón 'Ver todo'",
+            "fr": "Afficher le bouton « Tout afficher »",
+            "it": "Mostra il pulsante \"Visualizza tutto\"",
+            "ja": "「すべて表示」ボタンを表示する",
+            "pt-BR": "Exibir botão 'Visualizar tudo'"
+          },
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "img_blog_size",
+          "label": "Image size",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "medium",
+              "label": "Medium"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            }
+          ]
+        },
+        {
+           "type": "select",
+           "id": "column-blog",
+           "options": [
+              { "value": "one-whole", "label": "one-whole"},
+              { "value": "one-half", "label": "one-half"},
+              { "value": "one-third", "label": "one-third"},
+              { "value": "one-quarter", "label": "one-quarter"}
+           ],
+            "label": {
+              "de": "Spaltenbreite",
+              "en": "Column Width",
+              "es": "Ancho de columna",
+              "fr": "Largeur de colonne",
+              "it": "Larghezza della colonna",
+              "ja": "列幅",
+              "pt-BR": "Largura da coluna"
+            }
+        }
+      ]
+    },
+
+    // ABOUT BLOCK /////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "about",
+      "name": "About block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "about_title",
+          "label": "Block title",
+          "default": "About"
+        },
+        {
+          "type": "image_picker",
+          "id": "footer_logo",
+          "label": "Footer logo",
+          "info": "Image size 100x60px"
+        },
+        {
+          "type": "richtext",
+          "id": "about_text",
+          "label": "About text"
+        },
+        {
+          "type": "header",
+          "content": "TOP SOCIAL BLOCK"
+        },
+        {
+          "type": "text",
+          "id": "social_fb",
+          "label": "Facebook"
+        },
+        {
+          "type": "text",
+          "id": "social_tw",
+          "label": "Twitter"
+        },
+        {
+          "type": "text",
+          "id": "social_inst",
+          "label": "Instagram"
+        },
+        {
+          "type": "text",
+          "id": "social_pin",
+          "label": "Pinterest"
+        },
+        {
+          "type": "text",
+          "id": "social_gplus",
+          "label": "Google+"
+        },
+        {
+          "type": "text",
+          "id": "social_link",
+          "label": "Linkedin"
+        },
+        {
+          "type": "text",
+          "id": "social_flic",
+          "label": "Flickr"
+        }, 
+         {
+          "type": "text",
+          "id": "social_vim",
+          "label": "Vimeo"
+        },     
+        {
+          "type": "text",
+          "id": "social_yt",
+          "label": "Youtube"
+        },
+        {
+           "type": "select",
+           "id": "column-about",
+           "options": [
+              { "value": "one-whole", "label": "one-whole"},
+              { "value": "one-half", "label": "one-half"},
+              { "value": "one-third", "label": "one-third"},
+              { "value": "one-quarter", "label": "one-quarter"}
+           ],
+            "label": {
+              "de": "Spaltenbreite",
+              "en": "Column Width",
+              "es": "Ancho de columna",
+              "fr": "Largeur de colonne",
+              "it": "Larghezza della colonna",
+              "ja": "列幅",
+              "pt-BR": "Largura da coluna"
+            }
+        }
+
+      ]
+    },
+
+    // NEWSLETTER ///////////////////////////////////////////////////////////////////////////////////////////
+    {
+      "type": "newsletter",
+      "name": "Newsletter",
+      "limit": 1,
+     "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": {
+        "de": "Überschrift",
+        "en": "Heading",
+        "es": "Título",
+        "fr": "Titre",
+        "it": "Heading",
+        "ja": "見出し",
+        "pt-BR": "Título"
+      },
+      "default": {
+        "de": "Unseren Newsletter abonnieren",
+        "en": "Subscribe to our newsletter",
+        "es": "Suscríbete a nuestro boletín de noticias",
+        "fr": "Inscription à notre newsletter",
+        "it": "Iscriviti alla nostra newsletter",
+        "ja": "ストアからのお知らせを受け取る",
+        "pt-BR": "Receber nosso newsletter"
+      }
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": {
+        "de": "Untertitel",
+        "en": "Subheading",
+        "es": "Subtítulo",
+        "fr": "Sous-titre",
+        "it": "Sottotitolo",
+        "ja": "小見出し",
+        "pt-BR": "Subtítulo"
+      },
+      "default": {
+        "de": "<p>Ein kurzer Satz, der beschreibt, was jemand abonniert</p>",
+        "en": "<p>A short sentence describing what someone will receive by subscribing</p>",
+        "es": "<p>Una frase corta que describe lo que alguien recibirá al suscribirse</p>",
+        "fr": "<p>Une courte phrase décrivant ce que quelqu'un recevra en s'abonnant</p>",
+        "it": "<p>Una breve frase che descrive ciò che qualcuno riceverà effettuando l'iscrizione</p>",
+        "ja": "<p>メルマガ購読者に向けたメッセージを入れましょう</p>",
+        "pt-BR": "<p>Uma frase curta que descreve o que alguém receberá ao assinar</p>"
+      }
+    },
+    {
+       "type": "select",
+       "id": "column-news",
+       "options": [
+          { "value": "one-whole", "label": "one-whole"},
+          { "value": "one-half", "label": "one-half"},
+          { "value": "one-third", "label": "one-third"},
+          { "value": "one-quarter", "label": "one-quarter"}
+       ],
+        "label": {
+          "de": "Spaltenbreite",
+          "en": "Column Width",
+          "es": "Ancho de columna",
+          "fr": "Largeur de colonne",
+          "it": "Larghezza della colonna",
+          "ja": "列幅",
+          "pt-BR": "Largura da coluna"
+        }
+    },
+    {
+      "type": "paragraph",
+      "content": {
+        "de": "Für alle Kunden, die sich anmelden, wird in Shopify ein Konto erstellt. [Kunden anzeigen](/admin/customers?query=&accepts_marketing=1)",
+        "en": "Any customers who sign up will have an account created for them in Shopify. [View customers](/admin/customers?query=&accepts_marketing=1)",
+        "es": "Todos los clientes que se registren tendrán una cuenta creada para ellos en Shopify. [Ver clientes](/admin/customers?query=&accepts_marketing=1)",
+        "fr": "Les clients qui s'inscrivent auront un compte créé pour eux dans Shopify. [Afficher les clients](/admin/customers?query=&accepts_marketing=1)",
+        "it": "Qualsiasi cliente che si iscrive avrà un account creato appositamente per lui su Shopify. [Visualizza clienti](/admin/customers?query=&accepts_marketing=1)",
+        "ja": "サインアップしたお客様は、Shopifyでアカウントが作成されます。[お客様を表示](/admin/customers?query=&accepts_marketing=1)",
+        "pt-BR": "Todos os clientes que se inscreverem terão uma conta criada para eles na Shopify. [View customers](/admin/customers?query=&accepts_marketing=1)"
+      }
+    }
+  ]
+  },
+  // divider BLOCK /////////////////////////////////////////////////////////////////////////////////
+  {
+    "type": "divider",
+    "name": "Divider block",
+    "settings": [
+      {
+        "type": "select",
+        "id": "column-divider",
+        "options": [
+          { "value": "one-whole", "label": "one-whole"},
+          { "value": "one-half", "label": "one-half"},
+          { "value": "one-third", "label": "one-third"},
+          { "value": "one-quarter", "label": "one-quarter"}
+        ],
+        "label": {
+          "de": "Spaltenbreite",
+          "en": "Column Width",
+          "es": "Ancho de columna",
+          "fr": "Largeur de colonne",
+          "it": "Larghezza della colonna",
+          "ja": "列幅",
+          "pt-BR": "Largura da coluna"
+        }
+      }
+    ]
+  },
+  // CONTACTS BLOCK /////////////////////////////////////////////////////////////////////////////////
+  {
+    "type": "contacts",
+    "name": "Contacts block",
+    "limit": 1,
+    "settings": [
+      {
+        "type": "text",
+        "id": "contacts_title",
+        "label": "Block title"
+      },
+      {
+        "type": "text",
+        "id": "contacts_name",
+        "label": "Contacts name"
+      },
+      {
+        "type": "text",
+        "id": "contacts_address",
+        "label": "Contacts address"
+      },
+      {
+        "type": "text",
+        "id": "contacts_phone",
+        "label": "Contacts phone"
+      },
+      {
+        "type": "text",
+        "id": "contacts_email",
+        "label": "Contacts email"
+      },
+      {
+        "type": "text",
+        "id": "contacts_time",
+        "label": "Contacts time"
+      },
+      {
+         "type": "select",
+         "id": "column-contact",
+         "options": [
+            { "value": "one-whole", "label": "one-whole"},
+            { "value": "one-half", "label": "one-half"},
+            { "value": "one-third", "label": "one-third"},
+            { "value": "one-quarter", "label": "one-quarter"}
+         ],
+          "label": {
+            "de": "Spaltenbreite",
+            "en": "Column Width",
+            "es": "Ancho de columna",
+            "fr": "Largeur de colonne",
+            "it": "Larghezza della colonna",
+            "ja": "列幅",
+            "pt-BR": "Largura da coluna"
+          }
+      }
+    ]
+  }
+  ]
+}
+{% endschema %}
+{% javascript %}
+(function($) {
+
+ var footFlag = 0;
+   footToggle = function() {
+    if ( $(window).width() > 991 ) {
+      $('#shopify-section-footer .footer_trigger').removeClass('active');
+      footFlag = 0;
+    }
+    else {
+      if ( footFlag == 0 ) {
+       footMobile();
+        footFlag = 1;
+      };
+    };
+  };
+  footMobile = function() {
+    $('#shopify-section-footer .footer_trigger').on('click', function() {
+
+      var targetFoot = '#' + $(this).data('subfoot');
+
+      $(targetFoot).slideToggle(300);
+
+      $(this).toggleClass('active');
+
+      return false;
+    });
+
+  };
+  $(window).on('load resize', function() {
+    footToggle();
+  });
+
+  $(document).ready(function() {
+    footToggle();
+  });
+  
+})(jQuery);
+{% endjavascript %}
